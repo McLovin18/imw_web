@@ -47,7 +47,7 @@ export function Loading3DIcon() {
           style={{ transformStyle: "preserve-3d" }}
         >
           <Image
-            src="/atlas_logo.png"
+            src="/imw-light.png"
             alt="Balde de la marca"
             fill
             className="object-contain drop-shadow-[0_18px_22px_rgba(0,0,0,0.30)]"
@@ -69,7 +69,7 @@ export function Loading3DIcon() {
           uppercase
           text-black
         ">
-          ATLAS
+          IMW
         </span>
 
         <div className="flex gap-1.5 mt-3 items-center">

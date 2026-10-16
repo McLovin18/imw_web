@@ -187,24 +187,6 @@ const Footer: React.FC = () => {
                 ))}
               </ul>
             </div>
-
-            <div className={styles.ftCol}>
-              <h3 className={styles.ftColTitle} style={{ color: "var(--text)" }}>Nuestras políticas</h3>
-              <ul className={styles.ftList}>
-                {policyLinks.map(({ href, label }) => (
-                  <li key={label}>
-                    <Link
-                      href={href}
-                      className={styles.ftLink}
-                      style={{ color: "var(--textSecondary)" }}
-                      onClick={() => trackLinkClick().catch(console.error)}
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
 
           {/* Redes sociales centradas */}
@@ -227,15 +209,6 @@ const Footer: React.FC = () => {
           </ul>
 
           <div className={styles.ftDivider} style={{ background: softBorder }} />
-
-          {/* Métodos de pago */}
-          <div className={styles.ftPayments}>
-            <PayVisa />
-            <PayMastercard />
-            <PayAmex />
-            <PayDiners />
-            <PayMaestro />
-          </div>
 
           {/* Copyright + créditos */}
           <div className={styles.ftCopyRow}>

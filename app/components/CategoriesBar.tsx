@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { db } from "../lib/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 import {
   mapCategorySnapshot,
   sortCategoriasByOrder,
@@ -23,11 +23,12 @@ const CategoriesBar = () => {
   const [categorias, setCategorias] = useState<any[]>([]);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "categorias"), (snap) => {
-      setCategorias(sortCategoriasByOrder(mapCategorySnapshot(snap.docs)));
-    });
-
-    return () => unsub();
+    const loadCategorias = async () => {
+      const { obtenerCategorias } = await import("../lib/categorias-db");
+      const cats = await obtenerCategorias();
+      setCategorias(cats);
+    };
+    loadCategorias();
   }, []);
 
 

@@ -10,6 +10,8 @@ import {
   writeBatch,
   query,
   where,
+  limit,
+  orderBy,
   Timestamp,
 } from "firebase/firestore";
 import type { Blog } from "./blog-types";
@@ -17,7 +19,7 @@ import type { Blog } from "./blog-types";
 const COLLECTION = "blogs";
 
 export async function getAllBlogsAdmin(): Promise<Blog[]> {
-  const snap = await getDocs(collection(db, COLLECTION));
+  const snap = await getDocs(query(collection(db, COLLECTION), limit(50)));
   const blogs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Blog[];
   return blogs.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
 }

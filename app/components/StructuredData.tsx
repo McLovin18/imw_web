@@ -4,37 +4,38 @@
  */
 
 export function StructuredData() {
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://marcaestilo.com";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://imw_ec.com";
 
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Marca Estilo",
+    name: "IMW - In My Wardrobe",
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`,
-    description: "Tienda online de camisetas para hombre en Ecuador",
+    description: "Tienda online de perfumes originales importados desde USA",
     sameAs: [
-      "https://www.instagram.com/marcaestilo593/",
-      "https://www.tiktok.com/@marcaestilomen",
+      "https://www.instagram.com/imw_ec/",
+      "https://www.facebook.com/imw_ec",
+      "https://www.tiktok.com/@imw_ec",
     ],
     address: {
       "@type": "PostalAddress",
       addressCountry: "EC",
-      addressLocality: "Quito", // Ajusta según tu ubicación
-      postalCode: "170103",
-      streetAddress: "Tu dirección aquí", // Actualiza
+      addressLocality: "Guayaquil",
+      postalCode: "090XXX",
+      streetAddress: "Tu dirección aquí",
     },
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "Customer Service",
-      telephone: "+593-XXX-XXXX", // Actualiza
+      telephone: "+593-968-514-889",
     },
   };
 
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Marca Estilo",
+    name: "IMW - In My Wardrobe",
     url: SITE_URL,
     potentialAction: {
       "@type": "SearchAction",
@@ -48,20 +49,20 @@ export function StructuredData() {
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
-    "@type": "ClothingStore",
-    name: "Marca Estilo",
+    "@type": "Store",
+    name: "IMW - In My Wardrobe",
     image: `${SITE_URL}/logo.png`,
     description:
-      "Tienda online de camisetas para hombre con envíos a todo Ecuador",
+      "Tienda online de perfumes originales importados desde USA con envíos a todo Ecuador",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Tu dirección aquí",
-      addressLocality: "Quito",
-      addressRegion: "Pichincha",
-      postalCode: "170103",
+      addressLocality: "Guayaquil",
+      addressRegion: "Guayas",
+      postalCode: "090XXX",
       addressCountry: "EC",
     },
-    telephone: "+593-XXX-XXXX",
+    telephone: "+593-968-514-889",
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],

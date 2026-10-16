@@ -8,7 +8,7 @@ const sections = [
   {
     number: "01",
     title: "Responsable del Tratamiento de Datos",
-    body: "Importadora Atlas, Tienda de tecnología. Domiciliada en Ecuador. Correo para temas de privacidad: importaciones.Atlas@hotmail.com — WhatsApp: +593 98 280 4800.",
+    body: "IMW - In My Wardrobe. Tienda online de perfumes. Domiciliada en Ecuador. Correo para temas de privacidad: imw_ec@gmail.com — WhatsApp: 0968514889.",
   },
   {
     number: "02",
@@ -17,23 +17,23 @@ const sections = [
   },
   {
     number: "03",
-    title: "Pagos con Tarjeta — Datafast",
-    body: "Para tu seguridad, NO almacenamos los datos de tu tarjeta. Todos los pagos online son procesados directamente por Datafast S.A., pasarela certificada bajo estándar PCI DSS Nivel 1. Tus datos viajan cifrados hacia Datafast sin pasar por nuestros servidores. Solo recibimos confirmación de pago aprobado y los últimos 4 dígitos. Si eliges guardar tarjeta, Datafast usa tokenización segura.",
+    title: "Pagos",
+    body: "Para tu seguridad, NO almacenamos los datos de tu tarjeta. Los pagos se coordinan directamente por WhatsApp o transferencia bancaria. Solo procesamos la confirmación de pago y los datos necesarios para la entrega.",
   },
   {
     number: "04",
     title: "Pedidos por WhatsApp",
-    body: "Al escribirnos al +593 98 280 4800, nos autorizas a usar tu número, nombre y el contenido del chat únicamente para: cotizar y procesar tu pedido, enviarte el estado de tu compra y guía de envío, y darte soporte post-venta. No usaremos tu número para publicidad sin tu consentimiento. Puedes pedir que eliminemos la conversación cuando quieras.",
+    body: "Al escribirnos al 0968514889, nos autorizas a usar tu número, nombre y el contenido del chat únicamente para: cotizar y procesar tu pedido, enviarte el estado de tu compra y guía de envío, y darte soporte post-venta. No usaremos tu número para publicidad sin tu consentimiento. Puedes pedir que eliminemos la conversación cuando quieras.",
   },
   {
     number: "05",
     title: "Con quién compartimos tus datos",
-    body: "Solo compartimos lo mínimo necesario con: Datafast S.A. para procesar pagos; empresas de courier como Servientrega o Tramaco para entregar tu pedido; el SRI para emitir tu factura electrónica; Meta/Facebook y Google solo si aceptas cookies para mostrarte anuncios relevantes; y nuestro proveedor de hosting para que la web funcione. No vendemos ni alquilamos tus datos personales a nadie.",
+    body: "Solo compartimos lo mínimo necesario con: empresas de courier como Servientrega para entregar tu pedido; el SRI para emitir tu factura electrónica; Meta/Facebook y Google solo si aceptas cookies para mostrarte anuncios relevantes; y nuestro proveedor de hosting para que la web funcione. No vendemos ni alquilamos tus datos personales a nadie.",
   },
   {
     number: "06",
     title: "Tus Derechos ARCO",
-    body: "Tienes derecho a: Acceso (saber qué datos tenemos tuyos), Rectificación (corregir datos incorrectos), Cancelación (eliminar tu cuenta y datos) y Oposición (que no usemos tus datos para marketing). Escríbenos a importaciones.Atlas@hotmail.com con tu cédula y solicitud. Responderemos dentro de los plazos establecidos por la normativa ecuatoriana.",
+    body: "Tienes derecho a: Acceso (saber qué datos tenemos tuyos), Rectificación (corregir datos incorrectos), Cancelación (eliminar tu cuenta y datos) y Oposición (que no usemos tus datos para marketing). Escríbenos a imw_ec@gmail.com con tu cédula y solicitud. Responderemos dentro de los plazos establecidos por la normativa ecuatoriana.",
   },
   {
     number: "07",
@@ -430,7 +430,7 @@ const PoliticaPrivacidad: React.FC = () => {
               POLÍTICA DE<br /><span>PRIVACIDAD</span>
             </h1>
             <p className="pp-subtitle">
-              En Importadora Atlas protegemos tu información personal. Aquí te explicamos con transparencia cómo recopilamos y usamos tus datos.
+              En IMW - In My Wardrobe protegemos tu información personal. Aquí te explicamos con transparencia cómo recopilamos y usamos tus datos.
             </p>
             <p className="pp-date">Última actualización: 01 de Octubre de 2026</p>
             <div className="pp-divider" />
@@ -460,13 +460,13 @@ const PoliticaPrivacidad: React.FC = () => {
                     <p className="pp-contact-desc">
                       Escríbenos para cualquier consulta sobre privacidad o ejercer tus derechos ARCO.
                     </p>
-                    <a href="mailto:importaciones.Atlas@hotmail.com" className="pp-btn">
-                      importaciones.Atlas@hotmail.com
+                    <a href="mailto:imw_ec@gmail.com" className="pp-btn">
+                      imw_ec@gmail.com
                     </a>
                   </div>
                   <div style={{ fontSize: "12px", color: "#3a3750", textAlign: "right", lineHeight: 1.8 }}>
                     <div style={{ color: "#5a5570", marginBottom: 4 }}>WhatsApp</div>
-                    <div style={{ color: "#dcb432", fontWeight: 600 }}>+593 98 280 4800</div>
+                    <div style={{ color: "#dcb432", fontWeight: 600 }}>0968514889</div>
                   </div>
                 </div>
               </div>
@@ -488,12 +488,12 @@ const PoliticaPrivacidad: React.FC = () => {
 
           {/* CONSENT NOTE */}
           <div className="pp-consent">
-            Al usar <strong>importadoratlas.com</strong> y marcar la casilla <strong>"Acepto la Política de Privacidad"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley Orgánica de Protección de Datos Personales de Ecuador</strong>.
+            Al usar <strong>imw_ec</strong> y marcar la casilla <strong>"Acepto la Política de Privacidad"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley Orgánica de Protección de Datos Personales de Ecuador</strong>.
           </div>
 
           {/* FOOTER */}
           <div className="pp-footer">
-            <p>Gracias por confiar en Importadora Atlas. Tu privacidad es lo primero.</p>
+            <p>Gracias por confiar en IMW - In My Wardrobe. Tu privacidad es lo primero.</p>
             <Link href="/">← Volver al inicio</Link>
           </div>
         </div>

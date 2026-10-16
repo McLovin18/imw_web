@@ -2,7 +2,14 @@
 
 import React from "react";
 
-const WhatsAppFloatingButton: React.FC = () => {
+interface WhatsAppFloatingButtonProps {
+  phoneNumber: string;
+  message?: string;
+}
+
+const WhatsAppFloatingButton: React.FC<WhatsAppFloatingButtonProps> = ({ phoneNumber, message = "Hola, quiero información" }) => {
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
   return (
     <>
       <style>{`
@@ -109,10 +116,10 @@ const WhatsAppFloatingButton: React.FC = () => {
       `}</style>
 
       <a
-        href="https://wa.me/593968517232"
+        href={whatsappUrl}
         target="_blank"
         rel="noreferrer"
-        aria-label="WhatsApp Marca Estilo"
+        aria-label="WhatsApp IMW"
         className="wa-float"
       >
         <div className="wa-wrap">

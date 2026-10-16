@@ -5,20 +5,27 @@ import {
   setDoc,
   doc,
   deleteDoc,
-  onSnapshot
+  onSnapshot,
+  query,
+  orderBy
 } from "firebase/firestore";
 
 const COLLECTION = "marcas";
 
 export async function obtenerMarcas() {
-  const snapshot = await getDocs(collection(db, COLLECTION));
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const snapshot = await getDocs(
+    query(collection(db, COLLECTION), orderBy("nombre", "asc"))
+  );
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
 }
 
-export async function guardarMarca(nombre) {
+export async function guardarMarca(nombre: string) {
   await setDoc(doc(db, COLLECTION, nombre.toLowerCase().replace(/\s+/g, "_")), { nombre });
 }
 
-export async function eliminarMarca(id) {
+export async function eliminarMarca(id: string) {
   await deleteDoc(doc(db, COLLECTION, id));
 }

@@ -44,9 +44,13 @@ function getTodayDate(): string {
  */
 export async function trackPageView(): Promise<void> {
   try {
+    // Temporarily disabled due to Firebase configuration issues
+    console.log("[Analytics] Tracking temporarily disabled");
+    return;
+
     const deviceId = getOrCreateDeviceId();
     console.log("[Analytics] Tracking page view for device:", deviceId);
-    
+
     const response = await fetch(API_TRACK_URL, {
       method: "POST",
       headers: {
@@ -78,9 +82,13 @@ export async function trackClick(
   type: "productClick" | "categoryClick" | "buttonClick" | "linkClick" | "blogClick" = "buttonClick"
 ): Promise<void> {
   try {
+    // Temporarily disabled due to Firebase configuration issues
+    console.log("[Analytics] Click tracking temporarily disabled");
+    return;
+
     const deviceId = getOrCreateDeviceId();
     console.log("[Analytics] Tracking click:", { type, deviceId });
-    
+
     const response = await fetch(API_TRACK_URL, {
       method: "POST",
       headers: {

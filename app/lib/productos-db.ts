@@ -1,3 +1,19 @@
+import { db } from "./firebase";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  onSnapshot,
+  orderBy,
+  limit
+} from "firebase/firestore";
+
 // Tipos
 export interface StockVariant {
   talla?: string;
@@ -135,19 +151,6 @@ export async function obtenerProductosPorSubsubcategoria(subsubcategoria, subcat
   if (excludeId) productos = productos.filter(p => p.id !== excludeId);
   return productos;
 }
-import { db } from "./firebase";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  getDoc,
-  doc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  onSnapshot
-} from "firebase/firestore";
 
 const COLLECTION = "productos";
 
@@ -210,12 +213,14 @@ export async function crearProducto(producto: Producto): Promise<Producto> {
 
 // Obtener todos los productos
 // Si opts.incluirSinStock es true, no filtra por stock (solo para admin/inventario)
+// Si opts.limit es un número, limita la cantidad de resultados
 export async function obtenerProductos(opts = {}) {
-  const snapshot = await getDocs(collection(db, COLLECTION));
+  const limitValue = opts.limit || 100; // Límite por defecto para evitar lentitud
+  const snapshot = await getDocs(query(collection(db, COLLECTION), limit(limitValue)));
   let productos = snapshot.docs.map(doc => {
     const data = doc.data();
     const producto = { id: doc.id, ...data };
-    
+
     // Normalizar createdAt: si no existe, intentar usar fechaCreacion o asignar 0
     if (!producto.createdAt) {
       if (data.fechaCreacion && typeof data.fechaCreacion.toMillis === 'function') {
@@ -228,10 +233,10 @@ export async function obtenerProductos(opts = {}) {
         producto.createdAt = 0;
       }
     }
-    
+
     return producto;
   });
-  
+
   return filtrarProductosConStock(productos, opts);
 }
 
@@ -252,18 +257,8 @@ export async function obtenerProductosPorCategoria(categoria, opts = {}) {
     return { id: doc.id, ...data };
   });
 
-  // Si no hay resultados con el ID exacto, buscar en toda la colección
-  // (productos legacy pueden tener guardado el nombre en vez del id)
-  if (productos.length === 0) {
-    const allSnap = await getDocs(collection(db, COLLECTION));
-    const needle = categoriaNorm.toLowerCase();
-    productos = allSnap.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter(
-        (p) =>
-          String(p.categoria || "").trim().toLowerCase() === needle
-      );
-  }
+  // NO hacer consulta legacy - era extremadamente lenta
+  // Si no hay resultados, devolver array vacío
 
   return filtrarProductosConStock(productos, opts);
 }
@@ -289,7 +284,8 @@ export async function eliminarProducto(id: string): Promise<void> {
 
 // Obtener productos destacados
 export async function obtenerProductosDestacados(opts = {}) {
-  const q = query(collection(db, COLLECTION), where("destacado", "==", true));
+  const limitValue = opts.limit || 20;
+  const q = query(collection(db, COLLECTION), where("destacado", "==", true), limit(limitValue));
   const snapshot = await getDocs(q);
   let productos = snapshot.docs.map(doc => {
     const data = doc.data();

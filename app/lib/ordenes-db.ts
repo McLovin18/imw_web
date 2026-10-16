@@ -8,6 +8,7 @@ import {
   updateDoc,
   query,
   where,
+  limit,
   Timestamp,
   runTransaction,
   increment,
@@ -147,7 +148,7 @@ export async function obtenerOrdenesPorUsuario(uid) {
 
 // Admin: obtener todas las órdenes
 export async function obtenerTodasOrdenes() {
-  const snapshot = await getDocs(collection(db, COLLECTION));
+  const snapshot = await getDocs(query(collection(db, COLLECTION), limit(100)));
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 

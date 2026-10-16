@@ -11,8 +11,9 @@ import {
   mapCategorySnapshot,
   sortCategoriasByOrder,
   sameCategoryId,
+  obtenerCategorias,
 } from "../lib/categorias-db";
-import { collection, query, onSnapshot } from "firebase/firestore";
+import { collection, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export default function SearchResultsPage() {
@@ -21,7 +22,7 @@ export default function SearchResultsPage() {
   const categoriaId = (searchParams?.get("cat") || searchParams?.get("category") || "").trim();
   const isLogger = useUser();
 
-  const [productos, setProductos] = useState([]);
+  const [productos, setProductos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState(queryParam);
@@ -29,7 +30,7 @@ export default function SearchResultsPage() {
   const [precioMax, setPrecioMax] = useState("");
   const [orden, setOrden] = useState("price-high");
   const [marca, setMarca] = useState("");
-  const [marcas, setMarcas] = useState([]);
+  const [marcas, setMarcas] = useState<(string | undefined)[]>([]);
   const [categorias, setCategorias] = useState<any[]>([]);
   const categoriesScrollRef = useRef<HTMLDivElement>(null);
 
@@ -48,14 +49,11 @@ export default function SearchResultsPage() {
 
   // 🔥 Cargar categorías
   useEffect(() => {
-    const categoriasRef = collection(db, "categorias");
-    const q = query(categoriasRef);
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setCategorias(sortCategoriasByOrder(mapCategorySnapshot(snapshot.docs)));
-    });
-
-    return () => unsubscribe();
+    const loadCategorias = async () => {
+      const cats = await obtenerCategorias();
+      setCategorias(cats);
+    };
+    loadCategorias();
   }, []);
 
   // 🔥 Filtrado

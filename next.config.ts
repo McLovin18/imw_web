@@ -92,10 +92,10 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "geolocation=(), microphone=(), camera=()",
           },
-          // Content Security Policy para permitir Datafast, Firebase y Google Analytics
+          // Content Security Policy para permitir Firebase y Google Analytics
           {
             key: "Content-Security-Policy",
-            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://* blob:; worker-src 'self' blob:; frame-src 'self' https://eu-test.oppwa.com https://test.oppwa.com; connect-src 'self' https://eu-test.oppwa.com https://test.oppwa.com https://firestore.googleapis.com https://www.google-analytics.com https://www.google.com;",
+            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://* blob:; worker-src 'self' blob:; frame-src 'self'; connect-src 'self' https://firestore.googleapis.com https://firebasestorage.googleapis.com https://www.google-analytics.com https://www.google.com https://identitytoolkit.googleapis.com https://firebase.googleapis.com https://securetoken.googleapis.com;",
           },
           // Cache headers para mejor rendimiento
           {

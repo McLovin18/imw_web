@@ -7,7 +7,8 @@ import {
   deleteDoc,
   onSnapshot,
   query,
-  orderBy
+  orderBy,
+  limit
 } from "firebase/firestore";
 
 const COLLECTION = "bodegas";
@@ -22,7 +23,7 @@ export interface Bodega {
 
 export async function obtenerBodegas(): Promise<Bodega[]> {
   const snapshot = await getDocs(
-    query(collection(db, COLLECTION), orderBy("nombre", "asc"))
+    query(collection(db, COLLECTION), orderBy("nombre", "asc"), limit(50))
   );
   return snapshot.docs.map(doc => ({
     id: doc.id,

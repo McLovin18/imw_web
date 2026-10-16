@@ -3,144 +3,148 @@
 
 :root {
   /* ============================================================
-     PALETA DE COLORES — Floristería
-     Fondo    #0A0A0A (negro, fijo por requerimiento del cliente)
-     Fern     #3A5A40  (verde botánico — hojas / tallos)
-     Terracota#8C4A3A  (acento floral apagado, sin caer en rosado)
-     Gold     #C9A227  (detalle premium — precios, líneas, hover)
-     Bone     #EDE7DA  (texto principal sobre negro)
-     Stone    #9C9488  (texto secundario)
-     Charcoal #1A1A1A  (superficies / cards sobre el negro puro)
+     PALETA DE COLORES — IMW (In My Wardrobe)
+     Negro Medianoche  #0B0D12  (fondo dark)
+     Azul Abismo       #1B2430  (superficies dark)
+     Gris Platino      #C0C1C4  (texto secundario dark)
+     Blanco Puro       #FFFFFF  (fondo light / texto dark)
+     Dorado Antiguo    #D4A933  (CTA y detalles de marca)
      ============================================================ */
 
-  /* --- Colores base de la paleta (para uso directo si se necesita) --- */
-  --color-black: #0a0a0a;
-  --color-fern: #3a5a40;
-  --color-terracota: #8c4a3a;
-  --color-gold: #c9a227;
-  --color-bone: #ede7da;
-  --color-stone: #9c9488;
-  --color-charcoal: #1a1a1a;
+  /* --- Colores base de la paleta --- */
+  --color-negro: #0b0d12;
+  --color-azul: #1b2430;
+  --color-platino: #c0c1c4;
+  --color-blanco: #ffffff;
+  --color-dorado: #d4a933;
 
-  /* --- Variantes derivadas (hover / active) --- */
-  --color-fern-dark: #2a4230;       /* fern oscurecido, hover en botones verdes */
-  --color-terracota-dark: #6f392c;  /* terracota oscurecido, hover en acentos florales */
-  --color-gold-dark: #a8871f;       /* gold oscurecido, hover en botones dorados */
-  --color-bone-dark: #d9d0ba;       /* bone oscurecido, hover sobre superficies claras */
-  --color-gold-muted: #4a3d1a;      /* gold muy oscurecido/desaturado — fondo navbar/footer, no compite con el negro */
-  --color-gold-muted-hover: #5c4c22; /* variante un poco más clara para hover/active sobre el navbar */
+  /* --- Variantes derivadas --- */
+  --color-azul-light: #25303f;      /* azul abismo aclarado, hover/superficies elevadas */
+  --color-azul-border: #2c3747;     /* bordes en dark */
+  --color-dorado-dark: #b8912a;     /* hover en botones dorados */
+  --color-dorado-text: #8a6a12;     /* dorado legible como texto sobre blanco */
+  --color-negro-deep: #07090d;      /* footer dark, más profundo que el fondo */
+  --color-gris-claro: #f1f2f4;      /* superficies light (derivado de platino) */
+  --color-gris-border: #d9dadd;     /* bordes en light */
+  --color-slate-text: #475264;      /* texto secundario light */
 
   /* --- Tipografía --- */
-  --font-body-family: "Open Sauce One", sans-serif;
+  --font-body-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
   --font-body-style: normal;
   --font-body-weight: 400;
   --font-body-weight-bold: 700;
 
-  --font-heading-family: "Open Sauce One", sans-serif;
+  --font-heading-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
   --font-heading-style: normal;
   --font-heading-weight: 700;
 
   --font-body-scale: 1.0;
   --font-heading-scale: 1.15;
 
-  /* --- Tipografía exclusiva del navbar --- */
-  --font-navbar-body-family: "Open Sauce One", sans-serif;
-  --font-navbar-heading-family: "Hagrid Text", serif;
+  /* --- Tipografía del navbar --- */
+  --font-navbar-body-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  --font-navbar-heading-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
 }
 
 /* --- Tema Oscuro (por defecto) --- */
 :root,
 .dark {
+  color-scheme: dark;
+
   /* --- Semántica --- */
-  --background: var(--color-black);
-  --foreground: var(--color-bone);
+  --background: var(--color-negro);
+  --foreground: var(--color-blanco);
 
-  --bg: var(--color-black);
-  --bgSecondary: var(--color-charcoal);
+  --bg: var(--color-negro);
+  --bgSecondary: var(--color-azul);
 
-  --text: var(--color-bone);
-  --textSecondary: var(--color-stone);
+  --text: var(--color-blanco);
+  --textSecondary: var(--color-platino);
 
-  --border: var(--color-charcoal);
+  --border: var(--color-azul-border);
 
-  --cardBg: var(--color-charcoal);
+  --cardBg: var(--color-azul);
 
   /* --- Colores de marca / acción --- */
-  --primary: var(--color-gold);
-  --primaryHover: var(--color-gold-dark);
-  --primaryForeground: var(--color-black);
+  --primary: var(--color-dorado);
+  --primaryHover: var(--color-dorado-dark);
+  --primaryForeground: var(--color-negro);
 
-  --secondary: var(--color-fern);
-  --secondaryHover: var(--color-fern-dark);
-  --secondaryForeground: var(--color-bone);
+  --secondary: var(--color-azul);
+  --secondaryHover: var(--color-azul-light);
+  --secondaryForeground: var(--color-blanco);
 
-  --accent: var(--color-terracota);
-  --accentForeground: var(--color-bone);
+  --accent: var(--color-dorado);
+  --accentForeground: var(--color-negro);
 
-  --muted: var(--color-charcoal);
-  --mutedForeground: var(--color-stone);
+  --muted: var(--color-azul);
+  --mutedForeground: var(--color-platino);
 
-  --card: var(--color-charcoal);
-  --cardForeground: var(--color-bone);
+  --card: var(--color-azul);
+  --cardForeground: var(--color-blanco);
 
-  --galleryImgBg: var(--color-charcoal);
-
-  /* --- Navbar / Footer (dorado oscurecido, no compite con el fondo negro) --- */
-  --navbarBg: var(--color-gold-muted);
-  --navbarBgHover: var(--color-gold-muted-hover);
-  --navbarText: var(--color-bone);
-  --navbarTextMuted: var(--color-gold);
-
-  --footerBg: var(--color-gold-muted);
-  --footerText: var(--color-bone);
-  --footerTextMuted: var(--color-stone);
-}
-
-/* --- Tema Claro --- */
-.light {
-  /* --- Semántica --- */
-  --background: #f8fafc !important;
-  --foreground: #0f172a !important;
-
-  --bg: #f8fafc !important;
-  --bgSecondary: #ffffff !important;
-
-  --text: #0f172a !important;
-  --textSecondary: #64748b !important;
-
-  --border: #e2e8f0 !important;
-
-  --cardBg: #ffffff !important;
-
-  /* --- Colores de marca / acción --- */
-  --primary: #3b82f6 !important;
-  --primaryHover: #2563eb !important;
-  --primaryForeground: #ffffff !important;
-
-  --secondary: var(--color-fern) !important;
-  --secondaryHover: var(--color-fern-dark) !important;
-  --secondaryForeground: var(--color-bone) !important;
-
-  --accent: var(--color-terracota) !important;
-  --accentForeground: var(--color-bone) !important;
-
-  --muted: #f1f5f9 !important;
-  --mutedForeground: #64748b !important;
-
-  --card: #ffffff !important;
-  --cardForeground: #0f172a !important;
-
-  --galleryImgBg: #f1f5f9 !important;
+  --galleryImgBg: var(--color-azul);
 
   /* --- Navbar / Footer --- */
-  --navbarBg: rgba(255, 255, 255, 0.8) !important;
-  --navbarBgHover: rgba(255, 255, 255, 0.95) !important;
-  --navbarText: #0f172a !important;
-  --navbarTextMuted: var(--color-gold) !important;
+  --navbarBg: rgba(11, 13, 18, 0.85);
+  --navbarBgHover: var(--color-azul);
+  --navbarText: var(--color-blanco);
+  --navbarTextMuted: var(--color-dorado);
 
-  --footerBg: #ffffff !important;
-  --footerText: #0f172a !important;
-  --footerTextMuted: #64748b !important;
+  --footerBg: var(--color-negro-deep);
+  --footerText: var(--color-blanco);
+  --footerTextMuted: var(--color-platino);
+}
+
+/* --- Tema Claro ---
+   Se activa con la clase .light o con data-theme="light" en <html> */
+.light,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* --- Semántica --- */
+  --background: var(--color-blanco) !important;
+  --foreground: var(--color-negro) !important;
+
+  --bg: var(--color-blanco) !important;
+  --bgSecondary: var(--color-gris-claro) !important;
+
+  --text: var(--color-negro) !important;
+  --textSecondary: var(--color-slate-text) !important;
+
+  --border: var(--color-gris-border) !important;
+
+  --cardBg: var(--color-blanco) !important;
+
+  /* --- Colores de marca / acción --- */
+  --primary: var(--color-dorado) !important;
+  --primaryHover: var(--color-dorado-dark) !important;
+  --primaryForeground: var(--color-negro) !important;
+
+  --secondary: var(--color-azul) !important;
+  --secondaryHover: var(--color-azul-light) !important;
+  --secondaryForeground: var(--color-blanco) !important;
+
+  --accent: var(--color-dorado-text) !important;
+  --accentForeground: var(--color-blanco) !important;
+
+  --muted: var(--color-gris-claro) !important;
+  --mutedForeground: var(--color-slate-text) !important;
+
+  --card: var(--color-blanco) !important;
+  --cardForeground: var(--color-negro) !important;
+
+  --galleryImgBg: var(--color-gris-claro) !important;
+
+  /* --- Navbar / Footer --- */
+  --navbarBg: rgba(255, 255, 255, 0.85) !important;
+  --navbarBgHover: rgba(255, 255, 255, 0.95) !important;
+  --navbarText: var(--color-negro) !important;
+  --navbarTextMuted: var(--color-dorado-text) !important;
+
+  --footerBg: var(--color-gris-claro) !important;
+  --footerText: var(--color-negro) !important;
+  --footerTextMuted: var(--color-slate-text) !important;
 }
 
 @theme inline {
@@ -172,6 +176,7 @@ body {
   overflow-x: hidden;
   max-width: 100vw;
   max-height: 100vh;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1,
@@ -200,7 +205,7 @@ select {
   font: inherit;
 }
 
-/* Mantener la tipografía original en el navbar y todos sus elementos internos */
+/* Mantener la tipografía del navbar y todos sus elementos internos */
 nav, nav * {
   font-family: var(--font-navbar-body-family);
 }
@@ -258,8 +263,6 @@ nav h6 {
   animation: loadingSteps 0.9s steps(4) infinite;
 }
 
-
-
 /* Evitar desbordamiento horizontal en móviles */
 html,
 body {
@@ -267,5 +270,3 @@ body {
   max-width: 100%;
   overflow-x: hidden;
 }
-
-

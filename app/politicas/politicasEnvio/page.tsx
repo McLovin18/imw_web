@@ -19,7 +19,7 @@ const sections = [
   {
     number: "03",
     title: "Tiempos de Entrega",
-    body: "Guayaquil: 1 a 2 días hábiles desde la confirmación del pago. Otras ciudades principales: 2 a 5 días hábiles. Ciudades secundarias: 3 a 7 días hábiles. Los tiempos se cuentan desde que Datafast confirma el pago. Pedidos realizados en fines de semana o feriados se procesan el siguiente día hábil.",
+    body: "Guayaquil: 1 a 2 días hábiles desde la confirmación del pago. Otras ciudades principales: 2 a 5 días hábiles. Ciudades secundarias: 3 a 7 días hábiles. Los tiempos se cuentan desde que se confirma el pago. Pedidos realizados en fines de semana o feriados se procesan el siguiente día hábil.",
     hasTable: true,
   },
   {
@@ -530,13 +530,13 @@ const PoliticasEnvio: React.FC = () => {
                     <p className="env-contact-desc">
                       Consultas sobre tu envío — escríbenos con tu número de pedido.
                     </p>
-                    <a href="mailto:importaciones.Atlas@hotmail.com" className="env-btn">
-                      importaciones.Atlas@hotmail.com
+                    <a href="mailto:imw_ec@gmail.com" className="env-btn">
+                      imw_ec@gmail.com
                     </a>
                   </div>
                   <div style={{ fontSize: "12px", color: isLight ? "#64748b" : "#3a3750", textAlign: "right", lineHeight: 1.8 }}>
                     <div style={{ color: isLight ? "#64748b" : "#5a5570", marginBottom: 4 }}>WhatsApp</div>
-                    <div style={{ color: "#dcb432", fontWeight: 600 }}>+593 98 280 4800</div>
+                    <div style={{ color: "#dcb432", fontWeight: 600 }}>0968514889</div>
                   </div>
                 </div>
               </div>
@@ -572,8 +572,8 @@ const PoliticasEnvio: React.FC = () => {
 
           {/* NOTA FINAL */}
           <div className="env-consent">
-            <strong>Importadora Atlas</strong> — RUC: [TU RUC] · Domicilio: Guayaquil, Ecuador.<br />
-            Los tiempos de entrega son estimados y pueden variar por factores externos al control de Importadora Atlas.
+            <strong>IMW - In My Wardrobe</strong> — RUC: [TU RUC] · Domicilio: Ecuador.<br />
+            Los tiempos de entrega son estimados y pueden variar por factores externos al control de IMW.
           </div>
 
           {/* FOOTER */}

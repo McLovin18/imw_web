@@ -17,7 +17,7 @@ import {
   productMatchesSubsubcategoria,
 } from "../lib/categorias-db";
 import { useUser } from "../context/UserContext";
-import { collection, query, onSnapshot } from "firebase/firestore";
+import { collection, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export default function ProductsByCategoryPage() {
@@ -197,14 +197,11 @@ export default function ProductsByCategoryPage() {
 
   // 2.5. Cargar categorías
   useEffect(() => {
-    const categoriasRef = collection(db, "categorias");
-    const q = query(categoriasRef);
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setCategorias(sortCategoriasByOrder(mapCategorySnapshot(snapshot.docs)));
-    });
-
-    return () => unsubscribe();
+    const loadCategorias = async () => {
+      const cats = await obtenerCategorias();
+      setCategorias(cats);
+    };
+    loadCategorias();
   }, []);
 
   // 3. Filtrado y orden (Memoizado)

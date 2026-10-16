@@ -74,11 +74,11 @@ const PayMaestro = () => (
 
 /* ---------------- Datos del negocio ---------------- */
 
-const WHATSAPP_NUMBER = "593982804800"; // solo números, con código de país, sin '+' ni espacios
-const WHATSAPP_DISPLAY = "+593 98 280 4800"; // como se muestra al usuario
-const INSTAGRAM_URL = "https://www.instagram.com/importadoratlas/";
-const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61591825107751";
-const TIKTOK_URL = "https://www.tiktok.com/@atlas.importadora";
+const WHATSAPP_NUMBER = "593968514889"; // solo números, con código de país, sin '+' ni espacios
+const WHATSAPP_DISPLAY = "0968514889"; // como se muestra al usuario
+const INSTAGRAM_URL = "https://www.instagram.com/imw_ec/";
+const FACEBOOK_URL = "https://www.facebook.com/imw_ec";
+const TIKTOK_URL = "https://www.tiktok.com/@imw_ec";
 const DEV_INSTAGRAM_URL = "https://www.instagram.com/hector.cobena/";
 
 const socialLinks = [
@@ -126,11 +126,15 @@ const Footer: React.FC = () => {
           {/* Marca + descripción */}
           <div className={styles.ftIntro}>
             <h2 className={styles.ftBrand} style={{ color: "var(--text)" }}>
-              Importadora Atlas — Tecnología que simplifica tu vida.
+              IMW - In My Wardrobe.
             </h2>
             <p className={styles.ftIntroText} style={{ color: "var(--textSecondary)" }}>
-              Importamos tecnología directamente desde China con foco en calidad, garantía real y una
-              experiencia de compra en línea segura, rápida y con envíos a todo Ecuador.
+              Tienda Online 🌐
+              NO LOCAL 🏢❌
+              Productos originales 💯
+              Importados desde USA 🇺🇸
+              Envíos por Servientrega 🚛
+              Whatsapp 0968514889📲
             </p>
           </div>
 
@@ -153,7 +157,7 @@ const Footer: React.FC = () => {
 
                 {/* Correo de contacto */}
                 <a
-                  href="mailto:importaciones.Atlas@hotmail.com"
+                  href="mailto:imw_ec@gmail.com"
                   className={styles.ftWhatsappLine}
                   style={{ color: "var(--textSecondary)" }}
                   onClick={() => trackLinkClick().catch(console.error)}
@@ -161,7 +165,7 @@ const Footer: React.FC = () => {
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                     <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                   </svg>
-                  <span>importaciones.Atlas@hotmail.com</span>
+                  <span>imw_ec@gmail.com</span>
                 </a>
               </div>
             </div>
@@ -236,7 +240,7 @@ const Footer: React.FC = () => {
           {/* Copyright + créditos */}
           <div className={styles.ftCopyRow}>
             <p className={styles.ftCopyText} style={{ color: isLight ? "#64748b" : "#cccccc" }}>
-              © {new Date().getFullYear()} Importadora Atlas. Todos los derechos reservados.
+              © {new Date().getFullYear()} IMW - In My Wardrobe. Todos los derechos reservados.
             </p>
             <div className={styles.ftCopyRight}>
               <div
@@ -268,7 +272,7 @@ const Footer: React.FC = () => {
       {showWhatsAppFloating && (
         <WhatsAppFloatingButton
           phoneNumber={WHATSAPP_NUMBER}
-          message="Hola, quiero información sobre Importadora Atlas"
+          message="Hola, quiero información sobre IMW - In My Wardrobe"
         />
       )}
     </>

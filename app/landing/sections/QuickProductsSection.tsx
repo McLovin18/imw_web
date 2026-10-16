@@ -5,8 +5,9 @@ import Link from "next/link";
 import {
   mapCategorySnapshot,
   sortCategoriasByOrder,
+  obtenerCategorias,
 } from "../../lib/categorias-db";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import ProductoCard from "../../components/ProductoCard";
 import type { LandingFieldStyle, LandingSectionStyles } from "../../lib/landing-types";
@@ -36,11 +37,8 @@ export default function QuickProductsSection({
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const categoriasRef = collection(db, "categorias");
-    const q = query(categoriasRef);
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const cats = sortCategoriasByOrder(mapCategorySnapshot(snapshot.docs));
+    const loadCategorias = async () => {
+      const cats = await obtenerCategorias();
       setCategorias(cats);
       setSelectedCategoryId((prev) => {
         if (prev && cats.some((c) => c.id === prev)) return prev;
@@ -49,34 +47,19 @@ export default function QuickProductsSection({
         }
         return cats[0]?.id || "";
       });
-    });
-
-    return () => unsubscribe();
+    };
+    loadCategorias();
   }, [defaultCategoryId]);
 
   useEffect(() => {
-    if (!selectedCategoryId) {
-      setProductos([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setCurrentIndex(0);
-
-    const productosRef = collection(db, "productos");
-    const q = query(productosRef, where("categoria", "==", selectedCategoryId));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const prods = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const loadProductos = async () => {
+      setLoading(true);
+      const { obtenerProductosPorCategoria } = await import("../../lib/productos-db");
+      const prods = await obtenerProductosPorCategoria(selectedCategoryId);
       setProductos(prods.slice(0, 5));
       setLoading(false);
-    });
-
-    return () => unsubscribe();
+    };
+    loadProductos();
   }, [selectedCategoryId]);
 
   useEffect(() => {
@@ -193,8 +176,6 @@ export default function QuickProductsSection({
                   <ProductoCard
                   key={p.id}
                   producto={p}
-                  showCart
-                  showEye
                   isCompact={false}
                   />
                 </div>

@@ -4,11 +4,12 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import InfoSlider from "./InfoSlider";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import {
   mapCategorySnapshot,
   sortCategoriasByOrder,
+  obtenerCategorias,
 } from "../lib/categorias-db";
 import { obtenerProductos } from "../lib/productos-db";
 import { useUser } from "../context/UserContext";
@@ -25,10 +26,11 @@ function MobileCategoriesAccordion({ basePath }: { basePath: string }) {
   const [openSub, setOpenSub] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const unsub = onSnapshot(collection(db, "categorias"), (snap) => {
-      setCategorias(sortCategoriasByOrder(mapCategorySnapshot(snap.docs)));
-    });
-    return () => unsub();
+    const loadCategorias = async () => {
+      const cats = await obtenerCategorias();
+      setCategorias(cats);
+    };
+    loadCategorias();
   }, []);
 
   return (
@@ -185,12 +187,13 @@ export const Navbar = () => {
     obtenerProductos().then((prods) => setAllProducts(prods));
   }, []);
 
-  // Escuchar categorías desde Firestore
+  // Cargar categorías (sin listener en tiempo real para reducir conexiones)
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "categorias"), (snap) => {
-      setCategorias(sortCategoriasByOrder(mapCategorySnapshot(snap.docs)));
-    });
-    return () => unsub();
+    const loadCategorias = async () => {
+      const cats = await obtenerCategorias();
+      setCategorias(cats);
+    };
+    loadCategorias();
   }, []);
 
   useEffect(() => {
@@ -262,13 +265,15 @@ export const Navbar = () => {
   ];
 
   const infoSliderItems = [
-    { text: "¡Haz clic y obtén 15% de descuento en prendas seleccionadas! →", href: "https://marca-estilo-41im.vercel.app/ofertas" },
-    "🚛 Envíos a todo el Ecuador incluyendo las Islas Galápagos",
+    "🌐 Tienda Online - NO LOCAL 🏢❌",
+    "💯 Productos originales - Importados desde USA 🇺🇸",
+    "🚛 Envíos por Servientrega",
+    "📲 Whatsapp 0968514889",
   ];
 
   // Logo paths - AGREGA TUS LOGOS AQUÍ
-  const logoDark = "/logo_dark.png"; // Logo para modo oscuro
-  const logoLight = "/logo_light.png"; // Logo para modo claro
+  const logoDark = "/imw-dark.png"; // Logo para modo oscuro
+  const logoLight = "/imw-light.png"; // Logo para modo claro
   const logoSrc = theme === "light" ? logoLight : logoDark;
 
   const handleSearch = () => {
@@ -327,7 +332,7 @@ export const Navbar = () => {
             >
               <Image
                 src={logoSrc}
-                alt="ATLAS"
+                alt="IMW"
                 width={180}
                 height={48}
                 className="h-12 w-auto"
@@ -673,7 +678,7 @@ export const Navbar = () => {
               style={{ borderColor: theme === "light" ? "#e2e8f0" : "rgba(255,255,255,0.1)" }}
             >
                               <span className="font-bold text-base">
-                Importadora Atlas
+                IMW - In My Wardrobe
               </span>
               <button
                 onClick={() => setMobileOpen(false)}

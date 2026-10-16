@@ -9,32 +9,32 @@ const sections = [
   {
     number: "01",
     title: "Datos de la Empresa",
-    body: "Razón social: Importadora Atlas, Tienda de tecnología. Domicilio: Guayaquil, Ecuador. Correo: importaciones.Atlas@hotmail.com — WhatsApp: +593 98 280 4800. Horario de atención: Lunes a Viernes de 9:00 a 18:00.",
+    body: "Razón social: IMW - In My Wardrobe. Tienda online de perfumes. Domicilio: Ecuador. Correo: imw_ec@gmail.com — WhatsApp: 0968514889. Horario de atención: Lunes a Viernes de 9:00 a 18:00.",
   },
   {
     number: "02",
     title: "Productos y Precios",
-    body: "Importadora Atlas comercializa tecnología a través de su tienda online. Todos los precios están expresados en dólares americanos e incluyen IVA del 15% según ley vigente. Las fotos son referenciales; el color puede variar ligeramente según la configuración de tu pantalla. Nos reservamos el derecho de modificar precios sin previo aviso — el precio válido es el que aparece al momento de confirmar el pago.",
+    body: "IMW - In My Wardrobe comercializa perfumes originales importados desde USA a través de su tienda online. Todos los precios están expresados en dólares americanos e incluyen IVA del 15% según ley vigente. Las fotos son referenciales; el color puede variar ligeramente según la configuración de tu pantalla. Nos reservamos el derecho de modificar precios sin previo aviso — el precio válido es el que aparece al momento de confirmar el pago.",
   },
   {
     number: "03",
     title: "Proceso de Compra",
-    body: "Selecciona tus productos, agrega al carrito y procede al checkout. Completa tus datos de facturación y envío — eres responsable de que sean correctos. Acepta la Política de Privacidad y estos Términos. Realiza el pago a través de Datafast o coordina por WhatsApp. Recibirás un correo de confirmación con el detalle de tu pedido una vez aprobado el pago.",
+    body: "Selecciona tus productos, agrega al carrito y procede al checkout. Completa tus datos de facturación y envío — eres responsable de que sean correctos. Acepta la Política de Privacidad y estos Términos. Coordina el pago por WhatsApp. Recibirás un correo de confirmación con el detalle de tu pedido una vez confirmado el pago.",
   },
   {
     number: "04",
     title: "Métodos de Pago",
-    body: "Aceptamos tarjetas Visa, Mastercard, Diners, Discover y American Express procesadas por Datafast S.A. También transferencia bancaria o depósito coordinado por WhatsApp. Importadora Atlas no almacena datos de tarjetas — todo pago es procesado directamente por Datafast bajo estándar PCI DSS. El pedido se procesa una vez confirmado el pago.",
+    body: "Aceptamos transferencia bancaria o depósito coordinado por WhatsApp. El pedido se procesa una vez confirmado el pago.",
   },
   {
     number: "05",
     title: "Envíos",
-    body: "Realizamos envíos a todo Ecuador continental a través de Servientrega u otros couriers. Tiempo de entrega: Guayaquil 1-2 días hábiles, otras ciudades 2-5 días hábiles desde la confirmación del pago. El costo de envío se calcula en el checkout según ciudad de destino y se muestra antes de pagar. Envío gratis aplica solo en promociones específicas detalladas en la web. Importadora Atlas no se responsabiliza por retrasos causados por el courier, fuerza mayor o dirección incorrecta proporcionada por el cliente.",
+    body: "Realizamos envíos a todo Ecuador continental a través de Servientrega. Tiempo de entrega: Guayaquil 1-2 días hábiles, otras ciudades 2-5 días hábiles desde la confirmación del pago. El costo de envío se calcula en el checkout según ciudad de destino y se muestra antes de pagar. Envío gratis aplica solo en promociones específicas detalladas en la web. IMW no se responsabiliza por retrasos causados por el courier, fuerza mayor o dirección incorrecta proporcionada por el cliente.",
   },
   {
     number: "06",
     title: "Cambios y Devoluciones",
-    body: "Tienes 5 días calendario desde que recibes el producto para solicitar cambio por talla, color o modelo, según la Ley de Defensa del Consumidor. El producto debe estar sin uso, con etiquetas originales, en empaque original y sin olores. No aplica para artículos por higiene. El cliente asume el costo de envío por cambio, salvo que el error sea de Importadora Atlas. No se realizan devoluciones de dinero — solo cambios o nota de crédito. Si recibiste un producto defectuoso o diferente al pedido, asumimos todos los costos; repórtalo en máximo 48 horas desde la entrega.",
+    body: "Tienes 5 días calendario desde que recibes el producto para solicitar cambio por talla, color o modelo, según la Ley de Defensa del Consumidor. El producto debe estar sin uso, con etiquetas originales, en empaque original y sin olores. No aplica para artículos por higiene. El cliente asume el costo de envío por cambio, salvo que el error sea de IMW. No se realizan devoluciones de dinero — solo cambios o nota de crédito. Si recibiste un producto defectuoso o diferente al pedido, asumimos todos los costos; repórtalo en máximo 48 horas desde la entrega.",
   },
   {
     number: "07",
@@ -44,12 +44,12 @@ const sections = [
   {
     number: "08",
     title: "Propiedad Intelectual",
-    body: "Todo el contenido de importadoratlas.com — logos, textos, imágenes y diseños — es propiedad de Importadora Atlas. Queda prohibida su reproducción total o parcial sin autorización escrita.",
+    body: "Todo el contenido de imw_ec — logos, textos, imágenes y diseños — es propiedad de IMW - In My Wardrobe. Queda prohibida su reproducción total o parcial sin autorización escrita.",
   },
   {
     number: "09",
     title: "Responsabilidad",
-    body: "MarcaEstilo no se hace responsable por el mal uso que el cliente dé a los productos. No garantizamos que el sitio esté libre de errores; si encuentras uno, repórtalo a marcaestilo593@gmail.com. No nos responsabilizamos por links a sitios de terceros.",
+    body: "IMW no se hace responsable por el mal uso que el cliente dé a los productos. No garantizamos que el sitio esté libre de errores; si encuentras uno, repórtalo a imw_ec@gmail.com. No nos responsabilizamos por links a sitios de terceros.",
   },
   {
     number: "10",
@@ -64,7 +64,7 @@ const sections = [
   {
     number: "12",
     title: "Modificaciones",
-    body: "MarcaEstilo se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios aplican desde su publicación en la web. Te recomendamos revisarlos antes de cada compra.",
+    body: "IMW se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios aplican desde su publicación en la web. Te recomendamos revisarlos antes de cada compra.",
   },
   {
     number: "13",
@@ -432,7 +432,7 @@ const TerminosCondiciones: React.FC = () => {
               TÉRMINOS Y<br /><span>CONDICIONES</span>
             </h1>
             <p className="tc-subtitle">
-              Al realizar una compra en Importadora Atlas aceptas estos términos en su totalidad. Te recomendamos leerlos antes de cada pedido.
+              Al realizar una compra en IMW - In My Wardrobe aceptas estos términos en su totalidad. Te recomendamos leerlos antes de cada pedido.
             </p>
             <p className="tc-date">Última actualización: 01 de Octubre de 2026</p>
             <div className="tc-divider" />
@@ -462,13 +462,13 @@ const TerminosCondiciones: React.FC = () => {
                     <p className="tc-contact-desc">
                       Dudas sobre estos términos o para iniciar un cambio / garantía.
                     </p>
-                    <a href="mailto:importaciones.Atlas@hotmail.com" className="tc-btn">
-                      importaciones.Atlas@hotmail.com
+                    <a href="mailto:imw_ec@gmail.com" className="tc-btn">
+                      imw_ec@gmail.com
                     </a>
                   </div>
                   <div style={{ fontSize: "12px", color: "#3a3750", textAlign: "right", lineHeight: 1.8 }}>
                     <div style={{ color: "#5a5570", marginBottom: 4 }}>WhatsApp</div>
-                    <div style={{ color: "#dcb432", fontWeight: 600 }}>+593 98 280 4800</div>
+                    <div style={{ color: "#dcb432", fontWeight: 600 }}>0968514889</div>
                   </div>
                 </div>
               </div>
@@ -490,12 +490,12 @@ const TerminosCondiciones: React.FC = () => {
 
           {/* CONSENT NOTE */}
           <div className="tc-consent">
-            Al usar <strong>importadoratlas.com</strong> y marcar la casilla <strong>"Acepto los Términos y Condiciones"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley de Comercio Electrónico y Ley de Defensa del Consumidor de Ecuador</strong>.
+            Al usar <strong>imw_ec</strong> y marcar la casilla <strong>"Acepto los Términos y Condiciones"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley de Comercio Electrónico y Ley de Defensa del Consumidor de Ecuador</strong>.
           </div>
 
           {/* FOOTER */}
           <div className="tc-footer">
-            <p>Gracias por confiar en Importadora Atlas. Tu satisfacción es nuestra prioridad.</p>
+            <p>Gracias por confiar en IMW - In My Wardrobe. Tu satisfacción es nuestra prioridad.</p>
             <Link href="/">← Volver al inicio</Link>
           </div>
         </div>

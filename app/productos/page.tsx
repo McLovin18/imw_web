@@ -12,8 +12,9 @@ import {
   productMatchesCategoria,
   productMatchesSubcategoria,
   productMatchesSubsubcategoria,
+  obtenerCategorias,
 } from "../lib/categorias-db";
-import { collection, query, onSnapshot } from "firebase/firestore";
+import { collection, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export default function ProductosPage() {
@@ -44,11 +45,11 @@ export default function ProductosPage() {
   const [categorias, setCategorias] = useState<any[]>([]);
 
   useEffect(() => {
-    const categoriasRef = collection(db, "categorias");
-    const unsubscribe = onSnapshot(query(categoriasRef), (snapshot) => {
-      setCategorias(sortCategoriasByOrder(mapCategorySnapshot(snapshot.docs)));
-    });
-    return () => unsubscribe();
+    const loadCategorias = async () => {
+      const cats = await obtenerCategorias();
+      setCategorias(cats);
+    };
+    loadCategorias();
   }, []);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, addDoc, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, deleteDoc, arrayRemove, getDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, deleteDoc, arrayRemove, getDoc, query, limit as limitQuery } from "firebase/firestore";
 
 const COLLECTION = "atributos";
 
@@ -12,7 +12,7 @@ export type Atributo = {
 };
 
 export async function obtenerAtributos(): Promise<Atributo[]> {
-  const snapshot = await getDocs(collection(db, COLLECTION));
+  const snapshot = await getDocs(query(collection(db, COLLECTION), limitQuery(20)));
   return snapshot.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
 }
 

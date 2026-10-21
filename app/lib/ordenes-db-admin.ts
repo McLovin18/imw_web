@@ -239,6 +239,8 @@ export async function devolverStockOrdenAdmin(ordenId: string) {
   for (const producto of productos) {
     const productoId = producto.id;
     const cantidad = Number(producto.cantidad || 1);
+    const selectedVariations = producto.selectedVariations;
+    const variationAttributeIds = producto.variationAttributeIds;
 
     // Obtener el producto actual
     const productoRef = adminDb.collection("productos").doc(productoId);

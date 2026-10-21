@@ -27,39 +27,29 @@ export default function PedidosAdminPage() {
 		try {
 			// Obtener token del usuario logueado actualmente
 			const currentUser = auth.currentUser;
-			console.log("🔍 loadOrdenes - currentUser:", currentUser?.uid);
-			
-			if (!currentUser) {
-				console.error("❌ No hay usuario logueado");
-				setOrdenes([]);
-				setLoading(false);
-				return;
-			}
+		
+		if (!currentUser) {
+			setOrdenes([]);
+			setLoading(false);
+			return;
+		}
 
-			const token = await getIdToken(currentUser);
-			console.log("🔍 Token obtenido:", token.slice(0, 20) + "...");
+		const token = await getIdToken(currentUser);
 
-			// Usar endpoint API para obtener órdenes
-			console.log("🔍 Llamando a /api/admin/ordenes");
-			const res = await fetch("/api/admin/ordenes", {
+		const res = await fetch("/api/admin/ordenes", {
 				headers: {
 					"Authorization": `Bearer ${token}`,
 				},
 			});
 
-			console.log("🔍 Response status:", res.status);
-			
 			if (!res.ok) {
 				const errorText = await res.text();
-				console.error("❌ Error al obtener órdenes:", res.status, errorText);
 				throw new Error(`Error ${res.status}: ${errorText}`);
 			}
 
 			const data = await res.json();
-			console.log("✅ Órdenes recibidas:", data.length, data);
 			setOrdenes(Array.isArray(data) ? data : []);
 		} catch (error) {
-			console.error("❌ Error cargando órdenes:", error);
 			setOrdenes([]);
 		}
 
@@ -74,7 +64,7 @@ export default function PedidosAdminPage() {
 			}
 			setClientesMap(map);
 		} catch (error) {
-			console.error("Error cargando clientes:", error);
+			// Error cargando clientes
 		}
 
 		setLoading(false);
@@ -255,12 +245,14 @@ export default function PedidosAdminPage() {
 
 	const ordenesPendientes = ordenes.filter((o) =>
 		(o.estado === "generada" || o.estado === "pendiente_pago" || o.estado === "pago_fallido") &&
+		o.estado !== "rechazada" &&
 		estaEnRango(o.visitaFecha) &&
 		matchesBusqueda(o)
 	);
 
 	const ordenesAprobadas = ordenes.filter((o) =>
 		o.estado === "aprobada" &&
+		o.estado !== "rechazada" &&
 		estaEnRango(o.visitaFecha) &&
 		matchesBusqueda(o)
 	);

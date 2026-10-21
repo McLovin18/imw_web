@@ -4,11 +4,7 @@ import { getCatalogPricing } from "./pricing";
 // ── Funciones que usan admin SDK (solo para API routes) ─────────────────────
 
 export async function crearOrdenAdmin(orden: any) {
-  console.log("[crearOrdenAdmin] Iniciando creación de orden");
   const adminDb = admin.firestore();
-
-  // Generar orderId usando admin SDK
-  console.log("[crearOrdenAdmin] Generando orderId...");
   const metaRef = adminDb.collection("ordenes_meta").doc("counter");
   const counterDoc = await adminDb.runTransaction(async (tx) => {
     const snap = await tx.get(metaRef);
@@ -18,7 +14,6 @@ export async function crearOrdenAdmin(orden: any) {
     return next;
   });
   const orderId = `ID-${String(counterDoc).padStart(6, "0")}`;
-  console.log("[crearOrdenAdmin] orderId generado:", orderId);
 
   const productosOrigen = Array.isArray(orden.productos) ? orden.productos : [];
   const productosProcesados: any[] = [];
@@ -131,7 +126,6 @@ export async function crearOrdenAdmin(orden: any) {
 
 // Reservar stock para una orden pendiente (transferencias)
 export async function reservarStockOrdenAdmin(ordenId: string) {
-  console.log("[reservarStockOrdenAdmin] Iniciando para orden:", ordenId);
   const adminDb = admin.firestore();
   const ordenDoc = await adminDb.collection("ordenes").doc(ordenId).get();
   
@@ -145,7 +139,6 @@ export async function reservarStockOrdenAdmin(ordenId: string) {
   for (const producto of productos) {
     const productoId = producto.id;
     const cantidad = Number(producto.cantidad || 1);
-    console.log(`[reservarStockOrdenAdmin] Procesando producto: ${producto.nombre}, cantidad: ${cantidad}`);
 
     // Obtener el producto actual
     const productoRef = adminDb.collection("productos").doc(productoId);
@@ -155,9 +148,6 @@ export async function reservarStockOrdenAdmin(ordenId: string) {
 
     const productoData = productoSnap.data();
     const stockVariants = productoData.stockVariants || [];
-    console.log(`[reservarStockOrdenAdmin] stockVariants length: ${stockVariants.length}`);
-    console.log(`[reservarStockOrdenAdmin] selectedVariations:`, producto.selectedVariations);
-    console.log(`[reservarStockOrdenAdmin] variationAttributeIds:`, producto.variationAttributeIds);
 
     // Verificar si tiene variaciones
     if (producto.selectedVariations && producto.variationAttributeIds && stockVariants.length > 0) {
@@ -167,13 +157,9 @@ export async function reservarStockOrdenAdmin(ordenId: string) {
           (attrId: string) => v.attributes?.[attrId] === producto.selectedVariations[attrId]
         );
       });
-      console.log(`[reservarStockOrdenAdmin] variantIndex: ${variantIndex}`);
 
       if (variantIndex !== -1) {
         const currentVariantStock = Number(stockVariants[variantIndex].cantidad || 0);
-        console.log(`[reservarStockOrdenAdmin] currentVariantStock: ${currentVariantStock}`);
-        console.log(`[reservarStockOrdenAdmin] variantIndex: ${variantIndex}`);
-        console.log(`[reservarStockOrdenAdmin] Nueva cantidad: ${currentVariantStock - cantidad}`);
         
         if (currentVariantStock >= cantidad) {
           // Convertir stockVariants a array si es objeto
@@ -188,28 +174,18 @@ export async function reservarStockOrdenAdmin(ordenId: string) {
           await productoRef.update({
             stockVariants: stockVariantsArray,
           });
-          console.log(`[reservarStockOrdenAdmin] Stock reservado: ${currentVariantStock - cantidad}`);
-          
-          // Verificar la actualización
-          const updatedSnap = await productoRef.get();
-          const updatedData = updatedSnap.data();
-          console.log(`[reservarStockOrdenAdmin] stockVariants después de update:`, updatedData?.stockVariants);
         } else {
           throw new Error(`Stock insuficiente para "${producto.nombre}". Disponibles: ${currentVariantStock}, Solicitados: ${cantidad}`);
         }
       } else {
-        console.error("[reservarStockOrdenAdmin] Variación no encontrada en stockVariants");
         throw new Error(`Variación no encontrada para "${producto.nombre}"`);
       }
     } else {
-      // Manejo de stock general
       const currentStock = Number(productoData.stock || 0);
-      console.log(`[reservarStockOrdenAdmin] currentStock (general): ${currentStock}`);
       if (currentStock >= cantidad) {
         await productoRef.update({
           stock: currentStock - cantidad,
         });
-        console.log(`[reservarStockOrdenAdmin] Stock reservado: ${currentStock - cantidad}`);
       } else {
         throw new Error(`Stock insuficiente para "${producto.nombre}". Disponibles: ${currentStock}, Solicitados: ${cantidad}`);
       }
@@ -220,8 +196,6 @@ export async function reservarStockOrdenAdmin(ordenId: string) {
 // Deducir stock definitivamente cuando se aprueba la orden
 export async function deducirStockOrdenAdmin(ordenId: string) {
   // El stock ya fue reservado al crear la orden, aquí solo confirmamos
-  // Podríamos agregar lógica adicional si es necesario
-  console.log(`[deducirStockOrdenAdmin] Stock ya fue reservado para orden ${ordenId}`);
 }
 
 // Devolver stock cuando se rechaza la orden

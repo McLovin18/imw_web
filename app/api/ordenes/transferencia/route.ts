@@ -147,7 +147,6 @@ export async function POST(req: NextRequest) {
                    orden.createdAt
       };
 
-      console.log("[transferencia] Enviando email al cliente...");
       const emailClienteRes = await fetch(`${baseUrl}/api/email/send-transferencia-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -161,11 +160,8 @@ export async function POST(req: NextRequest) {
         const text = await emailClienteRes.text();
         console.error("[transferencia] Error email cliente - Status:", emailClienteRes.status);
         console.error("[transferencia] Error email cliente - Response:", text);
-      } else {
-        console.log("[transferencia] ✅ Email cliente enviado");
       }
 
-      console.log("[transferencia] Enviando email al dueño...");
       const emailDueñoRes = await fetch(`${baseUrl}/api/email/send-transferencia-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -179,8 +175,6 @@ export async function POST(req: NextRequest) {
         const text = await emailDueñoRes.text();
         console.error("[transferencia] Error email dueño - Status:", emailDueñoRes.status);
         console.error("[transferencia] Error email dueño - Response:", text);
-      } else {
-        console.log("[transferencia] ✅ Email dueño enviado");
       }
     } catch (emailError) {
       console.error("[transferencia] Error enviando emails:", emailError);

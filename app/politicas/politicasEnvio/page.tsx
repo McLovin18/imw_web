@@ -13,8 +13,8 @@ const sections = [
   },
   {
     number: "02",
-    title: "Costo de Envío y Recargos",
-    body: "El costo de envío es de $5.00 USD a cualquier ciudad de Ecuador continental. Los pagos con tarjeta de crédito o débito tienen un recargo del 7% sobre el valor total de los productos. El valor final — incluyendo envío y recargo — se muestra en el checkout antes de confirmar la compra. Promociones de envío gratis aplican únicamente cuando se indique expresamente en el sitio web o campañas oficiales de Importadora Atlas.",
+    title: "Costo de Envío",
+    body: "El costo de envío se calcula en el checkout según ciudad de destino y se muestra antes de pagar. Aceptamos transferencia bancaria o pago coordinado por WhatsApp. El valor final — incluyendo envío — se muestra antes de confirmar la compra. Promociones de envío gratis aplican únicamente cuando se indique expresamente en el sitio web o campañas oficiales de iMW.",
   },
   {
     number: "03",
@@ -25,7 +25,7 @@ const sections = [
   {
     number: "04",
     title: "Proceso de Despacho",
-    body: "Una vez aprobado tu pago recibirás un correo de confirmación de pedido. Cuando tu pedido sea despachado, recibirás un segundo correo con el número de guía para rastreo. Es responsabilidad del cliente proporcionar una dirección correcta y completa — Importadora Atlas no se responsabiliza por retrasos o pérdidas por dirección incorrecta.",
+    body: "Una vez aprobado tu pago recibirás un correo de confirmación de pedido. Cuando tu pedido sea despachado, recibirás un segundo correo con el número de guía para rastreo. Es responsabilidad del cliente proporcionar una dirección correcta y completa — iMW no se responsabiliza por retrasos o pérdidas por dirección incorrecta.",
   },
   {
     number: "05",
@@ -35,12 +35,12 @@ const sections = [
   {
     number: "06",
     title: "Retrasos",
-    body: "Importadora Atlas no se responsabiliza por retrasos ocasionados por el courier, eventos de fuerza mayor, feriados, desastres naturales, o problemas de orden público que impidan la entrega en el tiempo estimado.",
+    body: "iMW no se responsabiliza por retrasos ocasionados por el courier, eventos de fuerza mayor, feriados, desastres naturales, o problemas de orden público que impidan la entrega en el tiempo estimado.",
   },
   {
     number: "07",
     title: "Retiro en Bodega",
-    body: "Importadora Atlas es una tienda 100% virtual. No contamos con tienda física ni opción de retiro en bodega. Todos los pedidos se envían por courier a la dirección que indiques en el checkout.",
+    body: "iMW es una tienda 100% virtual. No contamos con tienda física ni opción de retiro en bodega. Todos los pedidos se envían por courier a la dirección que indiques en el checkout.",
   },
   {
     number: "08",
@@ -490,20 +490,16 @@ const PoliticasEnvio: React.FC = () => {
         {/* ── HIGHLIGHTS ── */}
         <div className="env-highlights" style={{ zIndex: 1, position: "relative" }}>
           <div className="env-highlight-card">
-            <div className="env-highlight-value">$5.00</div>
-            <div className="env-highlight-label">Costo de envío fijo</div>
-          </div>
-          <div className="env-highlight-card">
-            <div className="env-highlight-value">+7%</div>
-            <div className="env-highlight-label">Recargo pago con tarjeta</div>
-          </div>
-          <div className="env-highlight-card">
             <div className="env-highlight-value">1–7</div>
             <div className="env-highlight-label">Días hábiles de entrega</div>
           </div>
           <div className="env-highlight-card">
             <div className="env-highlight-value">100%</div>
             <div className="env-highlight-label">Ecuador continental</div>
+          </div>
+          <div className="env-highlight-card">
+            <div className="env-highlight-value">Servientrega</div>
+            <div className="env-highlight-label">Courier oficial</div>
           </div>
         </div>
 
@@ -572,8 +568,8 @@ const PoliticasEnvio: React.FC = () => {
 
           {/* NOTA FINAL */}
           <div className="env-consent">
-            <strong>IMW - In My Wardrobe</strong> — RUC: [TU RUC] · Domicilio: Ecuador.<br />
-            Los tiempos de entrega son estimados y pueden variar por factores externos al control de IMW.
+            <strong>iMW</strong> — Tienda online de perfumes · Domicilio: Ecuador.<br />
+            Los tiempos de entrega son estimados y pueden variar por factores externos al control de iMW.
           </div>
 
           {/* FOOTER */}

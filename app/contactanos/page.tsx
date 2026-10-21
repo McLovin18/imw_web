@@ -34,7 +34,7 @@ const Contacto: React.FC = () => {
   }, []);
 
   const copyEmail = () => {
-    navigator.clipboard.writeText("importaciones.Atlas@hotmail.com");
+    navigator.clipboard.writeText("imw_ec@gmail.com");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -500,7 +500,7 @@ const Contacto: React.FC = () => {
 
           <div className="ct-badge">
             <div className="ct-badge-dot" />
-            Importadora Atlas · Ecuador
+            iMW · Ecuador
           </div>
 
           <h1 className="ct-title">
@@ -520,7 +520,7 @@ const Contacto: React.FC = () => {
 
           {/* WHATSAPP — featured */}
           <a
-            href="https://wa.me/593982804800"
+            href="https://wa.me/593968514889"
             target="_blank"
             rel="noreferrer"
             className="ct-card ct-card-wa"
@@ -535,7 +535,7 @@ const Contacto: React.FC = () => {
               </div>
 
               <div className="ct-card-label" style={{ marginBottom: 8 }}>WhatsApp directo</div>
-              <div className="ct-card-value-lg">+593 98 280 4800</div>
+              <div className="ct-card-value-lg">0968514889</div>
               <p className="ct-card-sub" style={{ marginTop: 10 }}>
                 La forma más rápida de contactarnos.<br />
                 <strong>Respuesta en minutos</strong> durante horario de atención.
@@ -597,7 +597,7 @@ const Contacto: React.FC = () => {
             </div>
             <div className="ct-card-label">Correo electrónico</div>
             <div className="ct-card-value" style={{ fontSize: "16px", wordBreak: "break-all" }}>
-              importaciones.Atlas@hotmail.com
+              imw_ec@gmail.com
             </div>
             <p className="ct-card-sub">Para consultas formales, cambios y garantías.</p>
             <button className="ct-copy-btn" onClick={copyEmail}>
@@ -631,13 +631,13 @@ const Contacto: React.FC = () => {
 
             <div style={{ marginTop: 4 }}>
               <a
-                href="https://www.instagram.com/importadoratlas/"
+                href="https://www.instagram.com/imw_ec/"
                 target="_blank"
                 rel="noreferrer"
                 className="ct-social-link"
               >
                 <span className="ct-social-platform">Instagram</span>
-                <span className="ct-social-handle">@importadoratlas</span>
+                <span className="ct-social-handle">@imw_ec</span>
                 <span className="ct-social-arrow">→</span>
               </a>
               <a
@@ -647,17 +647,17 @@ const Contacto: React.FC = () => {
                 className="ct-social-link"
               >
                 <span className="ct-social-platform">Facebook</span>
-                <span className="ct-social-handle">Importadora Atlas</span>
+                <span className="ct-social-handle">iMW</span>
                 <span className="ct-social-arrow">→</span>
               </a>
               <a
-                href="https://www.tiktok.com/@atlas.importadora"
+                href="https://www.tiktok.com/@imw_ec"
                 target="_blank"
                 rel="noreferrer"
                 className="ct-social-link"
               >
                 <span className="ct-social-platform">TikTok</span>
-                <span className="ct-social-handle">@atlas.importadora</span>
+                <span className="ct-social-handle">@imw_ec</span>
                 <span className="ct-social-arrow">→</span>
               </a>
             </div>
@@ -691,7 +691,7 @@ const Contacto: React.FC = () => {
 
         {/* ── FOOTER ── */}
         <div className="ct-footer">
-          <p>© {new Date().getFullYear()} MarcaEstilo. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} iMW. Todos los derechos reservados.</p>
           <Link href="/">← Volver al inicio</Link>
         </div>
 

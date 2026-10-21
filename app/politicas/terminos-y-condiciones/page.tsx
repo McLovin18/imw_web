@@ -34,7 +34,7 @@ const sections = [
   {
     number: "06",
     title: "Cambios y Devoluciones",
-    body: "Tienes 5 días calendario desde que recibes el producto para solicitar cambio por talla, color o modelo, según la Ley de Defensa del Consumidor. El producto debe estar sin uso, con etiquetas originales, en empaque original y sin olores. No aplica para artículos por higiene. El cliente asume el costo de envío por cambio, salvo que el error sea de IMW. No se realizan devoluciones de dinero — solo cambios o nota de crédito. Si recibiste un producto defectuoso o diferente al pedido, asumimos todos los costos; repórtalo en máximo 48 horas desde la entrega.",
+    body: "Tienes 5 días calendario desde que recibes el producto para solicitar cambio por tamaño (ml), modelo o por defecto de fabricación, según la Ley de Defensa del Consumidor. El producto debe estar sin uso, con etiquetas originales, en empaque original y sin olores. No aplica para productos abiertos o usados por higiene. El cliente asume el costo de envío por cambio, salvo que el error sea de iMW. No se realizan devoluciones de dinero — solo cambios o nota de crédito. Si recibiste un producto defectuoso o diferente al pedido, asumimos todos los costos; repórtalo en máximo 48 horas desde la entrega.",
   },
   {
     number: "07",
@@ -44,12 +44,12 @@ const sections = [
   {
     number: "08",
     title: "Propiedad Intelectual",
-    body: "Todo el contenido de imw_ec — logos, textos, imágenes y diseños — es propiedad de IMW - In My Wardrobe. Queda prohibida su reproducción total o parcial sin autorización escrita.",
+    body: "Todo el contenido de iMW — logos, textos, imágenes y diseños — es propiedad de iMW. Queda prohibida su reproducción total o parcial sin autorización escrita.",
   },
   {
     number: "09",
     title: "Responsabilidad",
-    body: "IMW no se hace responsable por el mal uso que el cliente dé a los productos. No garantizamos que el sitio esté libre de errores; si encuentras uno, repórtalo a imw_ec@gmail.com. No nos responsabilizamos por links a sitios de terceros.",
+    body: "iMW no se hace responsable por el mal uso que el cliente dé a los productos. No garantizamos que el sitio esté libre de errores; si encuentras uno, repórtalo a imw_ec@gmail.com. No nos responsabilizamos por links a sitios de terceros.",
   },
   {
     number: "10",
@@ -64,7 +64,7 @@ const sections = [
   {
     number: "12",
     title: "Modificaciones",
-    body: "IMW se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios aplican desde su publicación en la web. Te recomendamos revisarlos antes de cada compra.",
+    body: "iMW se reserva el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios aplican desde su publicación en la web. Te recomendamos revisarlos antes de cada compra.",
   },
   {
     number: "13",
@@ -432,7 +432,7 @@ const TerminosCondiciones: React.FC = () => {
               TÉRMINOS Y<br /><span>CONDICIONES</span>
             </h1>
             <p className="tc-subtitle">
-              Al realizar una compra en IMW - In My Wardrobe aceptas estos términos en su totalidad. Te recomendamos leerlos antes de cada pedido.
+              Al realizar una compra en iMW aceptas estos términos en su totalidad. Te recomendamos leerlos antes de cada pedido.
             </p>
             <p className="tc-date">Última actualización: 01 de Octubre de 2026</p>
             <div className="tc-divider" />
@@ -490,12 +490,12 @@ const TerminosCondiciones: React.FC = () => {
 
           {/* CONSENT NOTE */}
           <div className="tc-consent">
-            Al usar <strong>imw_ec</strong> y marcar la casilla <strong>"Acepto los Términos y Condiciones"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley de Comercio Electrónico y Ley de Defensa del Consumidor de Ecuador</strong>.
+            Al usar <strong>iMW</strong> y marcar la casilla <strong>"Acepto los Términos y Condiciones"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley de Comercio Electrónico y Ley de Defensa del Consumidor de Ecuador</strong>.
           </div>
 
           {/* FOOTER */}
           <div className="tc-footer">
-            <p>Gracias por confiar en IMW - In My Wardrobe. Tu satisfacción es nuestra prioridad.</p>
+            <p>Gracias por confiar en iMW. Tu satisfacción es nuestra prioridad.</p>
             <Link href="/">← Volver al inicio</Link>
           </div>
         </div>

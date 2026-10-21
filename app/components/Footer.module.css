@@ -1,23 +1,79 @@
+/* ============================================================
+   Footer - módulo de estilos (plantilla Nexel)
+   - Tema con [data-theme="dark" | "light"] en .ftRoot
+   - Acento = var(--accent) del proyecto (fallback dorado)
+   - Usa --bg, --text, --textSecondary con fallbacks
+   - Al final quedan las clases de la plantilla anterior
+     (newsletter, pagos, ftGrid...) por si otro cliente las usa
+   ============================================================ */
+
 .ftRoot {
+  --ft-bg: var(--bg, #0b0b10);
+  --ft-text: var(--text, #f5f5f7);
+  --ft-muted: var(--textSecondary, #a8a8b3);
+  --ft-accent: var(--accent, #d9b97a);
+  --ft-accent-soft: color-mix(in srgb, var(--ft-accent) 14%, transparent);
+  --ft-border: rgba(255, 255, 255, 0.12);
+  --ft-surface: rgba(255, 255, 255, 0.04);
+  --ft-surface-hover: rgba(255, 255, 255, 0.08);
+  --ft-watermark: rgba(255, 255, 255, 0.05);
+  --ft-serif: "Cormorant Garamond", "Playfair Display", "Times New Roman", Georgia, serif;
+
   position: relative;
   overflow: hidden;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  isolation: isolate;
+  background: var(--ft-bg);
+  color: var(--ft-muted);
+  margin-top: 4rem;
+}
+
+.ftRoot[data-theme="light"] {
+  --ft-border: #e2e8f0;
+  --ft-surface: rgba(15, 23, 42, 0.03);
+  --ft-surface-hover: rgba(15, 23, 42, 0.07);
+  --ft-watermark: rgba(15, 23, 42, 0.05);
+}
+
+/* ---------- Decoración de fondo ---------- */
+
+.ftTopLine {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ft-accent) 50%, transparent);
+  opacity: 0.7;
+  z-index: 1;
 }
 
 .ftGlowLeft,
 .ftGlowRight {
   position: absolute;
-  top: -60px;
-  width: 320px;
-  height: 320px;
+  width: 420px;
+  height: 420px;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.12;
+  filter: blur(110px);
   pointer-events: none;
-  background: var(--accent, #6366f1);
+  z-index: -1;
 }
-.ftGlowLeft { left: -80px; }
-.ftGlowRight { right: -80px; }
+
+.ftGlowLeft {
+  top: -180px;
+  left: -140px;
+  background: var(--ft-accent);
+  opacity: 0.12;
+}
+
+.ftGlowRight {
+  bottom: -200px;
+  right: -140px;
+  background: var(--ft-accent);
+  opacity: 0.08;
+}
+
+.ftRoot[data-theme="light"] .ftGlowLeft { opacity: 0.1; }
+.ftRoot[data-theme="light"] .ftGlowRight { opacity: 0.06; }
+
+/* ---------- Contenedor ---------- */
 
 .ftContainer {
   position: relative;
@@ -27,69 +83,390 @@
   padding: 56px 24px 32px;
 }
 
-/* Intro: marca + descripción */
-.ftIntro {
-  max-width: 640px;
-  margin-bottom: 40px;
-}
-.ftBrand {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  margin: 0 0 12px;
-  line-height: 1.25;
-}
-.ftIntroText {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  margin: 0;
+/* ---------- Franja de confianza ---------- */
+
+.ftTrust {
+  list-style: none;
+  margin: 0 0 56px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--ft-border);
+  border-radius: 18px;
+  background: var(--ft-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-/* Grid principal */
-.ftGrid {
+.ftTrustItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+  min-width: 0;
+}
+
+.ftTrustItem + .ftTrustItem { border-left: 1px solid var(--ft-border); }
+
+.ftTrustIcon {
+  flex: none;
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 36px;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: var(--ft-accent);
+  background: var(--ft-accent-soft);
 }
+
+.ftTrustCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--ft-muted);
+}
+
+.ftTrustCopy strong {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ft-text);
+}
+
+/* ---------- Cuerpo principal ---------- */
+
+.ftMain {
+  display: grid;
+  grid-template-columns: 1.6fr 0.8fr 1fr 1.3fr;
+  gap: 48px;
+}
+
+/* Intro: marca + descripción */
+.ftIntro { max-width: 380px; }
+
+.ftBrand {
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--ft-serif);
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  color: var(--ft-text);
+}
+
+.ftBrandSub {
+  margin-top: 7px;
+  font-family: var(--ft-serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ft-accent);
+}
+
+.ftIntroText {
+  margin: 0 0 24px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--ft-muted);
+}
+
+/* Botón WhatsApp */
+.ftCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #062b14;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 24px -10px rgba(37, 211, 102, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.ftCta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 14px 28px -12px rgba(37, 211, 102, 0.85);
+}
+
+/* Redes sociales */
+.ftSocials {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.ftSocialsLink {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--ft-border);
+  background: var(--ft-surface);
+  color: var(--ft-text);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.ftSocialsLink:hover {
+  background: var(--ft-accent);
+  border-color: var(--ft-accent);
+  color: #111;
+  transform: translateY(-2px);
+}
+
+/* ---------- Columnas ---------- */
+
 .ftCol { min-width: 0; }
+
 .ftColTitle {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin: 0 0 14px;
+  position: relative;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ft-text);
 }
-.ftColText {
-  font-size: 0.82rem;
-  margin: 0 0 14px;
-  line-height: 1.5;
+
+.ftColTitle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ft-accent);
 }
+
 .ftList {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 11px;
 }
-.ftLink {
-  font-size: 0.85rem;
-  text-decoration: none;
-  transition: opacity 0.15s ease;
-}
-.ftLink:hover { opacity: 0.75; }
 
-/* Newsletter */
+.ftLink {
+  position: relative;
+  display: inline-block;
+  font-size: 0.92rem;
+  color: var(--ft-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.ftLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--ft-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.ftLink:hover { color: var(--ft-text); }
+.ftLink:hover::after { transform: scaleX(1); }
+
+/* ---------- Contacto ---------- */
+
+.ftContactList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ftContactItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--ft-muted);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition: color 0.2s ease;
+}
+
+a.ftContactItem:hover { color: var(--ft-text); }
+
+.ftContactIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--ft-border);
+  background: var(--ft-surface);
+  color: var(--ft-accent);
+  transition: background 0.2s ease;
+}
+
+a.ftContactItem:hover .ftContactIcon { background: var(--ft-surface-hover); }
+
+/* ---------- Divisor y barra inferior ---------- */
+
+.ftDivider {
+  height: 1px;
+  width: 100%;
+  margin: 48px 0 24px;
+  background: var(--ft-border);
+}
+
+.ftCopyRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.ftCopyText {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ft-muted);
+}
+
+.ftCopyRight {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.ftBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--ft-border);
+  border-radius: 999px;
+  background: var(--ft-surface);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ft-text);
+}
+
+.ftBadgeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  animation: ftPulse 2.4s ease-out infinite;
+}
+
+@keyframes ftPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+  70%  { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.ftDevLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.78rem;
+  color: var(--ft-muted);
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.ftDevLink:hover {
+  color: var(--ft-accent);
+  border-color: var(--ft-border);
+  background: var(--ft-surface);
+}
+
+/* ---------- Marca de agua ---------- */
+
+.ftWatermark {
+  position: relative;
+  z-index: 0;
+  margin-top: -8px;
+  height: 0.55em;
+  overflow: hidden;
+  text-align: center;
+  font-family: var(--ft-serif);
+  font-size: clamp(7rem, 24vw, 19rem);
+  font-weight: 700;
+  line-height: 0.72;
+  letter-spacing: 0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--ft-watermark);
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ---------- Accesibilidad ---------- */
+
+.ftRoot a:focus-visible {
+  outline: 2px solid var(--ft-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ftBadgeDot { animation: none; }
+  .ftCta,
+  .ftSocialsLink,
+  .ftLink,
+  .ftLink::after { transition: none; }
+}
+
+/* ============================================================
+   Clases de la plantilla anterior (no usadas en este Footer.tsx,
+   se conservan para otros clientes que compartan el módulo)
+   ============================================================ */
+
+.ftGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 36px;
+}
+
+.ftColText {
+  font-size: 0.82rem;
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
 .ftNewsletter {
   display: flex;
   align-items: center;
   max-width: 320px;
-  border: 1px solid;
+  border: 1px solid var(--ft-border);
   border-radius: 10px;
   padding: 4px 4px 4px 14px;
   background: transparent;
 }
+
 .ftNewsletterInput {
   flex: 1;
   min-width: 0;
@@ -98,8 +475,11 @@
   outline: none;
   font-size: 0.85rem;
   padding: 8px 6px;
+  color: var(--ft-text);
 }
-.ftNewsletterInput::placeholder { color: var(--textSecondary); opacity: 0.7; }
+
+.ftNewsletterInput::placeholder { color: var(--ft-muted); opacity: 0.7; }
+
 .ftNewsletterBtn {
   flex-shrink: 0;
   display: flex;
@@ -108,14 +488,15 @@
   width: 34px;
   height: 34px;
   border: none;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--ft-surface-hover);
   border-radius: 7px;
+  color: var(--ft-text);
   cursor: pointer;
   transition: background 0.15s ease, transform 0.15s ease;
 }
-.ftNewsletterBtn:hover { background: rgba(255, 255, 255, 0.16); transform: translateX(2px); }
 
-/* Línea de WhatsApp de contacto */
+.ftNewsletterBtn:hover { background: var(--ft-border); transform: translateX(2px); }
+
 .ftWhatsappLine {
   display: inline-flex;
   align-items: center;
@@ -125,38 +506,9 @@
   margin-bottom: 10px;
   transition: opacity 0.15s ease;
 }
+
 .ftWhatsappLine:hover { opacity: 0.8; }
 
-/* Redes sociales */
-.ftSocials {
-  list-style: none;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 0 0 28px;
-  padding: 0;
-}
-.ftSocialsLink {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid;
-  border-radius: 50%;
-  text-decoration: none;
-  transition: transform 0.15s ease, opacity 0.15s ease;
-}
-.ftSocialsLink:hover { transform: translateY(-2px); opacity: 0.85; }
-
-/* Divider */
-.ftDivider {
-  height: 1px;
-  width: 100%;
-  margin-bottom: 24px;
-}
-
-/* Métodos de pago */
 .ftPayments {
   display: flex;
   justify-content: center;
@@ -164,6 +516,7 @@
   gap: 10px;
   margin-bottom: 24px;
 }
+
 .ftPayCard {
   width: 46px;
   height: 30px;
@@ -176,50 +529,6 @@
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
-/* Fila de copyright */
-.ftCopyRow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  text-align: center;
-}
-.ftCopyText {
-  font-size: 0.78rem;
-  margin: 0;
-}
-.ftCopyRight {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-.ftBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid;
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-.ftBadgeDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22c55e;
-  flex-shrink: 0;
-}
-.ftDevLink {
-  font-size: 0.72rem;
-  text-decoration: none;
-  opacity: 0.85;
-  transition: opacity 0.15s ease;
-}
-.ftDevLink:hover { opacity: 1; }
-
 /* ---------------- Responsive ---------------- */
 
 @media (min-width: 768px) {
@@ -230,15 +539,60 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .ftMain {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .ftIntro {
+    grid-column: 1 / -1;
+    max-width: 520px;
+  }
+
+  .ftTrust { grid-template-columns: repeat(2, 1fr); }
+  .ftTrustItem:nth-child(3) { border-left: none; }
+  .ftTrustItem:nth-child(n + 3) { border-top: 1px solid var(--ft-border); }
+}
+
 @media (max-width: 767px) {
   .ftContainer { padding: 40px 20px 24px; }
-  .ftIntro { text-align: center; margin: 0 auto 32px; }
+
+  .ftTrust {
+    grid-template-columns: 1fr;
+    margin-bottom: 40px;
+  }
+
+  .ftTrustItem + .ftTrustItem {
+    border-left: none;
+    border-top: 1px solid var(--ft-border);
+  }
+
+  .ftMain {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .ftBrand { font-size: 2.6rem; }
+
+  .ftCta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ftDivider { margin-top: 36px; }
+
+  .ftCopyRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* plantilla anterior */
   .ftGrid {
     grid-template-columns: 1fr;
     gap: 32px;
     text-align: center;
   }
   .ftNewsletter { margin: 0 auto; }
-  .ftList { align-items: center; }
   .ftWhatsappLine { display: flex; justify-content: center; }
 }

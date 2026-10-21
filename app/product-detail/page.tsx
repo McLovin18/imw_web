@@ -107,18 +107,14 @@ export default function ProductDetailPage({ params }) {
       fetchReviews(id);
       if (prod) {
         let rel = [];
-        console.log("[RELACIONADOS] subsubcategoria:", prod.subsubcategoria, "subcategoria:", prod.subcategoria, "categoria:", prod.categoria);
         if (prod.subsubcategoria) {
           rel = await obtenerProductosPorSubsubcategoria(prod.subsubcategoria, prod.id, 10);
-          console.log("[RELACIONADOS] encontrados por subsubcategoria:", rel);
         }
         if ((!rel || rel.length === 0) && prod.subcategoria) {
           rel = await obtenerProductosPorSubcategoria(prod.subcategoria, prod.id, 10);
-          console.log("[RELACIONADOS] encontrados por subcategoria:", rel);
         }
         if ((!rel || rel.length === 0) && prod.categoria) {
           rel = await obtenerProductosPorCategoria(prod.categoria, prod.id, 10);
-          console.log("[RELACIONADOS] encontrados por categoria:", rel);
         }
         setRelacionados(rel);
       } else {
@@ -221,12 +217,6 @@ export default function ProductDetailPage({ params }) {
   const stockVariants = Array.isArray(stockVariantsRaw) 
     ? stockVariantsRaw 
     : Object.values(stockVariantsRaw || {}).filter((v: any) => v && typeof v === 'object');
-  
-  console.log("[product-detail] hasVariations:", hasVariations);
-  console.log("[product-detail] variationAttributeIds:", variationAttributeIds);
-  console.log("[product-detail] stockVariants (raw):", stockVariantsRaw);
-  console.log("[product-detail] stockVariants (converted):", stockVariants);
-  console.log("[product-detail] stockVariants isArray:", Array.isArray(stockVariants));
   
   // Calcular maxCantidad basado en currentStock (que es actualizado por VariationsManager)
   const maxCantidad = hasVariations ? currentStock : (producto?.stock || 0);

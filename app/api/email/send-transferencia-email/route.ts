@@ -243,7 +243,7 @@ export async function POST(req: NextRequest) {
     }
 
     const email = tipo === "cliente" 
-      ? orden.datosCliente?.email 
+      ? (orden.datosCliente?.email || orden.guestEmail || orden.userEmail)
       : process.env.OWNER_EMAIL || "dueño@imw.com";
 
     if (!email || typeof email !== "string" || email.trim() === "" || 

@@ -35,14 +35,6 @@ export default function VariationsManager({
     ? stockVariantsProp 
     : Object.values(stockVariantsProp || {}).filter((v: any) => v && typeof v === 'object') as StockVariant[];
 
-  console.log("[VariationsManager] stockVariantsProp:", stockVariantsProp);
-  console.log("[VariationsManager] stockVariants (converted):", stockVariants);
-  console.log("[VariationsManager] stockVariants[0]:", stockVariants[0]);
-  console.log("[VariationsManager] stockVariants[0].attributes:", stockVariants[0]?.attributes);
-  console.log("[VariationsManager] stockVariants[0] keys:", stockVariants[0] ? Object.keys(stockVariants[0]) : []);
-  console.log("[VariationsManager] variationAttributeIds:", variationAttributeIds);
-  console.log("[VariationsManager] selectedVariations:", selectedVariations);
-
   // Calcular opciones disponibles para cada atributo
   const availableOptions = useMemo(() => {
     const formatted: Record<string, string[]> = {};

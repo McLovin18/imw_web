@@ -8,7 +8,7 @@ const sections = [
   {
     number: "01",
     title: "Responsable del Tratamiento de Datos",
-    body: "IMW - In My Wardrobe. Tienda online de perfumes. Domiciliada en Ecuador. Correo para temas de privacidad: imw_ec@gmail.com — WhatsApp: 0968514889.",
+    body: "iMW. Tienda online de perfumes. Domiciliada en Ecuador. Correo para temas de privacidad: imw_ec@gmail.com — WhatsApp: 0968514889.",
   },
   {
     number: "02",
@@ -430,7 +430,7 @@ const PoliticaPrivacidad: React.FC = () => {
               POLÍTICA DE<br /><span>PRIVACIDAD</span>
             </h1>
             <p className="pp-subtitle">
-              En IMW - In My Wardrobe protegemos tu información personal. Aquí te explicamos con transparencia cómo recopilamos y usamos tus datos.
+              En iMW protegemos tu información personal. Aquí te explicamos con transparencia cómo recopilamos y usamos tus datos.
             </p>
             <p className="pp-date">Última actualización: 01 de Octubre de 2026</p>
             <div className="pp-divider" />
@@ -488,12 +488,12 @@ const PoliticaPrivacidad: React.FC = () => {
 
           {/* CONSENT NOTE */}
           <div className="pp-consent">
-            Al usar <strong>imw_ec</strong> y marcar la casilla <strong>"Acepto la Política de Privacidad"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley Orgánica de Protección de Datos Personales de Ecuador</strong>.
+            Al usar <strong>iMW</strong> y marcar la casilla <strong>"Acepto la Política de Privacidad"</strong> en el checkout, confirmas que leíste y estás de acuerdo con este documento. Conforme a la <strong>Ley Orgánica de Protección de Datos Personales de Ecuador</strong>.
           </div>
 
           {/* FOOTER */}
           <div className="pp-footer">
-            <p>Gracias por confiar en IMW - In My Wardrobe. Tu privacidad es lo primero.</p>
+            <p>Gracias por confiar en iMW. Tu privacidad es lo primero.</p>
             <Link href="/">← Volver al inicio</Link>
           </div>
         </div>

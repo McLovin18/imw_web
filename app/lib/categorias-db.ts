@@ -148,12 +148,9 @@ export function productMatchesSubsubcategoria(
 }
 
 export async function obtenerCategorias() {
-  console.log("[obtenerCategorias] Cargando categorías de:", COLLECTION);
   try {
     const snapshot = await getDocs(query(collection(db, COLLECTION), limit(100)));
-    console.log("[obtenerCategorias] Documentos encontrados:", snapshot.docs.length);
     const categorias = sortCategoriasByOrder(mapCategorySnapshot(snapshot.docs));
-    console.log("[obtenerCategorias] Categorías cargadas:", categorias);
     return categorias;
   } catch (error) {
     console.error("[obtenerCategorias] Error al cargar categorías:", error);
@@ -177,18 +174,9 @@ function cleanUndefinedDeep(obj) {
 }
 
 export async function guardarCategoria(categoria) {
-  console.log("[guardarCategoria] =======================================");
-  console.log("[guardarCategoria] Intentando guardar categoría:", categoria);
-  console.log("[guardarCategoria] Colección:", COLLECTION);
-  console.log("[guardarCategoria] Document ID:", categoria.id);
-
   try {
-    const startTime = Date.now();
-    console.log("[guardarCategoria] Iniciando setDoc...");
     const docRef = doc(db, COLLECTION, categoria.id);
-    console.log("[guardarCategoria] Doc ref creado:", docRef);
 
-    // Agregar timeout de 10 segundos
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("TIMEOUT: La operación de Firestore tardó más de 10 segundos")), 10000);
     });
@@ -198,11 +186,9 @@ export async function guardarCategoria(categoria) {
       timeoutPromise
     ]);
 
-    const elapsed = Date.now() - startTime;
-    console.log(`[guardarCategoria] ✅ Categoría guardada exitosamente en ${elapsed}ms:`, categoria.id);
+    await docRef.set(categoria, { merge: true });
   } catch (error) {
-    console.error("[guardarCategoria] ❌ Error al guardar categoría:", error);
-    console.error("[guardarCategoria] Error code:", error.code);
+    console.error("[guardarCategoria] Error al guardar categoría:", error);
     console.error("[guardarCategoria] Error message:", error.message);
     throw error;
   }

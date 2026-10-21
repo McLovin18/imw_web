@@ -1,32 +1,18 @@
 
 import admin from "firebase-admin";
 
-console.log("[Firebase Admin] 1. Module imported");
-console.log("[Firebase Admin] 2. Checking env vars...");
-console.log("[Firebase Admin] FIREBASE_PROJECT_ID exists:", !!process.env.FIREBASE_PROJECT_ID);
-console.log("[Firebase Admin] FIREBASE_CLIENT_EMAIL exists:", !!process.env.FIREBASE_CLIENT_EMAIL);
-console.log("[Firebase Admin] FIREBASE_PRIVATE_KEY exists:", !!process.env.FIREBASE_PRIVATE_KEY);
-
 let db: admin.firestore.Firestore;
 let adminAuth: admin.auth.Auth;
 
 if (!admin.apps.length) {
   try {
-    console.log("[Firebase Admin] 3. Apps not initialized, starting init...");
-    
     if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
-      console.log("[Firebase Admin] 4. Using env vars to init...");
       
       // Clean up private key - remove any leading/trailing whitespace, ensure proper line breaks
       let privateKey = process.env.FIREBASE_PRIVATE_KEY;
       
-      // Fix common issues: remove literal \n characters and replace with real ones, trim whitespace
       privateKey = privateKey.trim().replace(/\\n/g, "\n").replace(/\r/g, "");
       
-      console.log("[Firebase Admin] 5. Private key length after cleanup:", privateKey.length);
-      console.log("[Firebase Admin] 5. Private key starts with: " + privateKey.substring(0, 40));
-      
-      // Clean up key (remove any whitespace or trailing newlines, make sure it's properly formatted
       privateKey = privateKey.trim();
       if (!privateKey.startsWith("-----BEGIN PRIVATE KEY-----")) {
         // If it doesn't have the header, check if it's in the raw key and add it
@@ -39,7 +25,6 @@ if (!admin.apps.length) {
       }
       
       const storageBucket = process.env.FIREBASE_STORAGE_BUCKET || `${process.env.FIREBASE_PROJECT_ID}.appspot.com`;
-      console.log("[Firebase Admin] Storage bucket:", storageBucket);
       
       admin.initializeApp({
         credential: admin.credential.cert({
@@ -49,29 +34,20 @@ if (!admin.apps.length) {
         }),
         storageBucket: storageBucket,
       });
-      console.log("[Firebase Admin] 6. ✅ Initialized with env vars");
     } else {
-      console.log("[Firebase Admin] 4. Using default credentials...");
       admin.initializeApp();
-      console.log("[Firebase Admin] 6. ✅ Initialized with default credentials");
     }
     
-    console.log("[Firebase Admin] 7. Getting Firestore instance...");
     db = admin.firestore();
     db.settings({ ignoreUndefinedProperties: true });
     
     // Eliminado test de conexión innecesario que añadía latencia
     
     adminAuth = admin.auth();
-    console.log("[Firebase Admin] 8. ✅ All instances ready!");
   } catch (err) {
-    console.error("[Firebase Admin] ❌ Initialization error:", err);
-    // Don't throw error - allow app to continue without Firebase
-    console.warn("[Firebase Admin] ⚠️  App will continue without Firebase admin features");
+    console.error("[Firebase Admin] Initialization error:", err);
   }
 } else {
-  console.log("[Firebase Admin] 3. Already initialized, skipping...");
-  console.log("[Firebase Admin] 7. Getting existing Firestore instance...");
   db = admin.firestore();
   adminAuth = admin.auth();
 }

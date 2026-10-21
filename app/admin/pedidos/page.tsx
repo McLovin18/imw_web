@@ -124,9 +124,34 @@ export default function PedidosAdminPage() {
 		try {
 			setLoading(true);
 
-			// Deducir stock cuando se aprueba y actualizar estado
-			await deducirStockOrden(orden.id);
-			await actualizarOrden(orden.id, { estado: "aprobada" });
+			// Llamar al API endpoint que usa admin SDK
+			const res = await fetch(`/api/admin/ordenes/approve`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ ordenId: orden.id, orden }),
+			});
+
+			if (!res.ok) {
+				const error = await res.json();
+				throw new Error(error.error || "Error al aprobar orden");
+			}
+
+			// Enviar emails de aprobación
+			try {
+				await fetch("/api/email/send-aprobacion-email", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ orden, tipo: "cliente" }),
+				});
+				await fetch("/api/email/send-aprobacion-email", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ orden, tipo: "dueño" }),
+				});
+			} catch (emailError) {
+				console.error("Error enviando emails de aprobación:", emailError);
+			}
+
 			setOrdenes((prev) => prev.map((o) => o.id === orden.id ? { ...o, estado: "aprobada" } : o));
 			alert("✅ Orden aprobada exitosamente");
 		} catch (error: any) {
@@ -140,46 +165,58 @@ export default function PedidosAdminPage() {
 	const rechazarOrden = async (orden: any) => {
 		const motivo = prompt("Motivo de rechazo (opcional):");
 		if (motivo === null) return; // Usuario canceló
-		
+
 		try {
 			setLoading(true);
-			
-			// Usar endpoint genérico de rechazo
-			const endpoint = "/api/admin/reject-order";
-			
-			const res = await fetch(endpoint, {
+
+			// Llamar al API endpoint que usa admin SDK
+			const res = await fetch(`/api/admin/ordenes/reject`, {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					"x-admin-token": process.env.NEXT_PUBLIC_ADMIN_TOKEN || "",
-				},
-				body: JSON.stringify({
-					orderId: orden.id,
-					reason: motivo || "Rechazada por el administrador",
-				}),
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ ordenId: orden.id, orden, motivo }),
 			});
-			
+
 			if (!res.ok) {
 				const error = await res.json();
-				throw new Error(error.error || `Error ${res.status}`);
+				throw new Error(error.error || "Error al rechazar orden");
 			}
-			
-			const data = await res.json();
-			
-			// ✅ Actualizar UI localmente
+
+			// Enviar emails de rechazo
+			try {
+				await fetch("/api/email/send-rechazo-email", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						orden: { ...orden, motivoRechazo: motivo },
+						tipo: "cliente",
+					}),
+				});
+				await fetch("/api/email/send-rechazo-email", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						orden: { ...orden, motivoRechazo: motivo },
+						tipo: "dueño",
+					}),
+				});
+			} catch (emailError) {
+				console.error("Error enviando emails de rechazo:", emailError);
+			}
+
+			// Actualizar UI localmente
 			setOrdenes((prev) =>
 				prev.map((o) =>
 					o.id === orden.id
 						? {
-							...o,
-							estado: "rechazada",
-							motivoRechazo: motivo || "",
-						}
+								...o,
+								estado: "rechazada",
+								motivoRechazo: motivo || "",
+							}
 						: o
 				)
 			);
-			
-			alert(`✅ ${data.message || "Orden rechazada exitosamente y stock devuelto"}`);
+
+			alert("✅ Orden rechazada exitosamente y stock devuelto");
 		} catch (error: any) {
 			console.error("Error al rechazar orden:", error);
 			alert(`❌ Error: ${error.message || "No se pudo rechazar la orden"}`);
@@ -283,7 +320,11 @@ export default function PedidosAdminPage() {
 					<span className="font-bold text-lg text-slate-800 dark:text-slate-100">
 						{orden.orderId || `#${orden.id.slice(-6)}`}
 					</span>
-					{/* payment method badge removed (Stripe not used) */}
+					{orden.metodoPago === "transferencia" && (
+						<span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-xs font-bold text-blue-700 dark:text-blue-300">
+							Transferencia
+						</span>
+					)}
 				</div>
 				{estadoBadge(orden.estado)}
 			</div>
@@ -304,7 +345,56 @@ export default function PedidosAdminPage() {
 						{orden.visitaHora && <span>{orden.visitaHora}</span>}
 					</div>
 				)}
+				{orden.datosEnvio && (
+					<div className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">
+						📍 {orden.datosEnvio.nombreCiudad || orden.datosEnvio.ciudad}
+					</div>
+				)}
 			</div>
+
+			{/* Datos de cliente para transferencias */}
+			{orden.metodoPago === "transferencia" && orden.datosCliente && (
+				<div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3 py-2 mb-3 border border-blue-100 dark:border-blue-900/40 space-y-1">
+					<p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">
+						Datos del cliente:
+					</p>
+					<p className="text-xs text-slate-600 dark:text-slate-300">
+						<strong>Nombre:</strong> {orden.datosCliente.nombre}
+					</p>
+					<p className="text-xs text-slate-600 dark:text-slate-300">
+						<strong>Teléfono:</strong> {orden.datosCliente.telefono}
+					</p>
+					<p className="text-xs text-slate-600 dark:text-slate-300">
+						<strong>Cédula/RUC:</strong> {orden.datosCliente.cedulaRuc}
+					</p>
+					{orden.datosEnvio && (
+						<p className="text-xs text-slate-600 dark:text-slate-300">
+							<strong>Dirección:</strong> {orden.datosEnvio.direccion}
+						</p>
+					)}
+				</div>
+			)}
+
+			{/* Evidencia de transferencia */}
+			{orden.metodoPago === "transferencia" && orden.evidenciaTransferencia && (
+				<div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg px-3 py-2 mb-3 border border-purple-100 dark:border-purple-900/40">
+					<p className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-2">
+						Evidencia de transferencia:
+					</p>
+					<a
+						href={orden.evidenciaTransferencia}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-block"
+					>
+						<img
+							src={orden.evidenciaTransferencia}
+							alt="Evidencia"
+							className="max-w-full h-auto rounded-lg border border-purple-200 dark:border-purple-800 max-h-40 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+						/>
+					</a>
+				</div>
+			)}
 
 			{/* Productos */}
 			<ul className="border-t border-slate-100 dark:border-slate-700 pt-3 mb-3 space-y-2">

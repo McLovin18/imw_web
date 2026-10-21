@@ -38,12 +38,16 @@ if (!admin.apps.length) {
         privateKey = privateKey + "\n-----END PRIVATE KEY-----";
       }
       
+      const storageBucket = process.env.FIREBASE_STORAGE_BUCKET || `${process.env.FIREBASE_PROJECT_ID}.appspot.com`;
+      console.log("[Firebase Admin] Storage bucket:", storageBucket);
+      
       admin.initializeApp({
         credential: admin.credential.cert({
           projectId: process.env.FIREBASE_PROJECT_ID,
           clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
           privateKey: privateKey,
         }),
+        storageBucket: storageBucket,
       });
       console.log("[Firebase Admin] 6. ✅ Initialized with env vars");
     } else {

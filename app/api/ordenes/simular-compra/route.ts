@@ -429,7 +429,7 @@ export async function POST(req: NextRequest) {
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       await resend.emails.send({
-        from: "Marca Estilo <noreply@marcaestilo.com>",
+        from: process.env.EMAIL_FROM_ADDRESS || "Marca Estilo <noreply@marcaestilo.com>",
         to: email,
         subject: `Tu orden #${resultado.orderId} ha sido recibida`,
         html: emailHtml,

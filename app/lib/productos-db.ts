@@ -30,6 +30,7 @@ export interface Producto {
   nombre?: string;
   descripcion?: string;
   precio?: number;
+  precioPromocional?: string;
   descuento?: number;
   stock?: number;
   isCamiseta?: boolean;

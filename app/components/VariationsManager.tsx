@@ -23,13 +23,26 @@ interface VariationsManagerProps {
 }
 
 export default function VariationsManager({
-  stockVariants,
+  stockVariants: stockVariantsProp,
   variationAttributeIds,
   attributeNames,
   selectedVariations,
   onVariationChange,
   onStockChange,
 }: VariationsManagerProps) {
+  // Convertir stockVariants de Object a Array si es necesario
+  const stockVariants = Array.isArray(stockVariantsProp) 
+    ? stockVariantsProp 
+    : Object.values(stockVariantsProp || {}).filter((v: any) => v && typeof v === 'object') as StockVariant[];
+
+  console.log("[VariationsManager] stockVariantsProp:", stockVariantsProp);
+  console.log("[VariationsManager] stockVariants (converted):", stockVariants);
+  console.log("[VariationsManager] stockVariants[0]:", stockVariants[0]);
+  console.log("[VariationsManager] stockVariants[0].attributes:", stockVariants[0]?.attributes);
+  console.log("[VariationsManager] stockVariants[0] keys:", stockVariants[0] ? Object.keys(stockVariants[0]) : []);
+  console.log("[VariationsManager] variationAttributeIds:", variationAttributeIds);
+  console.log("[VariationsManager] selectedVariations:", selectedVariations);
+
   // Calcular opciones disponibles para cada atributo
   const availableOptions = useMemo(() => {
     const formatted: Record<string, string[]> = {};
@@ -37,7 +50,8 @@ export default function VariationsManager({
     variationAttributeIds.forEach((targetAttrId) => {
       const values = new Set<string>();
 
-      stockVariants.forEach((variant) => {
+      const variants = Array.isArray(stockVariants) ? stockVariants : [];
+      variants.forEach((variant) => {
         if (variant.cantidad <= 0) {
           return;
         }
@@ -77,15 +91,16 @@ export default function VariationsManager({
       return 0;
     }
 
+    const variants = Array.isArray(stockVariants) ? stockVariants : [];
     // Encontrar la variante que coincida
-    const matchingVariants = stockVariants.filter((variant) => {
+    const matchingVariants = variants.filter((variant: StockVariant) => {
       const attrs = variant.attributes || {};
       return variationAttributeIds.every(
         (attrId) => attrs[attrId] === selectedVariations[attrId]
       );
     });
 
-    return matchingVariants.reduce((sum, variant) => sum + (variant.cantidad || 0), 0);
+    return matchingVariants.reduce((sum, variant: StockVariant) => sum + (variant.cantidad || 0), 0);
   }, [stockVariants, variationAttributeIds, selectedVariations]);
 
   // Notificar cambio de stock

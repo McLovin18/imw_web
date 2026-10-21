@@ -6,6 +6,7 @@ import { getSnapshotPricing } from "../lib/pricing";
 import { useUser } from "../context/UserContext";
 import BottomBarPublic from "../components/BottomBarPublic";
 import { obtenerAtributos } from "../lib/atributos-db";
+import TransferenciaModal from "../components/TransferenciaModal";
 
 function resolveCartItemKey(item: any) {
   if (!item) return "";
@@ -66,6 +67,8 @@ export default function CartPage() {
   const [error, setError] = useState("");
   const { isLogged } = useUser();
   const [atributos, setAtributos] = useState<any[]>([]);
+  const [showTransferenciaModal, setShowTransferenciaModal] = useState(false);
+  const [cuentasBancarias, setCuentasBancarias] = useState<CuentaBancaria[]>([]);
 
   const calcularPrecioData = (p: any) => {
     const { basePrice, discount, hasDiscount, fakeOldPrice, finalPrice } = getSnapshotPricing(p);
@@ -78,7 +81,22 @@ export default function CartPage() {
       setAtributos(data);
     }
 
+    async function loadCuentasBancarias() {
+      try {
+        const res = await fetch("/api/cuentas-bancarias");
+        if (res.ok) {
+          const data = await res.json();
+          setCuentasBancarias(data);
+        } else {
+          console.error("Error fetching cuentas bancarias:", res.status);
+        }
+      } catch (error) {
+        console.error("Error cargando cuentas bancarias:", error);
+      }
+    }
+
     loadAtributos();
+    loadCuentasBancarias();
   }, []);
 
   const subtotal = carrito.reduce((sum, p) => {
@@ -160,6 +178,34 @@ export default function CartPage() {
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "0968517232";
     const message = await generateWhatsAppMessage();
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+  };
+
+  const handleTransferenciaClick = () => {
+    setError("");
+
+    if (carrito.length === 0) {
+      setError("El carrito está vacío");
+      return;
+    }
+
+    for (const p of carrito) {
+      const availableStock = resolveAvailableStock(p);
+      if (p.cantidad > availableStock) {
+        setError(`Solo hay ${availableStock} unidades disponibles de "${p.nombre}".`);
+        return;
+      }
+    }
+
+    if (cuentasBancarias.length === 0) {
+      setError("No hay cuentas bancarias disponibles para transferencia");
+      return;
+    }
+
+    setShowTransferenciaModal(true);
+  };
+
+  const handleOrdenCreada = () => {
+    setShowTransferenciaModal(false);
   };
 
   const handleCantidad = (id: string, cantidad: number) => {
@@ -382,7 +428,15 @@ export default function CartPage() {
                       title="Enviar pedido por WhatsApp"
                     >
                       <span className="material-icons-round text-base">chat</span>
-                      Pedir por WhatsApp
+                      Pedir con WhatsApp
+                    </button>
+                    <button
+                      onClick={handleTransferenciaClick}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-sm rounded-xl transition-colors shadow-md"
+                      title="Pagar por transferencia bancaria"
+                    >
+                      <span className="material-icons-round text-base">account_balance</span>
+                      Pagar por Transferencia
                     </button>
                   </div>
                 </div>
@@ -392,6 +446,25 @@ export default function CartPage() {
         </main>
       </div>
       {!isLogged && <BottomBarPublic />}
+      
+      {showTransferenciaModal && (
+        <TransferenciaModal
+          carrito={carrito}
+          subtotal={subtotal}
+          total={total}
+          onClose={() => setShowTransferenciaModal(false)}
+          cuentasBancarias={cuentasBancarias}
+          atributos={atributos}
+          getVariationText={getVariationText}
+          onOrdenCreada={handleOrdenCreada}
+          clearCarrito={() => {
+            carrito.forEach((p) => {
+              const key = resolveCartItemKey(p);
+              removeCarrito(key);
+            });
+          }}
+        />
+      )}
     </>
   );
 }

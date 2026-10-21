@@ -369,7 +369,10 @@ function ProductoCard({
 
   const hasVariations =
     producto?.hasVariations || producto?.isCamiseta || false;
-  const stockVariants = producto?.stockVariants || [];
+  const stockVariantsRaw = producto?.stockVariants || [];
+  const stockVariants = Array.isArray(stockVariantsRaw) 
+    ? stockVariantsRaw 
+    : Object.values(stockVariantsRaw || {}).filter((v: any) => v && typeof v === 'object');
 
   const totalStock = hasVariations
     ? stockVariants.reduce((sum: number, v: any) => sum + (v?.cantidad || 0), 0) || 0

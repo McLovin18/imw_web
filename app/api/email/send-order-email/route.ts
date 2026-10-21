@@ -25,7 +25,7 @@ function buildOrderEmailHTML(orden: any): string {
         <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);border-radius:12px 12px 0 0;">
           <tr>
             <td style="padding:32px;text-align:center;color:white;">
-              <h1 style="margin:0 0 8px;font-size:28px;font-weight:bold;">🛍️ TecnoThings</h1>
+              <h1 style="margin:0 0 8px;font-size:28px;font-weight:bold;">🛍️ IMW</h1>
               <p style="margin:0;font-size:14px;opacity:0.9;">Tu orden ha sido recibida</p>
             </td>
           </tr>
@@ -118,7 +118,7 @@ function buildOrderEmailHTML(orden: any): string {
                   <strong>Presenta:</strong> Este número de orden <strong>${orden.orderId}</strong> o tu documento
                 </p>
                 <p style="margin:12px 0 0;font-size:13px;color:#92400e;">
-                  Para seguimiento: <a href="${process.env.NEXT_PUBLIC_DOMAIN || "https://tecnothings.com"}/home/ordenes" style="color:#6d28d9;font-weight:bold;text-decoration:none;">Ver mis órdenes</a>
+                  Para seguimiento: <a href="${process.env.NEXT_PUBLIC_DOMAIN || "https://imw.com"}/home/ordenes" style="color:#6d28d9;font-weight:bold;text-decoration:none;">Ver mis órdenes</a>
                 </p>
               </div>
             </td>
@@ -128,8 +128,8 @@ function buildOrderEmailHTML(orden: any): string {
         <!-- Footer -->
         <tr>
           <td style="background:#f9fafb;padding:20px 36px;text-align:center;border-top:1px solid #e5e7eb;border-radius:0 0 12px 12px;">
-            <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">Este correo fue enviado automáticamente por TecnoThings</p>
-            <p style="margin:0;font-size:11px;color:#d1d5db;">© ${new Date().getFullYear()} TecnoThings. Todos los derechos reservados.</p>
+            <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">Este correo fue enviado automáticamente por IMW</p>
+            <p style="margin:0;font-size:11px;color:#d1d5db;">© ${new Date().getFullYear()} IMW. Todos los derechos reservados.</p>
           </td>
         </tr>
       </td>
@@ -163,13 +163,17 @@ export async function POST(req: NextRequest) {
 
     const resend = new Resend(resendApiKey);
 
+    const emailFrom = process.env.EMAIL_FROM || "pedidos@imw.com";
+    const emailReplyTo = process.env.EMAIL_REPLY_TO || "soporte@imw.com";
+    const siteName = process.env.SITE_NAME || "IMW";
+
     // Enviar email con Resend
     const emailResponse = await resend.emails.send({
-      from: "pedidos@tecnothings.com",
+      from: emailFrom,
       to: email.trim(),
-      subject: `Tu pedido ${orden.orderId} ha sido recibido — TecnoThings`,
+      subject: `Tu pedido ${orden.orderId} ha sido recibido — ${siteName}`,
       html: buildOrderEmailHTML(orden),
-      replyTo: "soporte@tecnothings.com",
+      replyTo: emailReplyTo,
     });
 
     if (emailResponse.error) {

@@ -329,11 +329,11 @@ export async function POST(req: NextRequest) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
         const emailResponse = await resend.emails.send({
-          from: "pedidos@tecnothings.com",
+          from: process.env.EMAIL_FROM_ADDRESS || "pedidos@tecnothings.com",
           to: resultado.email,
           subject: `Tu pedido ${resultado.orderId} ha sido recibido — TecnoThings`,
           html: buildOrderEmailHTML(resultado),
-          replyTo: "soporte@tecnothings.com",
+          replyTo: process.env.EMAIL_FROM_ADDRESS || "soporte@tecnothings.com",
         });
 
         if (emailResponse.error) {

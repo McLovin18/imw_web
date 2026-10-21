@@ -63,11 +63,26 @@ export async function crearOrdenAdmin(orden: any) {
     const unitPrice = finalPrice;
     const lineTotal = unitPrice * cantidad;
 
-    // Validar stock
-    const stock = Number(data.stock || 0);
-    if (stock < cantidad) {
+    // Validar stock (considerar variaciones si existen)
+    const stockVariants = data.stockVariants || [];
+    let availableStock = Number(data.stock || 0);
+    
+    if (item.selectedVariations && item.variationAttributeIds && stockVariants.length > 0) {
+      // Buscar variación específica
+      const variantIndex = stockVariants.findIndex((v: any) => {
+        return item.variationAttributeIds.every(
+          (attrId: string) => v.attributes?.[attrId] === item.selectedVariations[attrId]
+        );
+      });
+      
+      if (variantIndex !== -1) {
+        availableStock = Number(stockVariants[variantIndex].cantidad || 0);
+      }
+    }
+    
+    if (availableStock < cantidad) {
       throw new Error(
-        `Stock insuficiente para "${data.nombre}". Disponibles: ${stock}, Solicitados: ${cantidad}`
+        `Stock insuficiente para "${data.nombre}". Disponibles: ${availableStock}, Solicitados: ${cantidad}`
       );
     }
 
@@ -110,5 +125,161 @@ export async function crearOrdenAdmin(orden: any) {
   return {
     id: ordenDoc.id,
     orderId,
+    createdAt: admin.firestore.Timestamp.now(),
   };
+}
+
+// Reservar stock para una orden pendiente (transferencias)
+export async function reservarStockOrdenAdmin(ordenId: string) {
+  console.log("[reservarStockOrdenAdmin] Iniciando para orden:", ordenId);
+  const adminDb = admin.firestore();
+  const ordenDoc = await adminDb.collection("ordenes").doc(ordenId).get();
+  
+  if (!ordenDoc.exists) {
+    throw new Error("Orden no encontrada");
+  }
+
+  const orden = ordenDoc.data();
+  const productos = orden.productos || [];
+
+  for (const producto of productos) {
+    const productoId = producto.id;
+    const cantidad = Number(producto.cantidad || 1);
+    console.log(`[reservarStockOrdenAdmin] Procesando producto: ${producto.nombre}, cantidad: ${cantidad}`);
+
+    // Obtener el producto actual
+    const productoRef = adminDb.collection("productos").doc(productoId);
+    const productoSnap = await productoRef.get();
+
+    if (!productoSnap.exists) continue;
+
+    const productoData = productoSnap.data();
+    const stockVariants = productoData.stockVariants || [];
+    console.log(`[reservarStockOrdenAdmin] stockVariants length: ${stockVariants.length}`);
+    console.log(`[reservarStockOrdenAdmin] selectedVariations:`, producto.selectedVariations);
+    console.log(`[reservarStockOrdenAdmin] variationAttributeIds:`, producto.variationAttributeIds);
+
+    // Verificar si tiene variaciones
+    if (producto.selectedVariations && producto.variationAttributeIds && stockVariants.length > 0) {
+      // Manejo de stock por variación
+      const variantIndex = stockVariants.findIndex((v: any) => {
+        return producto.variationAttributeIds.every(
+          (attrId: string) => v.attributes?.[attrId] === producto.selectedVariations[attrId]
+        );
+      });
+      console.log(`[reservarStockOrdenAdmin] variantIndex: ${variantIndex}`);
+
+      if (variantIndex !== -1) {
+        const currentVariantStock = Number(stockVariants[variantIndex].cantidad || 0);
+        console.log(`[reservarStockOrdenAdmin] currentVariantStock: ${currentVariantStock}`);
+        console.log(`[reservarStockOrdenAdmin] variantIndex: ${variantIndex}`);
+        console.log(`[reservarStockOrdenAdmin] Nueva cantidad: ${currentVariantStock - cantidad}`);
+        
+        if (currentVariantStock >= cantidad) {
+          // Convertir stockVariants a array si es objeto
+          const stockVariantsArray = Array.isArray(stockVariants) 
+            ? stockVariants 
+            : Object.values(stockVariants).filter((v: any) => v && typeof v === 'object');
+          
+          // Actualizar solo la variación específica
+          stockVariantsArray[variantIndex].cantidad = currentVariantStock - cantidad;
+          
+          // Escribir el array completo de vuelta
+          await productoRef.update({
+            stockVariants: stockVariantsArray,
+          });
+          console.log(`[reservarStockOrdenAdmin] Stock reservado: ${currentVariantStock - cantidad}`);
+          
+          // Verificar la actualización
+          const updatedSnap = await productoRef.get();
+          const updatedData = updatedSnap.data();
+          console.log(`[reservarStockOrdenAdmin] stockVariants después de update:`, updatedData?.stockVariants);
+        } else {
+          throw new Error(`Stock insuficiente para "${producto.nombre}". Disponibles: ${currentVariantStock}, Solicitados: ${cantidad}`);
+        }
+      } else {
+        console.error("[reservarStockOrdenAdmin] Variación no encontrada en stockVariants");
+        throw new Error(`Variación no encontrada para "${producto.nombre}"`);
+      }
+    } else {
+      // Manejo de stock general
+      const currentStock = Number(productoData.stock || 0);
+      console.log(`[reservarStockOrdenAdmin] currentStock (general): ${currentStock}`);
+      if (currentStock >= cantidad) {
+        await productoRef.update({
+          stock: currentStock - cantidad,
+        });
+        console.log(`[reservarStockOrdenAdmin] Stock reservado: ${currentStock - cantidad}`);
+      } else {
+        throw new Error(`Stock insuficiente para "${producto.nombre}". Disponibles: ${currentStock}, Solicitados: ${cantidad}`);
+      }
+    }
+  }
+}
+
+// Deducir stock definitivamente cuando se aprueba la orden
+export async function deducirStockOrdenAdmin(ordenId: string) {
+  // El stock ya fue reservado al crear la orden, aquí solo confirmamos
+  // Podríamos agregar lógica adicional si es necesario
+  console.log(`[deducirStockOrdenAdmin] Stock ya fue reservado para orden ${ordenId}`);
+}
+
+// Devolver stock cuando se rechaza la orden
+export async function devolverStockOrdenAdmin(ordenId: string) {
+  const adminDb = admin.firestore();
+  const ordenDoc = await adminDb.collection("ordenes").doc(ordenId).get();
+  
+  if (!ordenDoc.exists) {
+    throw new Error("Orden no encontrada");
+  }
+
+  const orden = ordenDoc.data();
+  const productos = orden.productos || [];
+
+  for (const producto of productos) {
+    const productoId = producto.id;
+    const cantidad = Number(producto.cantidad || 1);
+
+    // Obtener el producto actual
+    const productoRef = adminDb.collection("productos").doc(productoId);
+    const productoSnap = await productoRef.get();
+
+    if (!productoSnap.exists) continue;
+
+    const productoData = productoSnap.data();
+    const stockVariants = productoData.stockVariants || [];
+
+    // Verificar si tiene variaciones
+    if (selectedVariations && variationAttributeIds && stockVariants.length > 0) {
+      // Manejo de stock por variación
+      const variantIndex = stockVariants.findIndex((v: any) => {
+        return variationAttributeIds.every(
+          (attrId: string) => v.attributes?.[attrId] === selectedVariations[attrId]
+        );
+      });
+
+      if (variantIndex !== -1) {
+        const currentVariantStock = Number(stockVariants[variantIndex].cantidad || 0);
+        
+        // Convertir stockVariants a array si es objeto
+        const stockVariantsArray = Array.isArray(stockVariants) 
+          ? stockVariants 
+          : Object.values(stockVariants).filter((v: any) => v && typeof v === 'object');
+        
+        // Actualizar solo la variación específica
+        stockVariantsArray[variantIndex].cantidad = currentVariantStock + cantidad;
+        
+        // Escribir el array completo de vuelta
+        await productoRef.update({
+          stockVariants: stockVariantsArray,
+        });
+      }
+    } else {
+      // Manejo de stock general
+      const currentStock = Number(productoData.stock || 0);
+      await productoRef.update({
+        stock: currentStock + cantidad,
+      });
+    }
+  }
 }

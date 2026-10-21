@@ -215,7 +215,18 @@ export default function ProductDetailPage({ params }) {
   // ── Derivados ────────────────────────────────────────────────────────────
   const hasVariations = producto?.hasVariations || producto?.isCamiseta || false;
   const variationAttributeIds = producto?.variationAttributeIds || [];
-  const stockVariants = producto?.stockVariants || [];
+  
+  // Convertir stockVariants de Object a Array si es necesario
+  const stockVariantsRaw = producto?.stockVariants || [];
+  const stockVariants = Array.isArray(stockVariantsRaw) 
+    ? stockVariantsRaw 
+    : Object.values(stockVariantsRaw || {}).filter((v: any) => v && typeof v === 'object');
+  
+  console.log("[product-detail] hasVariations:", hasVariations);
+  console.log("[product-detail] variationAttributeIds:", variationAttributeIds);
+  console.log("[product-detail] stockVariants (raw):", stockVariantsRaw);
+  console.log("[product-detail] stockVariants (converted):", stockVariants);
+  console.log("[product-detail] stockVariants isArray:", Array.isArray(stockVariants));
   
   // Calcular maxCantidad basado en currentStock (que es actualizado por VariationsManager)
   const maxCantidad = hasVariations ? currentStock : (producto?.stock || 0);
@@ -253,8 +264,9 @@ export default function ProductDetailPage({ params }) {
     const allSelected = variationAttributeIds.every(attrId => selectedVariations[attrId]);
     if (!allSelected) return Number(producto.precio || 0);
     
+    const variants = Array.isArray(stockVariants) ? stockVariants : [];
     // Encontrar variante que coincida
-    const matchingVariant = stockVariants.find((variant) => {
+    const matchingVariant = variants.find((variant) => {
       const attrs = variant.attributes || {};
       return variationAttributeIds.every(
         (attrId) => attrs[attrId] === selectedVariations[attrId]

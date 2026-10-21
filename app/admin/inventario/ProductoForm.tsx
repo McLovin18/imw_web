@@ -19,6 +19,7 @@ type Producto = {
   stockVariants?: StockVariant[];
   variationAttributeIds?: string[];
   precio: string;
+  precioPromocional?: string;
   descuento?: number;
   categoria: string;
   subcategoria?: string;
@@ -55,6 +56,9 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
   const [stock, setStock] = useState<number>(initialData?.stock || 0);
   const [stockVariants, setStockVariants] = useState<StockVariant[]>(initialData?.stockVariants || []);
   const [precio, setPrecio] = useState<string>(initialData?.precio || "");
+  const [precioPromocional, setPrecioPromocional] = useState<string>(
+    initialData?.precioPromocional || ""
+  );
   const [descuento, setDescuento] = useState<string>(
     initialData?.descuento !== undefined && initialData?.descuento !== null
       ? String(initialData.descuento)
@@ -332,7 +336,8 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
 
     setStockVariants((current) => {
       const previousByKey = new Map<string, StockVariant>();
-      current.forEach((variant) => {
+      const currentArray = Array.isArray(current) ? current : Object.values(current || {}).filter((v: any) => v && typeof v === 'object');
+      currentArray.forEach((variant) => {
         const attrs = normalizeVariantAttributes(variant) || {};
         // Remap possible attribute-name keys to attribute IDs to improve matching with generated combinations
         const remapped = remapAttributeKeysToIds(attrs);
@@ -1118,25 +1123,42 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
       <div className="grid gap-5 md:max-w-2xl md:grid-cols-2">
         <label className="block md:col-span-2">
           <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">Precio base</span>
-          <input className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-lg font-semibold text-slate-900 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-100" type="number" min="0" value={precio} onChange={e => setPrecio(e.target.value)} required />
+          <input className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-lg font-semibold text-slate-900 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-100" type="number" min="0" value={precio} onChange={e => {
+            setPrecio(e.target.value);
+            const precioNum = Number(e.target.value);
+            const promoNum = Number(precioPromocional);
+            if (precioNum > 0 && promoNum > 0 && promoNum < precioNum) {
+              const porcentaje = ((precioNum - promoNum) / precioNum) * 100;
+              const decimal = porcentaje % 1;
+              const entero = Math.floor(porcentaje);
+              const redondeado = decimal >= 0.60 ? entero + 1 : entero;
+              setDescuento(String(redondeado));
+            } else {
+              setDescuento("");
+            }
+          }} required />
         </label>
         <label className="block">
-          <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">Descuento (%)</span>
-          <input className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-lg font-semibold text-slate-700 outline-none" type="number" min="0" value={descuento} onChange={e => {
+          <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">Precio promocional</span>
+          <input className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-lg font-semibold text-slate-700 outline-none" type="number" min="0" value={precioPromocional} onChange={e => {
             const val = e.target.value;
-            if (val === "") {
-              setDescuento("");
+            setPrecioPromocional(val);
+            const precioNum = Number(precio);
+            const promoNum = Number(val);
+            if (precioNum > 0 && promoNum > 0 && promoNum < precioNum) {
+              const porcentaje = ((precioNum - promoNum) / precioNum) * 100;
+              const decimal = porcentaje % 1;
+              const entero = Math.floor(porcentaje);
+              const redondeado = decimal >= 0.60 ? entero + 1 : entero;
+              setDescuento(String(redondeado));
             } else {
-              const num = Number(val);
-              if (!isNaN(num) && num >= 0 && num <= 100) {
-                setDescuento(val);
-              }
+              setDescuento("");
             }
           }} placeholder="0" />
         </label>
         <label className="block">
-          <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">Uso del descuento</span>
-          <input className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm font-semibold text-slate-400 outline-none" type="text" value="Se aplicará al precio base al comprar" readOnly />
+          <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">Descuento calculado (%)</span>
+          <input className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-lg font-semibold text-slate-400 outline-none" type="text" value={descuento ? `${descuento}%` : "0%"} readOnly />
         </label>
       </div>
 
@@ -1371,6 +1393,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
         stockVariants: hasVariations ? stockVariants : undefined,
         variationAttributeIds: hasVariations ? selectedAttributeIds : [],
         precio,
+        precioPromocional: precioPromocional !== "" ? precioPromocional : undefined,
         descuento: descuento !== "" ? Number(descuento) : undefined,
         categoria,
         subcategoria,

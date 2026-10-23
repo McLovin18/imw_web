@@ -2,9 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSnapshotPricing } from "../../../lib/pricing";
 
-function buildRechazoEmailHTML(orden: any, tipo: "cliente" | "dueño"): string {
+// Función para obtener URL de imagen proxy para correos
+function getProxyImageUrl(url: string): string {
+  if (!url) {
+    return "https://via.placeholder.com/60x60?text=No+Image";
+  }
+  // Usar servicio de proxy de imágenes público para asegurar compatibilidad con correos
+  try {
+    const encodedUrl = encodeURIComponent(url);
+    return `https://images.weserv.nl/?url=${encodedUrl}&w=60&h=60&fit=crop&output=webp`;
+  } catch (error) {
+    return url;
+  }
+}
+
+function buildRechazoEmailHTML(orden: any, tipo: "cliente" | "dueño", motivo: string): string {
   const isCliente = tipo === "cliente";
-  const motivo = orden.motivoRechazo || "No especificado";
   const siteName = process.env.SITE_NAME || "IMW";
   
   return `
@@ -80,6 +93,7 @@ function buildRechazoEmailHTML(orden: any, tipo: "cliente" | "dueño"): string {
               <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
                 <thead>
                   <tr style="background:#f3f4f6;border-bottom:2px solid #e5e7eb;">
+                    <th style="padding:12px 8px;text-align:left;font-size:13px;font-weight:bold;color:#374151;">Imagen</th>
                     <th style="padding:12px 8px;text-align:left;font-size:13px;font-weight:bold;color:#374151;">Producto</th>
                     <th style="padding:12px 8px;text-align:center;font-size:13px;font-weight:bold;color:#374151;width:60px;">Cant.</th>
                     <th style="padding:12px 8px;text-align:right;font-size:13px;font-weight:bold;color:#374151;width:100px;">Precio</th>
@@ -93,16 +107,20 @@ function buildRechazoEmailHTML(orden: any, tipo: "cliente" | "dueño"): string {
                           const { finalPrice: precioUnit, discount: descuento, hasDiscount: hasDescuento } = getSnapshotPricing(p);
                           const cantidad = Number(p.cantidad || 1);
                           const subtotal = precioUnit * cantidad;
+                          const imagen = getProxyImageUrl(p.imagen || p.imagenes?.[0] || "");
                           let variantText = "";
-                          
+
                           // Variaciones dinámicas
                           if (p.selectedVariationsConNombres) {
                             const variants = Object.values(p.selectedVariationsConNombres).map((v: any) => `${v.nombre}: ${v.valor}`).join(", ");
                             if (variants) variantText = `<br><span style="font-size:11px;color:#666;">${variants}</span>`;
                           }
-                          
+
                           return `
                     <tr style="border-bottom:1px solid #e5e7eb;">
+                      <td style="padding:12px 8px;text-align:center;">
+                        <img src="${imagen}" alt="${p.nombre}" width="60" height="60" style="width:60px;height:60px;object-fit:contain;border-radius:8px;border:1px solid #e5e7eb;display:block;" border="0">
+                      </td>
                       <td style="padding:12px 8px;font-size:13px;color:#374151;">
                         <strong>${p.nombre || "Producto"}</strong>
                         ${variantText}
@@ -114,7 +132,7 @@ function buildRechazoEmailHTML(orden: any, tipo: "cliente" | "dueño"): string {
                     </tr>
                   `;
                         })
-                      : "<tr><td colspan=4 style='padding:12px;text-align:center;color:#999;'>No hay productos</td></tr>"
+                      : "<tr><td colspan=5 style='padding:12px;text-align:center;color:#999;'>No hay productos</td></tr>"
                   }
                 </tbody>
               </table>
@@ -195,20 +213,20 @@ function buildRechazoEmailHTML(orden: any, tipo: "cliente" | "dueño"): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { orden, tipo } = await req.json();
+    const { orden, tipo, motivo } = await req.json();
 
-    if (!orden || !tipo || (tipo !== "cliente" && tipo !== "dueño")) {
+    if (!orden || !tipo || !motivo || (tipo !== "cliente" && tipo !== "dueño")) {
       return NextResponse.json(
         { error: "Parámetros inválidos" },
         { status: 400 }
       );
     }
 
-    const email = tipo === "cliente" 
+    const email = tipo === "cliente"
       ? (orden.datosCliente?.email || orden.guestEmail || orden.userEmail)
       : process.env.OWNER_EMAIL || "dueño@imw.com";
 
-    if (!email || typeof email !== "string" || email.trim() === "" || 
+    if (!email || typeof email !== "string" || email.trim() === "" ||
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return NextResponse.json(
         { error: "Email inválido" },
@@ -234,10 +252,10 @@ export async function POST(req: NextRequest) {
     const emailResponse = await resend.emails.send({
       from: emailFrom,
       to: email.trim(),
-      subject: tipo === "cliente" 
-        ? `🚫 Tu orden ${orden.orderId} no fue aprobada — ${siteName}`
-        : `🚫 Orden ${orden.orderId} rechazada — ${siteName}`,
-      html: buildRechazoEmailHTML(orden, tipo),
+      subject: tipo === "cliente"
+        ? `Tu orden ${orden.orderId} ha sido rechazada — ${siteName}`
+        : `Orden ${orden.orderId} rechazada — ${siteName}`,
+      html: buildRechazoEmailHTML(orden, tipo, motivo),
       replyTo: emailReplyTo,
     });
 

@@ -7,6 +7,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    console.log("[transferencia] Datos recibidos:", JSON.stringify(body, null, 2));
+
     const {
       productos,
       metodoPago,
@@ -133,18 +135,22 @@ export async function POST(req: NextRequest) {
     // Reservar stock (para transferencias pendientes)
     await reservarStockOrdenAdmin(orden.id);
 
+    // Leer la orden completa de la base de datos para enviar el correo
+    const ordenDoc = await adminDb.collection("ordenes").doc(orden.id).get();
+    const ordenCompleta = { id: ordenDoc.id, ...ordenDoc.data() };
+
     // Enviar emails
     try {
-      const baseUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:3000' 
+      const baseUrl = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
         : (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
 
       // Convertir Timestamp a string ISO para serialización JSON
       const ordenParaEmail = {
-        ...orden,
-        createdAt: orden.createdAt?.toDate ? orden.createdAt.toDate().toISOString() : 
-                   orden.createdAt?.seconds ? new Date(orden.createdAt.seconds * 1000).toISOString() :
-                   orden.createdAt
+        ...ordenCompleta,
+        createdAt: ordenCompleta.createdAt?.toDate ? ordenCompleta.createdAt.toDate().toISOString() :
+                   ordenCompleta.createdAt?.seconds ? new Date(ordenCompleta.createdAt.seconds * 1000).toISOString() :
+                   ordenCompleta.createdAt
       };
 
       const emailClienteRes = await fetch(`${baseUrl}/api/email/send-transferencia-email`, {

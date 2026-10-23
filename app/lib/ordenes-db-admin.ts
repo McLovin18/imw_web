@@ -83,6 +83,9 @@ export async function crearOrdenAdmin(orden: any) {
 
     total += lineTotal;
 
+    const imagenUrl = data.imagenes?.[0] || "";
+    console.log(`[crearOrdenAdmin] Producto: ${data.nombre}, imagen: ${imagenUrl}`);
+
     productosProcesados.push({
       id: item.id,
       nombre: data.nombre,
@@ -91,7 +94,7 @@ export async function crearOrdenAdmin(orden: any) {
       descuento: hasDiscount ? discount : 0,
       precioFinal: finalPrice,
       subtotal: lineTotal,
-      imagen: data.imagenes?.[0] || "",
+      imagen: imagenUrl,
       bodegaId: data.bodegaId || null,
       selectedTalla: item.selectedTalla || null,
       selectedColor: item.selectedColor || null,
@@ -126,6 +129,11 @@ export async function crearOrdenAdmin(orden: any) {
     guestEmail: orden.guestEmail || null,
     metodoPago: orden.metodoPago || null,
   });
+
+  console.log("[crearOrdenAdmin] Orden creada con ID:", ordenDoc.id);
+  console.log("[crearOrdenAdmin] datosCliente:", orden.datosCliente);
+  console.log("[crearOrdenAdmin] datosEnvio:", orden.datosEnvio);
+  console.log("[crearOrdenAdmin] cuentaBancaria:", orden.cuentaBancaria);
 
   return {
     id: ordenDoc.id,

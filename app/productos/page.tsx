@@ -69,6 +69,7 @@ export default function ProductosPage() {
   const categoriaFromUrl = (searchParams?.get("cat") || searchParams?.get("category") || "").trim();
   const subcategoriaFromUrl = (searchParams?.get("subcat") || searchParams?.get("subcategory") || searchParams?.get("sub") || "").trim();
   const subsubcategoriaFromUrl = (searchParams?.get("subsubcat") || searchParams?.get("subsubcategory") || searchParams?.get("subsub") || "").trim();
+  const generoFromUrl = (searchParams?.get("genero") || "").trim() as "hombre" | "mujer" | "unisex" | "";
 
   // Estado local: responde al click al instante (router.push a veces no actualiza searchParams en la misma ruta)
   const [filterCat, setFilterCat] = useState(categoriaFromUrl);
@@ -80,6 +81,10 @@ export default function ProductosPage() {
     setFilterSub(subcategoriaFromUrl);
     setFilterSubsub(subsubcategoriaFromUrl);
   }, [categoriaFromUrl, subcategoriaFromUrl, subsubcategoriaFromUrl]);
+
+  useEffect(() => {
+    setFilterGenero(generoFromUrl);
+  }, [generoFromUrl]);
 
   const categoriaId = filterCat;
   const subcategoriaId = filterSub;
@@ -102,6 +107,7 @@ export default function ProductosPage() {
   const [showPrecio, setShowPrecio] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [categorias, setCategorias] = useState<any[]>([]);
+  const [filterGenero, setFilterGenero] = useState<"hombre" | "mujer" | "unisex" | "">("");
   const categoriesScrollRef = useRef<HTMLDivElement>(null);
 
   // 1. Control de Montaje - Inicializa filtros desde URL
@@ -127,20 +133,26 @@ export default function ProductosPage() {
       setFilterCat(catId);
       setFilterSub("");
       setFilterSubsub("");
-      const url = catId
-        ? `/productos?cat=${encodeURIComponent(catId)}`
-        : "/productos";
+      // Mantener el filtro de género
+      const params = new URLSearchParams();
+      if (catId) params.set("cat", catId);
+      if (filterGenero) params.set("genero", filterGenero);
+      const url = params.toString() ? `/productos?${params.toString()}` : "/productos";
       router.replace(url, { scroll: false });
     },
-    [router]
+    [router, filterGenero]
   );
 
   const selectTodas = useCallback(() => {
     setFilterCat("");
     setFilterSub("");
     setFilterSubsub("");
-    router.replace("/productos", { scroll: false });
-  }, [router]);
+    // Mantener el filtro de género
+    const params = new URLSearchParams();
+    if (filterGenero) params.set("genero", filterGenero);
+    const url = params.toString() ? `/productos?${params.toString()}` : "/productos";
+    router.replace(url, { scroll: false });
+  }, [router, filterGenero]);
 
   // 2. Fetch productos (siempre catálogo completo + filtro por árbol de categorías)
   useEffect(() => {
@@ -253,8 +265,10 @@ export default function ProductosPage() {
         
         const matchMin = minNum === null || basePrice >= minNum;
         const matchMax = maxNum === null || basePrice <= maxNum;
+        
+        const matchGenero = !filterGenero || p.genero === filterGenero;
 
-        return matchTexto && matchMin && matchMax;
+        return matchTexto && matchMin && matchMax && matchGenero;
       })
       .sort((a: any, b: any) => {
         const basePrice = (p: any) => Number(p.precio || 0);
@@ -263,7 +277,7 @@ export default function ProductosPage() {
         return (new Date(b.createdAt).getTime() || 0) - (new Date(a.createdAt).getTime() || 0);
       });
     return filtered;
-  }, [productos, categoriaId, subcategoriaId, subsubcategoriaId, categorias, search, precioMin, precioMax, orden, urlMinPrice, urlMaxPrice]);
+  }, [productos, categoriaId, subcategoriaId, subsubcategoriaId, categorias, search, precioMin, precioMax, orden, urlMinPrice, urlMaxPrice, filterGenero]);
 
   const hasFilters = !!(search || precioMin || precioMax || orden !== "newest");
 
@@ -331,17 +345,32 @@ export default function ProductosPage() {
         {(categoriaId || subcategoriaId || subsubcategoriaId) && (
           <div className="mb-4">
             <nav style={{ color: "var(--textSecondary)" }} className="flex items-center gap-1 text-xs mb-1 select-none">
-              <span className="hover:underline cursor-pointer" onClick={() => window.location.href = '/productos'}>Categorías</span>
+              <span className="hover:underline cursor-pointer" onClick={() => {
+                const params = new URLSearchParams();
+                if (filterGenero) params.set("genero", filterGenero);
+                window.location.href = params.toString() ? `/productos?${params.toString()}` : '/productos';
+              }}>Categorías</span>
               {categoriaId && (
                 <>
                   <span className="mx-1">›</span>
-                  <span className="hover:underline cursor-pointer" onClick={() => window.location.href = `/productos?cat=${encodeURIComponent(categoriaId)}`}>{getCategoryName(categoriaId)}</span>
+                  <span className="hover:underline cursor-pointer" onClick={() => {
+                    const params = new URLSearchParams();
+                    params.set("cat", categoriaId);
+                    if (filterGenero) params.set("genero", filterGenero);
+                    window.location.href = `/productos?${params.toString()}`;
+                  }}>{getCategoryName(categoriaId)}</span>
                 </>
               )}
               {subcategoriaId && (
                 <>
                   <span className="mx-1">›</span>
-                  <span className="hover:underline cursor-pointer" onClick={() => window.location.href = `/productos?cat=${encodeURIComponent(categoriaId)}&subcat=${encodeURIComponent(subcategoriaId)}`}>{getSubcategoryName(subcategoriaId)}</span>
+                  <span className="hover:underline cursor-pointer" onClick={() => {
+                    const params = new URLSearchParams();
+                    params.set("cat", categoriaId);
+                    params.set("subcat", subcategoriaId);
+                    if (filterGenero) params.set("genero", filterGenero);
+                    window.location.href = `/productos?${params.toString()}`;
+                  }}>{getSubcategoryName(subcategoriaId)}</span>
                 </>
               )}
               {subsubcategoriaId && (
@@ -382,6 +411,29 @@ export default function ProductosPage() {
                 </button>
               )}
             </div>
+
+            <select
+              value={filterGenero}
+              onChange={(e) => {
+                const newGenero = e.target.value as "hombre" | "mujer" | "unisex" | "";
+                setFilterGenero(newGenero);
+                // Actualizar URL con el parámetro genero
+                const params = new URLSearchParams(searchParams?.toString() || "");
+                if (newGenero) {
+                  params.set("genero", newGenero);
+                } else {
+                  params.delete("genero");
+                }
+                router.replace(`/productos?${params.toString()}`, { scroll: false });
+              }}
+              style={inputStyle}
+              className={`${inputCls} min-w-32`}
+            >
+              <option value="">Todos</option>
+              <option value="hombre">Hombre</option>
+              <option value="mujer">Mujer</option>
+              <option value="unisex">Unisex</option>
+            </select>
 
           </div>
         </div>

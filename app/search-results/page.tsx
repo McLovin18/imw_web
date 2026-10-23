@@ -20,6 +20,7 @@ export default function SearchResultsPage() {
   const searchParams = useSearchParams();
   const queryParam = searchParams?.get("query") || "";
   const categoriaId = (searchParams?.get("cat") || searchParams?.get("category") || "").trim();
+  const generoFromUrl = (searchParams?.get("genero") || "").trim() as "hombre" | "mujer" | "unisex" | "";
   const isLogger = useUser();
 
   const [productos, setProductos] = useState<any[]>([]);
@@ -32,7 +33,13 @@ export default function SearchResultsPage() {
   const [marca, setMarca] = useState("");
   const [marcas, setMarcas] = useState<(string | undefined)[]>([]);
   const [categorias, setCategorias] = useState<any[]>([]);
+  const [filterGenero, setFilterGenero] = useState<"hombre" | "mujer" | "unisex" | "">(generoFromUrl);
   const categoriesScrollRef = useRef<HTMLDivElement>(null);
+
+  // Sincronizar filtro de género desde URL
+  useEffect(() => {
+    setFilterGenero(generoFromUrl);
+  }, [generoFromUrl]);
 
   // 🔥 Cargar productos
   useEffect(() => {
@@ -64,6 +71,7 @@ export default function SearchResultsPage() {
         const coincideMarca = !marca || p.marca === marca;
         const coincideCategoria =
           !categoriaId || sameCategoryId(p.categoria, categoriaId);
+        const coincideGenero = !filterGenero || p.genero === filterGenero;
 
         const basePrice = Number(p.precio || 0);
         const discount = Number(p.descuento || 0);
@@ -74,7 +82,7 @@ export default function SearchResultsPage() {
         const matchMin = min === null || finalPrice >= min;
         const matchMax = max === null || finalPrice <= max;
 
-        return coincideTexto && coincideMarca && coincideCategoria && matchMin && matchMax;
+        return coincideTexto && coincideMarca && coincideCategoria && coincideGenero && matchMin && matchMax;
       })
       .sort((a, b) => {
         const getFinalPrice = (p: any) => {
@@ -87,7 +95,7 @@ export default function SearchResultsPage() {
         if (a.createdAt && b.createdAt) return b.createdAt - a.createdAt;
         return 0;
       });
-  }, [productos, search, precioMin, precioMax, orden, marca, categoriaId]);
+  }, [productos, search, precioMin, precioMax, orden, marca, categoriaId, filterGenero]);
 
 
 
@@ -116,13 +124,14 @@ export default function SearchResultsPage() {
 
 
 
-  const hasFilters = search || precioMin || precioMax || marca || orden !== "newest";
+  const hasFilters = search || precioMin || precioMax || marca || orden !== "newest" || filterGenero;
   const clearFilters = useCallback(() => {
     setSearch("");
     setPrecioMin("");
     setPrecioMax("");
     setMarca("");
     setOrden("newest");
+    setFilterGenero("");
   }, []);
 
   const inputClass =
@@ -148,8 +157,34 @@ export default function SearchResultsPage() {
         />
       </div>
 
+      <div>
+        <label style={{ color: "var(--text)" }} className="text-xs font-semibold mb-1 sm:mb-2 block">Género</label>
+        <select
+          value={filterGenero}
+          onChange={(e) => {
+            const newGenero = e.target.value as "hombre" | "mujer" | "unisex" | "";
+            setFilterGenero(newGenero);
+            // Actualizar URL con el parámetro genero
+            const params = new URLSearchParams(searchParams?.toString() || "");
+            if (newGenero) {
+              params.set("genero", newGenero);
+            } else {
+              params.delete("genero");
+            }
+            window.location.href = `/search-results?${params.toString()}`;
+          }}
+          style={inputStyle}
+          className={inputClass}
+        >
+          <option value="">Todos</option>
+          <option value="hombre">Hombre</option>
+          <option value="mujer">Mujer</option>
+          <option value="unisex">Unisex</option>
+        </select>
+      </div>
+
     </div>
-  ), [search]);
+  ), [search, filterGenero]);
 
   return (
     <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -166,7 +201,10 @@ export default function SearchResultsPage() {
             <div className="flex gap-2 min-w-max">
               <button
                 onClick={() => {
-                   window.location.href = `/search-results?query=${encodeURIComponent(queryParam)}`;
+                  const params = new URLSearchParams();
+                  params.set("query", queryParam);
+                  if (filterGenero) params.set("genero", filterGenero);
+                  window.location.href = `/search-results?${params.toString()}`;
                 }}
                 style={{
                   background: !categoriaId ? "var(--primary)" : "var(--cardBg)",
@@ -183,7 +221,11 @@ export default function SearchResultsPage() {
                 <button
                   key={cat.id}
                   onClick={() => {
-                    window.location.href = `/search-results?query=${encodeURIComponent(queryParam)}&cat=${encodeURIComponent(cat.id)}`;
+                    const params = new URLSearchParams();
+                    params.set("query", queryParam);
+                    params.set("cat", cat.id);
+                    if (filterGenero) params.set("genero", filterGenero);
+                    window.location.href = `/search-results?${params.toString()}`;
                   }}
                   style={{
                     background: categoriaId === cat.id ? "var(--primary)" : "var(--cardBg)",

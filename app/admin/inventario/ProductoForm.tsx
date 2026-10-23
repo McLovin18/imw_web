@@ -25,6 +25,7 @@ type Producto = {
   subcategoria?: string;
   subsubcategoria?: string;
   marca?: string;
+  genero?: "hombre" | "mujer" | "unisex";
   imagenes: (string | File)[];
   descripcion: string;
   caracteristicas: string[];
@@ -90,6 +91,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
       ? String(initialData.promocionarDescuento)
       : ""
   );
+  const [genero, setGenero] = useState<"hombre" | "mujer" | "unisex" | "">(initialData?.genero || "");
 
   // Recalcular descuento automáticamente cuando cambian los precios
   useEffect(() => {
@@ -689,6 +691,16 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
                   {b.nombre} ({b.tiempoEntrega}h)
                 </option>
               ))}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">Género</span>
+            <select className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-100" value={genero} onChange={e => setGenero(e.target.value as "hombre" | "mujer" | "unisex" | "")}>
+              <option value="">Selecciona un género</option>
+              <option value="hombre">Hombre</option>
+              <option value="mujer">Mujer</option>
+              <option value="unisex">Unisex</option>
             </select>
           </label>
 
@@ -1450,6 +1462,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
         subcategoria,
         subsubcategoria,
         marca: tieneMarca ? marca : undefined,
+        genero: genero || undefined,
         bodegaId,
         imagenes: imagenesFinal,
         destacado,

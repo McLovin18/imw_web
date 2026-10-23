@@ -153,6 +153,8 @@ export const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [openCatId, setOpenCatId] = useState<string | null>(null); // Para dropdown nivel 1 en tablet/desktop
   const [openSubId, setOpenSubId] = useState<string | null>(null); // Para dropdown nivel 2 en tablet/desktop
+  const [catalogDropdown, setCatalogDropdown] = useState(false); // Para dropdown de Ver catálogo
+  const [catalogSubmenu, setCatalogSubmenu] = useState<"tipo" | "genero" | null>(null); // Para submenús del catálogo
   const { user, carrito } = useUser();
   const [windowWidth, setWindowWidth] = useState<number | null>(null);
   const [theme, setTheme] = useState("dark");
@@ -312,14 +314,136 @@ export const Navbar = () => {
 
             <div className="hidden lg:flex items-center">
               {links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-white/10 whitespace-nowrap text-body"
-                  style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
-                >
-                  {link.label}
-                </Link>
+                link.label === "Ver Catalogo" ? (
+                  <div
+                    key={link.href}
+                    className="relative"
+                    onMouseEnter={() => setCatalogDropdown(true)}
+                    onMouseLeave={() => setCatalogDropdown(false)}
+                  >
+                    <button
+                      onClick={() => setCatalogDropdown(!catalogDropdown)}
+                      className="px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-white/10 whitespace-nowrap text-body flex items-center gap-1"
+                      style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                    >
+                      {link.label}
+                      <span
+                        className="material-icons-round transition-transform duration-200"
+                        style={{
+                          fontSize: 14,
+                          transform: catalogDropdown ? "rotate(180deg)" : "rotate(0deg)",
+                          color: theme === "light" ? "#0f172a" : "#ffffff"
+                        }}
+                      >
+                        arrow_drop_down
+                      </span>
+                    </button>
+
+                    {/* Dropdown de Ver catálogo */}
+                    {catalogDropdown && (
+                      <div
+                        className="absolute left-0 top-full min-w-56 rounded-2xl border shadow-xl py-2 z-50"
+                        style={{
+                          background: "#ffffff",
+                          borderColor: "rgba(17,24,39,0.12)",
+                        }}
+                      >
+                        {/* Perfumes por tipo */}
+                        <div
+                          className="relative group/tipo"
+                          onMouseEnter={() => setCatalogSubmenu("tipo")}
+                          onMouseLeave={() => setCatalogSubmenu(null)}
+                        >
+                          <button
+                            onClick={() => setCatalogSubmenu(catalogSubmenu === "tipo" ? null : "tipo")}
+                            className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                          >
+                            <span>Perfumes por tipo</span>
+                            <span className="material-icons-round text-sm text-slate-500">chevron_right</span>
+                          </button>
+
+                          {/* Submenú tipo */}
+                          {catalogSubmenu === "tipo" && (
+                            <div
+                              className="absolute left-full top-0 min-w-48 rounded-2xl border shadow-xl py-2 z-60"
+                              style={{
+                                background: "#ffffff",
+                                borderColor: "rgba(17,24,39,0.12)",
+                              }}
+                            >
+                              <a
+                                href="/productos?cat=1792053390551"
+                                className="block px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                              >
+                                Perfumes de diseñador
+                              </a>
+                              <a
+                                href="/productos?cat=1792053354691"
+                                className="block px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                              >
+                                Árabes
+                              </a>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Perfumes por género */}
+                        <div
+                          className="relative group/genero"
+                          onMouseEnter={() => setCatalogSubmenu("genero")}
+                          onMouseLeave={() => setCatalogSubmenu(null)}
+                        >
+                          <button
+                            onClick={() => setCatalogSubmenu(catalogSubmenu === "genero" ? null : "genero")}
+                            className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                          >
+                            <span>Perfumes por género</span>
+                            <span className="material-icons-round text-sm text-slate-500">chevron_right</span>
+                          </button>
+
+                          {/* Submenú género */}
+                          {catalogSubmenu === "genero" && (
+                            <div
+                              className="absolute left-full top-0 min-w-48 rounded-2xl border shadow-xl py-2 z-60"
+                              style={{
+                                background: "#ffffff",
+                                borderColor: "rgba(17,24,39,0.12)",
+                              }}
+                            >
+                              <a
+                                href="/productos?genero=hombre"
+                                className="block px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                              >
+                                Hombre
+                              </a>
+                              <a
+                                href="/productos?genero=mujer"
+                                className="block px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                              >
+                                Mujer
+                              </a>
+                              <a
+                                href="/productos?genero=unisex"
+                                className="block px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
+                              >
+                                Unisex
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-white/10 whitespace-nowrap text-body"
+                    style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                  >
+                    {link.label}
+                  </Link>
+                )
               ))}
             </div>
           </div>
@@ -775,14 +899,130 @@ export const Navbar = () => {
 
               {/* Links */}
               {links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors"
-                  style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
-                >
-                  {link.label}
-                </a>
+                link.label === "Ver Catalogo" ? (
+                  <div key={link.href}>
+                    <button
+                      onClick={() => setCatalogDropdown(!catalogDropdown)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                      style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                    >
+                      <span>{link.label}</span>
+                      <span
+                        className="material-icons-round transition-transform duration-200"
+                        style={{
+                          fontSize: 14,
+                          transform: catalogDropdown ? "rotate(180deg)" : "rotate(0deg)",
+                          color: theme === "light" ? "#0f172a" : "#ffffff"
+                        }}
+                      >
+                        arrow_drop_down
+                      </span>
+                    </button>
+
+                    {catalogDropdown && (
+                      <div className="ml-4 mt-1 space-y-1">
+                        {/* Perfumes por tipo */}
+                        <div className="px-2 py-1">
+                          <button
+                            onClick={() => setCatalogSubmenu(catalogSubmenu === "tipo" ? null : "tipo")}
+                            className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors"
+                            style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                          >
+                            <span>Perfumes por tipo</span>
+                            <span
+                              className="material-icons-round text-sm transition-transform duration-200"
+                              style={{
+                                transform: catalogSubmenu === "tipo" ? "rotate(90deg)" : "rotate(0deg)",
+                                color: theme === "light" ? "#64748b" : "rgba(255,255,255,0.6)"
+                              }}
+                            >
+                              chevron_right
+                            </span>
+                          </button>
+
+                          {catalogSubmenu === "tipo" && (
+                            <div className="ml-4 mt-1 space-y-1">
+                              <a
+                                href="/productos?cat=1792053390551"
+                                className="block px-3 py-2 text-sm rounded-md transition-colors"
+                                style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                Perfumes de diseñador
+                              </a>
+                              <a
+                                href="/productos?cat=1792053354691"
+                                className="block px-3 py-2 text-sm rounded-md transition-colors"
+                                style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                Árabes
+                              </a>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Perfumes por género */}
+                        <div className="px-2 py-1">
+                          <button
+                            onClick={() => setCatalogSubmenu(catalogSubmenu === "genero" ? null : "genero")}
+                            className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors"
+                            style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                          >
+                            <span>Perfumes por género</span>
+                            <span
+                              className="material-icons-round text-sm transition-transform duration-200"
+                              style={{
+                                transform: catalogSubmenu === "genero" ? "rotate(90deg)" : "rotate(0deg)",
+                                color: theme === "light" ? "#64748b" : "rgba(255,255,255,0.6)"
+                              }}
+                            >
+                              chevron_right
+                            </span>
+                          </button>
+
+                          {catalogSubmenu === "genero" && (
+                            <div className="ml-4 mt-1 space-y-1">
+                              <a
+                                href="/productos?genero=hombre"
+                                className="block px-3 py-2 text-sm rounded-md transition-colors"
+                                style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                Hombre
+                              </a>
+                              <a
+                                href="/productos?genero=mujer"
+                                className="block px-3 py-2 text-sm rounded-md transition-colors"
+                                style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                Mujer
+                              </a>
+                              <a
+                                href="/productos?genero=unisex"
+                                className="block px-3 py-2 text-sm rounded-md transition-colors"
+                                style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                Unisex
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
+                  >
+                    {link.label}
+                  </a>
+                )
               ))}
 
               {/* Categorías en acordeón */}

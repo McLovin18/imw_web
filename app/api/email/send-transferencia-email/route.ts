@@ -33,6 +33,7 @@ function buildTransferenciaEmailText(orden: any, tipo: "cliente" | "dueño", sit
   } else {
     text += `DATOS DEL CLIENTE\n`;
     text += `Nombre: ${orden.datosCliente?.nombre || "N/A"}\n`;
+    text += `Cedula/RUC: ${orden.datosCliente?.cedulaRuc || "N/A"}\n`;
     text += `Telefono: ${orden.datosCliente?.telefono || "N/A"}\n`;
     text += `Email: ${orden.datosCliente?.email || "N/A"}\n`;
     text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n\n`;
@@ -138,6 +139,7 @@ function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): st
               <h2 style="margin:0 0 12px;font-size:16px;font-weight:bold;color:#1f2937;">Datos del cliente</h2>
               <div style="background:#f9fafb;border-radius:8px;padding:16px;">
                 <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Nombre:</strong> ${orden.datosCliente?.nombre || "N/A"}</p>
+                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Cedula/RUC:</strong> ${orden.datosCliente?.cedulaRuc || "N/A"}</p>
                 <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Telefono:</strong> ${orden.datosCliente?.telefono || "N/A"}</p>
                 <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Email:</strong> ${orden.datosCliente?.email || "N/A"}</p>
                 <p style="margin:0;font-size:14px;color:#374151;"><strong>Direccion:</strong> ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}</p>

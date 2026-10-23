@@ -16,6 +16,73 @@ function getProxyImageUrl(url: string): string {
   }
 }
 
+function buildRechazoEmailText(orden: any, tipo: "cliente" | "dueño", motivo: string, siteName: string): string {
+  const isCliente = tipo === "cliente";
+
+  let text = `${siteName}\n`;
+  text += `${isCliente ? "Tu orden ha sido rechazada" : "Orden rechazada"}\n\n`;
+  text += `Numero de orden: ${orden.orderId || "N/A"}\n`;
+  text += `Fecha: ${orden.createdAt ? new Date(orden.createdAt).toLocaleDateString("es-ES") : "N/A"}\n`;
+  text += `Estado: Rechazada\n\n`;
+
+  if (isCliente) {
+    text += `TUS DATOS\n`;
+    text += `Nombre: ${orden.datosCliente?.nombre || "N/A"}\n`;
+    text += `Cedula/RUC: ${orden.datosCliente?.cedulaRuc || "N/A"}\n`;
+    text += `Telefono: ${orden.datosCliente?.telefono || "N/A"}\n`;
+    text += `Email: ${orden.datosCliente?.email || "N/A"}\n`;
+    text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n\n`;
+  } else {
+    text += `DATOS DEL CLIENTE\n`;
+    text += `Nombre: ${orden.datosCliente?.nombre || "N/A"}\n`;
+    text += `Cedula/RUC: ${orden.datosCliente?.cedulaRuc || "N/A"}\n`;
+    text += `Telefono: ${orden.datosCliente?.telefono || "N/A"}\n`;
+    text += `Email: ${orden.datosCliente?.email || "N/A"}\n`;
+    text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n\n`;
+  }
+
+  text += `CUENTA BANCARIA UTILIZADA\n`;
+  text += `Banco: ${orden.cuentaBancaria?.banco || "N/A"}\n`;
+  text += `Tipo: ${orden.cuentaBancaria?.tipo || "N/A"}\n`;
+  text += `Numero: ${orden.cuentaBancaria?.numeroCuenta || "N/A"}\n`;
+  text += `Titular: ${orden.cuentaBancaria?.titular || "N/A"}\n\n`;
+
+  text += `PRODUCTOS\n`;
+  if (orden.productos && Array.isArray(orden.productos)) {
+    orden.productos.forEach((p: any) => {
+      const { finalPrice: precioUnit } = getSnapshotPricing(p);
+      const cantidad = Number(p.cantidad || 1);
+      const subtotal = precioUnit * cantidad;
+      text += `- ${p.nombre || "Producto"}\n`;
+      text += `  Cantidad: ${cantidad}\n`;
+      text += `  Precio: $${precioUnit.toFixed(2)}\n`;
+      text += `  Subtotal: $${subtotal.toFixed(2)}\n`;
+    });
+  }
+
+  text += `\nTOTALES\n`;
+  text += `Subtotal productos: $${((orden.total || 0) - (orden.datosEnvio?.costoEnvio || 0)).toFixed(2)}\n`;
+  text += `Costo de envio (${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}): $${(orden.datosEnvio?.costoEnvio || 0).toFixed(2)}\n`;
+  text += `Total a pagar: $${(orden.total || 0).toFixed(2)}\n\n`;
+
+  text += `MOTIVO DEL RECHAZO\n`;
+  text += `${motivo}\n\n`;
+
+  if (isCliente) {
+    text += `TU ORDEN HA SIDO RECHAZADA\n`;
+    text += `Lamentamos informarte que tu orden no pudo ser procesada.\n`;
+    text += `Si tienes alguna duda, contactanos.\n\n`;
+  } else {
+    text += `ORDEN RECHAZADA\n`;
+    text += `La orden ha sido rechazada.\n\n`;
+  }
+
+  text += `Este correo fue enviado automaticamente por ${siteName}\n`;
+  text += `© ${new Date().getFullYear()} ${siteName}. Todos los derechos reservados.`;
+
+  return text;
+}
+
 function buildRechazoEmailHTML(orden: any, tipo: "cliente" | "dueño", motivo: string): string {
   const isCliente = tipo === "cliente";
   const siteName = process.env.SITE_NAME || "IMW";
@@ -253,9 +320,10 @@ export async function POST(req: NextRequest) {
       from: emailFrom,
       to: email.trim(),
       subject: tipo === "cliente"
-        ? `Tu orden ${orden.orderId} ha sido rechazada — ${siteName}`
-        : `Orden ${orden.orderId} rechazada — ${siteName}`,
+        ? `Tu orden ${orden.orderId} ha sido rechazada - ${siteName}`
+        : `Orden ${orden.orderId} rechazada - ${siteName}`,
       html: buildRechazoEmailHTML(orden, tipo, motivo),
+      text: buildRechazoEmailText(orden, tipo, motivo, siteName),
       replyTo: emailReplyTo,
     });
 

@@ -16,6 +16,75 @@ function getProxyImageUrl(url: string): string {
   }
 }
 
+function buildTransferenciaEmailText(orden: any, tipo: "cliente" | "dueño", siteName: string): string {
+  const isCliente = tipo === "cliente";
+
+  let text = `${siteName}\n`;
+  text += `${isCliente ? "Tu orden por transferencia" : "Nueva orden por transferencia"}\n\n`;
+  text += `Numero de orden: ${orden.orderId || "N/A"}\n`;
+  text += `Fecha: ${orden.createdAt ? new Date(orden.createdAt).toLocaleDateString("es-ES") : "N/A"}\n`;
+  text += `Estado: Pago pendiente de aprobacion\n\n`;
+
+  if (isCliente) {
+    text += `TUS DATOS\n`;
+    text += `Nombre: ${orden.datosCliente?.nombre || "N/A"}\n`;
+    text += `Cedula/RUC: ${orden.datosCliente?.cedulaRuc || "N/A"}\n`;
+    text += `Telefono: ${orden.datosCliente?.telefono || "N/A"}\n`;
+    text += `Email: ${orden.datosCliente?.email || "N/A"}\n`;
+    text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n\n`;
+  } else {
+    text += `DATOS DEL CLIENTE\n`;
+    text += `Nombre: ${orden.datosCliente?.nombre || "N/A"}\n`;
+    text += `Cedula/RUC: ${orden.datosCliente?.cedulaRuc || "N/A"}\n`;
+    text += `Telefono: ${orden.datosCliente?.telefono || "N/A"}\n`;
+    text += `Email: ${orden.datosCliente?.email || "N/A"}\n`;
+    text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n\n`;
+  }
+
+  text += `CUENTA BANCARIA SELECCIONADA\n`;
+  text += `Banco: ${orden.cuentaBancaria?.banco || "N/A"}\n`;
+  text += `Tipo: ${orden.cuentaBancaria?.tipo || "N/A"}\n`;
+  text += `Numero: ${orden.cuentaBancaria?.numeroCuenta || "N/A"}\n`;
+  text += `Titular: ${orden.cuentaBancaria?.titular || "N/A"}\n\n`;
+
+  if (orden.evidenciaTransferencia) {
+    text += `Evidencia de transferencia: ${orden.evidenciaTransferencia}\n\n`;
+  }
+
+  text += `PRODUCTOS\n`;
+  if (orden.productos && Array.isArray(orden.productos)) {
+    orden.productos.forEach((p: any) => {
+      const { finalPrice: precioUnit } = getSnapshotPricing(p);
+      const cantidad = Number(p.cantidad || 1);
+      const subtotal = precioUnit * cantidad;
+      text += `- ${p.nombre || "Producto"}\n`;
+      text += `  Cantidad: ${cantidad}\n`;
+      text += `  Precio: $${precioUnit.toFixed(2)}\n`;
+      text += `  Subtotal: $${subtotal.toFixed(2)}\n`;
+    });
+  }
+
+  text += `\nTOTALES\n`;
+  text += `Subtotal productos: $${((orden.total || 0) - (orden.datosEnvio?.costoEnvio || 0)).toFixed(2)}\n`;
+  text += `Costo de envio (${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}): $${(orden.datosEnvio?.costoEnvio || 0).toFixed(2)}\n`;
+  text += `Total a pagar: $${(orden.total || 0).toFixed(2)}\n\n`;
+
+  if (isCliente) {
+    text += `PROXIMOS PASOS\n`;
+    text += `Tu orden esta en estado "Pago pendiente de aprobacion". Revisaremos tu evidencia de transferencia y te notificaremos cuando sea aprobada.\n`;
+    text += `Tiempo estimado: 1-2 horas habitiles\n\n`;
+  } else {
+    text += `ACCIONES REQUERIDAS\n`;
+    text += `Revisa la evidencia de transferencia y aprueba o rechaza la orden desde el panel de administracion.\n`;
+    text += `Ver en panel: ${process.env.NEXT_PUBLIC_DOMAIN || "https://tecnothings.com"}/admin/pedidos\n\n`;
+  }
+
+  text += `Este correo fue enviado automaticamente por ${siteName}\n`;
+  text += `© ${new Date().getFullYear()} ${siteName}. Todos los derechos reservados.`;
+
+  return text;
+}
+
 function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): string {
   const isCliente = tipo === "cliente";
   const emailTo = isCliente ? orden.datosCliente?.email : process.env.OWNER_EMAIL || "dueño@imw.com";
@@ -294,9 +363,10 @@ export async function POST(req: NextRequest) {
       from: emailFrom,
       to: email.trim(),
       subject: tipo === "cliente"
-        ? `Tu orden ${orden.orderId} - Pago pendiente de aprobación — ${siteName}`
-        : `Nueva orden ${orden.orderId} - Transferencia pendiente — ${siteName}`,
+        ? `Tu orden ${orden.orderId} - Pago pendiente de aprobacion - ${siteName}`
+        : `Nueva orden ${orden.orderId} - Transferencia pendiente - ${siteName}`,
       html: htmlContent,
+      text: buildTransferenciaEmailText(orden, tipo, siteName),
       replyTo: emailReplyTo,
     });
 

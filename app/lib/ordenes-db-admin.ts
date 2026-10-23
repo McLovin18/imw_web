@@ -97,6 +97,8 @@ export async function crearOrdenAdmin(orden: any) {
       selectedColor: item.selectedColor || null,
       selectedVariations: item.selectedVariations || null,
       variationAttributeIds: item.variationAttributeIds || null,
+      precioPromocional: data.precioPromocional || null,
+      selectedVariationsConNombres: item.selectedVariationsConNombres || null,
     });
   }
 
@@ -107,7 +109,7 @@ export async function crearOrdenAdmin(orden: any) {
     direccion: orden.direccion,
     productos: productosProcesados,
     subtotal: orden.subtotal || total,
-    costoEnvio: orden.costoEnvio || 0,
+    costoEnvio: orden.datosEnvio?.costoEnvio || orden.costoEnvio || 0,
     total: orden.total || total,
     estado: orden.estado || "pendiente",
     paymentMethod: orden.paymentMethod || "whatsapp",
@@ -115,6 +117,14 @@ export async function crearOrdenAdmin(orden: any) {
     paymentStatus: orden.paymentStatus || "pending",
     createdAt: admin.firestore.Timestamp.now(),
     updatedAt: admin.firestore.Timestamp.now(),
+    // Campos adicionales para transferencias
+    datosCliente: orden.datosCliente || null,
+    datosEnvio: orden.datosEnvio || null,
+    cuentaBancaria: orden.cuentaBancaria || null,
+    cuentaBancariaId: orden.cuentaBancariaId || null,
+    evidenciaTransferencia: orden.evidenciaTransferencia || null,
+    guestEmail: orden.guestEmail || null,
+    metodoPago: orden.metodoPago || null,
   });
 
   return {

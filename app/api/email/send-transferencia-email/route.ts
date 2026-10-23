@@ -20,35 +20,26 @@ function buildTransferenciaEmailText(orden: any, tipo: "cliente" | "dueño", sit
   const isCliente = tipo === "cliente";
 
   let text = `${siteName}\n`;
-  text += `${isCliente ? "Tu orden por transferencia" : "Nueva orden por transferencia"}\n\n`;
+  text += `${isCliente ? "Confirmacion de tu pedido" : "Nuevo pedido recibido"}\n\n`;
   text += `Numero de orden: ${orden.orderId || "N/A"}\n`;
   text += `Fecha: ${orden.createdAt ? new Date(orden.createdAt).toLocaleDateString("es-ES") : "N/A"}\n`;
-  text += `Estado: Pago pendiente de aprobacion\n\n`;
+  text += `Estado: Esperando confirmacion de pago\n\n`;
 
   if (isCliente) {
-    text += `TUS DATOS\n`;
+    text += `DATOS DE ENVIO\n`;
     text += `Nombre: ${orden.datosCliente?.nombre || "N/A"}\n`;
-    text += `Cedula/RUC: ${orden.datosCliente?.cedulaRuc || "N/A"}\n`;
-    text += `Telefono: ${orden.datosCliente?.telefono || "N/A"}\n`;
-    text += `Email: ${orden.datosCliente?.email || "N/A"}\n`;
-    text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n\n`;
+    text += `Ciudad: ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n`;
+    text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}\n\n`;
   } else {
     text += `DATOS DEL CLIENTE\n`;
     text += `Nombre: ${orden.datosCliente?.nombre || "N/A"}\n`;
-    text += `Cedula/RUC: ${orden.datosCliente?.cedulaRuc || "N/A"}\n`;
     text += `Telefono: ${orden.datosCliente?.telefono || "N/A"}\n`;
     text += `Email: ${orden.datosCliente?.email || "N/A"}\n`;
     text += `Direccion: ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}\n\n`;
   }
 
-  text += `CUENTA BANCARIA SELECCIONADA\n`;
-  text += `Banco: ${orden.cuentaBancaria?.banco || "N/A"}\n`;
-  text += `Tipo: ${orden.cuentaBancaria?.tipo || "N/A"}\n`;
-  text += `Numero: ${orden.cuentaBancaria?.numeroCuenta || "N/A"}\n`;
-  text += `Titular: ${orden.cuentaBancaria?.titular || "N/A"}\n\n`;
-
-  if (orden.evidenciaTransferencia) {
-    text += `Evidencia de transferencia: ${orden.evidenciaTransferencia}\n\n`;
+  if (!isCliente && orden.evidenciaTransferencia) {
+    text += `Comprobante de pago: ${orden.evidenciaTransferencia}\n\n`;
   }
 
   text += `PRODUCTOS\n`;
@@ -70,12 +61,12 @@ function buildTransferenciaEmailText(orden: any, tipo: "cliente" | "dueño", sit
   text += `Total a pagar: $${(orden.total || 0).toFixed(2)}\n\n`;
 
   if (isCliente) {
-    text += `PROXIMOS PASOS\n`;
-    text += `Tu orden esta en estado "Pago pendiente de aprobacion". Revisaremos tu evidencia de transferencia y te notificaremos cuando sea aprobada.\n`;
-    text += `Tiempo estimado: 1-2 horas habitiles\n\n`;
+    text += `INFORMACION IMPORTANTE\n`;
+    text += `Tu pedido esta siendo procesado. Te notificaremos cuando este confirmado.\n`;
+    text += `Tiempo estimado: 1-2 horas habiles\n\n`;
   } else {
-    text += `ACCIONES REQUERIDAS\n`;
-    text += `Revisa la evidencia de transferencia y aprueba o rechaza la orden desde el panel de administracion.\n`;
+    text += `ACCION REQUERIDA\n`;
+    text += `Revisa el comprobante de pago y confirma el pedido desde el panel de administracion.\n`;
     text += `Ver en panel: ${process.env.NEXT_PUBLIC_DOMAIN || "https://tecnothings.com"}/admin/pedidos\n\n`;
   }
 
@@ -105,8 +96,8 @@ function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): st
         <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);border-radius:12px 12px 0 0;">
           <tr>
             <td style="padding:32px;text-align:center;color:white;">
-              <h1 style="margin:0 0 8px;font-size:28px;font-weight:bold;">🛍️ ${siteName}</h1>
-              <p style="margin:0;font-size:14px;opacity:0.9;">${isCliente ? "Tu orden por transferencia" : "Nueva orden por transferencia"}</p>
+              <h1 style="margin:0 0 8px;font-size:28px;font-weight:bold;">${siteName}</h1>
+              <p style="margin:0;font-size:14px;opacity:0.9;">${isCliente ? "Confirmacion de tu pedido" : "Nuevo pedido recibido"}</p>
             </td>
           </tr>
         </table>
@@ -116,10 +107,10 @@ function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): st
           <tr>
             <td style="padding:24px 36px;">
               <div style="background:#f0f9ff;border-left:4px solid #6d28d9;padding:16px;border-radius:4px;">
-                <p style="margin:0 0 4px;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:0.5px;font-weight:bold;">Número de orden</p>
+                <p style="margin:0 0 4px;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:0.5px;font-weight:bold;">Numero de orden</p>
                 <p style="margin:0;font-size:24px;font-weight:bold;color:#6d28d9;">${orden.orderId || "N/A"}</p>
                 <p style="margin:8px 0 0;font-size:13px;color:#666;">Fecha: ${orden.createdAt ? new Date(orden.createdAt).toLocaleDateString("es-ES") : "N/A"}</p>
-                <p style="margin:4px 0 0;font-size:13px;color:#f59e0b;font-weight:bold;">⏳ Estado: Pago pendiente de aprobación</p>
+                <p style="margin:4px 0 0;font-size:13px;color:#f59e0b;font-weight:bold;">Estado: Esperando confirmacion de pago</p>
               </div>
             </td>
           </tr>
@@ -130,13 +121,11 @@ function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): st
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="padding:0 36px 24px;">
-              <h2 style="margin:0 0 12px;font-size:16px;font-weight:bold;color:#1f2937;">Tus datos</h2>
+              <h2 style="margin:0 0 12px;font-size:16px;font-weight:bold;color:#1f2937;">Datos de envio</h2>
               <div style="background:#f9fafb;border-radius:8px;padding:16px;">
                 <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Nombre:</strong> ${orden.datosCliente?.nombre || "N/A"}</p>
-                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Cédula/RUC:</strong> ${orden.datosCliente?.cedulaRuc || "N/A"}</p>
-                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Teléfono:</strong> ${orden.datosCliente?.telefono || "N/A"}</p>
-                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Email:</strong> ${orden.datosCliente?.email || "N/A"}</p>
-                <p style="margin:0;font-size:14px;color:#374151;"><strong>Dirección:</strong> ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}</p>
+                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Ciudad:</strong> ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}</p>
+                <p style="margin:0;font-size:14px;color:#374151;"><strong>Direccion:</strong> ${orden.datosEnvio?.direccion || "N/A"}</p>
               </div>
             </td>
           </tr>
@@ -149,43 +138,27 @@ function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): st
               <h2 style="margin:0 0 12px;font-size:16px;font-weight:bold;color:#1f2937;">Datos del cliente</h2>
               <div style="background:#f9fafb;border-radius:8px;padding:16px;">
                 <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Nombre:</strong> ${orden.datosCliente?.nombre || "N/A"}</p>
-                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Cédula/RUC:</strong> ${orden.datosCliente?.cedulaRuc || "N/A"}</p>
-                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Teléfono:</strong> ${orden.datosCliente?.telefono || "N/A"}</p>
+                <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Telefono:</strong> ${orden.datosCliente?.telefono || "N/A"}</p>
                 <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Email:</strong> ${orden.datosCliente?.email || "N/A"}</p>
-                <p style="margin:0;font-size:14px;color:#374151;"><strong>Dirección:</strong> ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}</p>
+                <p style="margin:0;font-size:14px;color:#374151;"><strong>Direccion:</strong> ${orden.datosEnvio?.direccion || "N/A"}, ${orden.datosEnvio?.nombreCiudad || orden.datosEnvio?.ciudad || "N/A"}</p>
               </div>
             </td>
           </tr>
         </table>
         `}
 
-        <!-- Cuenta bancaria utilizada -->
+        ${!isCliente && orden.evidenciaTransferencia ? `
+        <!-- Evidencia de transferencia (solo para dueño) -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="padding:0 36px 24px;">
-              <h2 style="margin:0 0 12px;font-size:16px;font-weight:bold;color:#1f2937;">Cuenta bancaria seleccionada</h2>
-              <div style="background:#dbeafe;border-radius:8px;padding:16px;border:1px solid #93c5fd;">
-                <p style="margin:0 0 8px;font-size:14px;color:#1e40af;"><strong>Banco:</strong> ${orden.cuentaBancaria?.banco || "N/A"}</p>
-                <p style="margin:0 0 8px;font-size:14px;color:#1e40af;"><strong>Tipo:</strong> ${orden.cuentaBancaria?.tipo || "N/A"}</p>
-                <p style="margin:0 0 8px;font-size:14px;color:#1e40af;"><strong>Número:</strong> ${orden.cuentaBancaria?.numeroCuenta || "N/A"}</p>
-                <p style="margin:0;font-size:14px;color:#1e40af;"><strong>Titular:</strong> ${orden.cuentaBancaria?.titular || "N/A"}</p>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-        <!-- Evidencia de transferencia -->
-        ${orden.evidenciaTransferencia ? `
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:0 36px 24px;">
-              <h2 style="margin:0 0 12px;font-size:16px;font-weight:bold;color:#1f2937;">Evidencia de transferencia</h2>
+              <h2 style="margin:0 0 12px;font-size:16px;font-weight:bold;color:#1f2937;">Comprobante de pago</h2>
               <div style="background:#faf5ff;border-radius:8px;padding:16px;border:1px solid #d8b4fe;text-align:center;">
                 <a href="${orden.evidenciaTransferencia}" target="_blank" style="display:inline-block;">
-                  <img src="${orden.evidenciaTransferencia}" alt="Evidencia de transferencia" style="max-width:100%;height:auto;border-radius:8px;border:1px solid #d8b4fe;">
+                  <img src="${orden.evidenciaTransferencia}" alt="Comprobante de pago" style="max-width:100%;height:auto;border-radius:8px;border:1px solid #d8b4fe;">
                 </a>
                 <p style="margin:8px 0 0;font-size:13px;color:#7c3aed;">
-                  <a href="${orden.evidenciaTransferencia}" target="_blank" style="color:#7c3aed;text-decoration:underline;">Ver evidencia completa</a>
+                  <a href="${orden.evidenciaTransferencia}" target="_blank" style="color:#7c3aed;text-decoration:underline;">Ver comprobante completo</a>
                 </p>
               </div>
             </td>
@@ -274,12 +247,12 @@ function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): st
           <tr>
             <td style="padding:0 36px 24px;">
               <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px 20px;">
-                <p style="margin:0 0 8px;font-size:14px;color:#92400e;font-weight:bold;">⏳ Próximos pasos</p>
+                <p style="margin:0 0 8px;font-size:14px;color:#92400e;font-weight:bold;">Informacion importante</p>
                 <p style="margin:0 0 8px;font-size:14px;color:#92400e;">
-                  Tu orden está en estado <strong>"Pago pendiente de aprobación"</strong>. Revisaremos tu evidencia de transferencia y te notificaremos cuando sea aprobada.
+                  Tu pedido esta siendo procesado. Te notificaremos cuando este confirmado.
                 </p>
                 <p style="margin:0;font-size:14px;color:#92400e;">
-                  <strong>Tiempo estimado:</strong> 1-2 horas hábiles
+                  Tiempo estimado: 1-2 horas habiles
                 </p>
               </div>
             </td>
@@ -291,12 +264,12 @@ function buildTransferenciaEmailHTML(orden: any, tipo: "cliente" | "dueño"): st
           <tr>
             <td style="padding:0 36px 24px;">
               <div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:16px 20px;">
-                <p style="margin:0 0 8px;font-size:14px;color:#1e40af;font-weight:bold;">📋 Acciones requeridas</p>
+                <p style="margin:0 0 8px;font-size:14px;color:#1e40af;font-weight:bold;">Accion requerida</p>
                 <p style="margin:0 0 8px;font-size:14px;color:#1e40af;">
-                  Revisa la evidencia de transferencia y aprueba o rechaza la orden desde el panel de administración.
+                  Revisa el comprobante de pago y confirma el pedido desde el panel de administracion.
                 </p>
                 <p style="margin:0;font-size:14px;color:#1e40af;">
-                  <a href="${process.env.NEXT_PUBLIC_DOMAIN || "https://tecnothings.com"}/admin/pedidos" style="color:#1e40af;font-weight:bold;text-decoration:underline;">Ver en panel de administración</a>
+                  <a href="${process.env.NEXT_PUBLIC_DOMAIN || "https://tecnothings.com"}/admin/pedidos" style="color:#1e40af;font-weight:bold;text-decoration:underline;">Ver en panel de administracion</a>
                 </p>
               </div>
             </td>

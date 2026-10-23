@@ -55,13 +55,13 @@ export async function crearOrdenAdmin(orden: any) {
 
     const { basePrice, discount, hasDiscount, finalPrice } = getCatalogPricing(data);
     const cantidad = Number(item.cantidad || 1);
-    const unitPrice = finalPrice;
-    const lineTotal = unitPrice * cantidad;
 
     // Validar stock (considerar variaciones si existen)
     const stockVariants = data.stockVariants || [];
     let availableStock = Number(data.stock || 0);
-    
+    let variantPrice: number | null = null;
+    let variantPromoPrice: number | null = null;
+
     if (item.selectedVariations && item.variationAttributeIds && stockVariants.length > 0) {
       // Buscar variación específica
       const variantIndex = stockVariants.findIndex((v: any) => {
@@ -69,12 +69,29 @@ export async function crearOrdenAdmin(orden: any) {
           (attrId: string) => v.attributes?.[attrId] === item.selectedVariations[attrId]
         );
       });
-      
+
       if (variantIndex !== -1) {
         availableStock = Number(stockVariants[variantIndex].cantidad || 0);
+        // Usar precio de la variación si existe
+        variantPrice = Number(stockVariants[variantIndex].precio || 0);
+        // Usar precio promocional de la variación si existe
+        variantPromoPrice = Number(stockVariants[variantIndex].precioPromocional || 0);
       }
     }
-    
+
+    // Prioridad: precio promocional variación > precio promocional producto > precio variación > precio base
+    let unitPrice: number;
+    if (variantPromoPrice && variantPromoPrice > 0 && variantPromoPrice < (variantPrice || basePrice)) {
+      unitPrice = variantPromoPrice;
+    } else if (hasDiscount) {
+      unitPrice = finalPrice;
+    } else if (variantPrice && variantPrice > 0) {
+      unitPrice = variantPrice;
+    } else {
+      unitPrice = finalPrice;
+    }
+    const lineTotal = unitPrice * cantidad;
+
     if (availableStock < cantidad) {
       throw new Error(
         `Stock insuficiente para "${data.nombre}". Disponibles: ${availableStock}, Solicitados: ${cantidad}`
@@ -84,7 +101,7 @@ export async function crearOrdenAdmin(orden: any) {
     total += lineTotal;
 
     const imagenUrl = data.imagenes?.[0] || "";
-    console.log(`[crearOrdenAdmin] Producto: ${data.nombre}, imagen: ${imagenUrl}`);
+    console.log(`[crearOrdenAdmin] Producto: ${data.nombre}, imagen: ${imagenUrl}, precio variacion: ${variantPrice}, precio unitario: ${unitPrice}`);
 
     productosProcesados.push({
       id: item.id,
@@ -92,7 +109,8 @@ export async function crearOrdenAdmin(orden: any) {
       cantidad,
       precioBase: basePrice,
       descuento: hasDiscount ? discount : 0,
-      precioFinal: finalPrice,
+      precioFinal: unitPrice,
+      precioUnitario: unitPrice,
       subtotal: lineTotal,
       imagen: imagenUrl,
       bodegaId: data.bodegaId || null,

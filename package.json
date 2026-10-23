@@ -7,7 +7,8 @@
     "dev": "cross-env TURBOPACK=0 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean-orders": "node scripts/clean-orders.js"
   },
   "dependencies": {
     "@types/nodemailer": "^7.0.11",

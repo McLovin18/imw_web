@@ -265,10 +265,23 @@ export default function ProductDetailPage({ params }) {
     
     return matchingVariant?.precio ?? Number(producto.precio || 0);
   })();
-  
+
+  const variantPromoPrice = (() => {
+    const stockVariants = Array.isArray(producto.stockVariants) ? producto.stockVariants : [];
+    const matchingVariant = stockVariants.find((variant: any) => {
+      const attrs = variant.attributes || {};
+      return variationAttributeIds.every(
+        (attrId) => attrs[attrId] === selectedVariations[attrId]
+      );
+    });
+
+    return matchingVariant?.precioPromocional ?? Number(producto.precioPromocional || 0);
+  })();
+
   const { discount, hasDiscount, fakeOldPrice, finalPrice } = getCatalogPricing({
     ...producto,
     precio: basePrice,
+    precioPromocional: variantPromoPrice > 0 && variantPromoPrice < basePrice ? variantPromoPrice : undefined,
   });
 
   const avgRating = reviews.length > 0

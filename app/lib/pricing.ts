@@ -16,9 +16,30 @@ export type SnapshotPricing = {
 
 export function getCatalogPricing(product: any): CatalogPricing {
   const basePrice = Number(product?.precioBase ?? product?.precio ?? 0);
-  const discount = Number(product?.descuento || 0);
+  const promoPrice = Number(product?.precioPromocional ?? 0);
+  
+  // Validar si el precio promocional es válido (menor al precio base)
+  const hasValidPromoPrice = promoPrice > 0 && promoPrice < basePrice;
+  
+  // Si hay precio promocional válido, usarlo directamente como precio final
+  // Si no, usar el campo descuento del producto para calcular
+  let discount = 0;
+  let finalPrice = basePrice;
+  
+  if (hasValidPromoPrice) {
+    // Usar el precio promocional exacto como precio final
+    finalPrice = promoPrice;
+    // Calcular el descuento como un entero redondeado
+    discount = Math.round(((basePrice - promoPrice) / basePrice) * 100);
+  } else {
+    // Usar el campo descuento del producto
+    discount = Number(product?.descuento || 0);
+    if (discount > 0 && discount < 100) {
+      finalPrice = Math.round(basePrice * (1 - discount / 100) * 100) / 100;
+    }
+  }
+  
   const hasDiscount = !isNaN(discount) && discount > 0 && discount < 100;
-  const finalPrice = hasDiscount ? Math.round(basePrice * (1 - discount / 100) * 100) / 100 : basePrice;
   const fakeOldPrice = hasDiscount ? basePrice : null;
 
   return { basePrice, discount, hasDiscount, fakeOldPrice, finalPrice };

@@ -641,7 +641,7 @@ const Contacto: React.FC = () => {
                 <span className="ct-social-arrow">→</span>
               </a>
               <a
-                href="https://www.facebook.com/profile.php?id=61591825107751"
+                href="https://www.facebook.com/imwec/"
                 target="_blank"
                 rel="noreferrer"
                 className="ct-social-link"
@@ -651,7 +651,7 @@ const Contacto: React.FC = () => {
                 <span className="ct-social-arrow">→</span>
               </a>
               <a
-                href="https://www.tiktok.com/@imw_ec"
+                href="https://www.facebook.com/imwec/"
                 target="_blank"
                 rel="noreferrer"
                 className="ct-social-link"

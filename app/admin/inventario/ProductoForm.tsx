@@ -91,6 +91,21 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
       : ""
   );
 
+  // Recalcular descuento automáticamente cuando cambian los precios
+  useEffect(() => {
+    const precioNum = Number(precio);
+    const promoNum = precioPromocional === "" || precioPromocional === "0" ? 0 : Number(precioPromocional);
+    if (precioNum > 0 && promoNum > 0 && promoNum < precioNum) {
+      const porcentaje = ((precioNum - promoNum) / precioNum) * 100;
+      const decimal = porcentaje % 1;
+      const entero = Math.floor(porcentaje);
+      const redondeado = decimal >= 0.60 ? entero + 1 : entero;
+      setDescuento(String(redondeado));
+    } else {
+      setDescuento("");
+    }
+  }, [precio, precioPromocional]);
+
   function getVariantKey(attributes: Record<string, string>) {
     return Object.keys(attributes)
       .sort()
@@ -355,6 +370,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
         return {
           cantidad: previous?.cantidad ?? 0,
           precio: previous?.precio,
+          precioPromocional: previous?.precioPromocional,
           label: getVariantLabel(attributes),
           attributes,
           variantKey: key,
@@ -377,6 +393,18 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
       }
       const parsed = Number(precioVariant);
       return Number.isFinite(parsed) ? { ...variant, precio: parsed } : variant;
+    }));
+  }
+
+  function updateVariantPrecioPromocional(index: number, precioPromocionalVariant: string) {
+    setStockVariants((current) => current.map((variant, variantIndex) => {
+      if (variantIndex !== index) return variant;
+      if (precioPromocionalVariant === "" || precioPromocionalVariant === "0") {
+        const copy = { ...variant };
+        delete copy.precioPromocional;
+        return copy;
+      }
+      return { ...variant, precioPromocional: Number(precioPromocionalVariant) };
     }));
   }
 
@@ -852,15 +880,16 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
               {stockVariants.length > 0 && (
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <div className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700">Variaciones generadas</div>
-                  <div className="grid items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-black md:grid-cols-[minmax(0,1.8fr)_90px_90px_52px]">
+                  <div className="grid items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-black md:grid-cols-[minmax(0,1.8fr)_90px_90px_90px_52px]">
                     <div>Variación</div>
                     <div>Stock</div>
                     <div>Precio</div>
+                    <div>Precio Promo</div>
                     <div className="md:justify-self-end">Acción</div>
                   </div>
                   <div className="divide-y divide-slate-200">
                     {stockVariants.map((variant, idx) => (
-                      <div key={`${variant.label || idx}-${idx}`} className="grid items-center gap-2 px-3 py-2 md:grid-cols-[minmax(0,1.8fr)_90px_90px_52px]">
+                      <div key={`${variant.label || idx}-${idx}`} className="grid items-center gap-2 px-3 py-2 md:grid-cols-[minmax(0,1.8fr)_90px_90px_90px_52px]">
                         <div className="min-w-0">
                           <div className="truncate text-sm font-medium leading-none text-slate-900">{variant.label || `Variación ${idx + 1}`}</div>
                           <div className="truncate text-[10px] leading-none text-slate-500">{variant.attributes ? Object.entries(variant.attributes).map(([attrId, value]) => {
@@ -887,6 +916,18 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
                             className="h-8 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm text-black caret-black placeholder:text-black/60 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                             value={variant.precio ?? ""}
                             onChange={(e) => updateVariantPrecio(idx, e.target.value)}
+                            placeholder="Opcional"
+                          />
+                        </label>
+
+                        <label className="block">
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="h-8 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm text-black caret-black placeholder:text-black/60 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                            value={variant.precioPromocional ?? ""}
+                            onChange={(e) => updateVariantPrecioPromocional(idx, e.target.value)}
                             placeholder="Opcional"
                           />
                         </label>
@@ -1126,7 +1167,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
           <input className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-lg font-semibold text-slate-900 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-100" type="number" min="0" value={precio} onChange={e => {
             setPrecio(e.target.value);
             const precioNum = Number(e.target.value);
-            const promoNum = Number(precioPromocional);
+            const promoNum = precioPromocional === "" || precioPromocional === "0" ? 0 : Number(precioPromocional);
             if (precioNum > 0 && promoNum > 0 && promoNum < precioNum) {
               const porcentaje = ((precioNum - promoNum) / precioNum) * 100;
               const decimal = porcentaje % 1;
@@ -1144,7 +1185,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
             const val = e.target.value;
             setPrecioPromocional(val);
             const precioNum = Number(precio);
-            const promoNum = Number(val);
+            const promoNum = val === "" || val === "0" ? 0 : Number(val);
             if (precioNum > 0 && promoNum > 0 && promoNum < precioNum) {
               const porcentaje = ((precioNum - promoNum) / precioNum) * 100;
               const decimal = porcentaje % 1;
@@ -1158,7 +1199,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
         </label>
         <label className="block">
           <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">Descuento calculado (%)</span>
-          <input className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-lg font-semibold text-slate-400 outline-none" type="text" value={descuento ? `${descuento}%` : "0%"} readOnly />
+          <input className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-lg font-semibold text-slate-400 outline-none" type="text" value={descuento ? `${descuento}%` : ""} placeholder="Sin descuento" readOnly />
         </label>
       </div>
 
@@ -1384,6 +1425,16 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
         setSku(finalSku);
       }
 
+      // Validar descuento antes de guardar
+      const precioNum = Number(precio);
+      const promoNum = precioPromocional === "" || precioPromocional === "0" ? 0 : Number(precioPromocional);
+      let descuentoFinal: number | undefined;
+      if (precioNum > 0 && promoNum > 0 && promoNum < precioNum) {
+        descuentoFinal = descuento !== "" ? Number(descuento) : undefined;
+      } else {
+        descuentoFinal = undefined;
+      }
+
       onSave && onSave({
         nombre,
         sku: finalSku,
@@ -1394,7 +1445,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
         variationAttributeIds: hasVariations ? selectedAttributeIds : [],
         precio,
         precioPromocional: precioPromocional !== "" ? precioPromocional : undefined,
-        descuento: descuento !== "" ? Number(descuento) : undefined,
+        descuento: descuentoFinal,
         categoria,
         subcategoria,
         subsubcategoria,

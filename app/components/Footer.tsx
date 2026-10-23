@@ -78,8 +78,8 @@ const WHATSAPP_NUMBER = "593968514889"; // solo números, con código de país, 
 const WHATSAPP_DISPLAY = "0968514889"; // como se muestra al usuario
 const EMAIL = "imw_ec@gmail.com";
 const INSTAGRAM_URL = "https://www.instagram.com/imw_ec/";
-const FACEBOOK_URL = "https://www.facebook.com/imw_ec";
-const TIKTOK_URL = "https://www.tiktok.com/@imw_ec";
+const FACEBOOK_URL = "https://www.facebook.com/imwec/";
+const TIKTOK_URL = "https://www.tiktok.com/@imw2026";
 const DEV_INSTAGRAM_URL = "https://www.instagram.com/hector.cobena/";
 
 const socialLinks = [

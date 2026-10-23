@@ -6,6 +6,7 @@ import VariationSelector from "./VariationSelector";
 interface StockVariant {
   cantidad: number;
   precio?: number;
+  precioPromocional?: number;
   attributes?: Record<string, string>;
   label?: string;
   variantKey?: string;

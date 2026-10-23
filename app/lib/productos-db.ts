@@ -7,6 +7,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  deleteField,
   query,
   where,
   onSnapshot,
@@ -20,6 +21,7 @@ export interface StockVariant {
   color?: string;
   cantidad: number;
   precio?: number;
+  precioPromocional?: number;
   attributes?: Record<string, string>;
   label?: string;
   variantKey?: string;
@@ -275,7 +277,20 @@ export async function obtenerProductoPorId(id: string): Promise<Producto | null>
 
 // Actualizar producto
 export async function actualizarProducto(id: string, data: Partial<Producto>): Promise<void> {
-  await updateDoc(doc(db, COLLECTION, id), cleanUndefinedDeep(data));
+  const cleanData = cleanUndefinedDeep(data);
+  
+  // Aplicar deleteField DESPUÉS de cleanUndefinedDeep
+  // Si descuento es undefined en el data original, eliminarlo explícitamente del documento
+  if (data.descuento === undefined) {
+    cleanData.descuento = deleteField();
+  }
+  
+  // Si precioPromocional es undefined, "" o "0" en el data original, eliminarlo explícitamente del documento
+  if (data.precioPromocional === undefined || data.precioPromocional === "" || data.precioPromocional === "0") {
+    cleanData.precioPromocional = deleteField();
+  }
+  
+  await updateDoc(doc(db, COLLECTION, id), cleanData);
 }
 
 // Eliminar producto

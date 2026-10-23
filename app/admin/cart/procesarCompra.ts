@@ -28,8 +28,6 @@ export async function procesarCompra(carrito, userId) {
       const data = await res.json();
       if (!res.ok) {
         console.error("[procesarCompra] Error al actualizar stock:", data);
-      } else {
-        console.log(`[procesarCompra] Stock actualizado para producto ${p.id} a ${stockActual - cantidadComprada}`);
       }
     } catch (err) {
       console.error("[procesarCompra] Error de red al actualizar stock:", err);

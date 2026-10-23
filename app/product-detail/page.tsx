@@ -279,9 +279,9 @@ export default function ProductDetailPage({ params }) {
   })();
 
   const { discount, hasDiscount, fakeOldPrice, finalPrice } = getCatalogPricing({
-    ...producto,
     precio: basePrice,
     precioPromocional: variantPromoPrice > 0 && variantPromoPrice < basePrice ? variantPromoPrice : undefined,
+    descuento: hasVariations && variationAttributeIds.length > 0 && variationAttributeIds.every(attrId => selectedVariations[attrId]) ? undefined : producto.descuento,
   });
 
   const avgRating = reviews.length > 0
@@ -322,6 +322,8 @@ export default function ProductDetailPage({ params }) {
         ...(hasVariations && { selectedVariations, variationAttributeIds }),
         ...(producto as any)?.personalizado && { personalizacionValues },
         cartKey: currentCartKey,
+        descuento: hasVariations && variationAttributeIds.length > 0 && variationAttributeIds.every(attrId => selectedVariations[attrId]) ? undefined : producto.descuento,
+        precioPromocional: hasVariations && variationAttributeIds.length > 0 && variationAttributeIds.every(attrId => selectedVariations[attrId]) ? variantPromoPrice : undefined,
       };
       addCarrito(cartItem);
       showToast(`${producto.nombre} añadido al carrito`, "success");

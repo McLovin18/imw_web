@@ -13,19 +13,14 @@ export default function AdminReviewsPage() {
   }, []);
 
   async function fetchPending() {
-    console.log("[AdminReviewsPage] fetchPending called");
     setLoading(true);
     setError("");
     try {
-      console.log("[AdminReviewsPage] Fetching /api/reviews/pending...");
       const res = await fetch("/api/reviews/pending", { cache: 'no-store', headers: { 'Cache-Control': 'no-store' } });
-      console.log("[AdminReviewsPage] Response status:", res.status);
       if (res.ok) {
         const data = await res.json();
-        console.log("[AdminReviewsPage] Got data, reviews:", data.length);
         setPending(data);
       } else {
-        console.error("[AdminReviewsPage] Error response:", res.status);
         setError("Error al cargar reseñas");
       }
     } catch (err) {
@@ -38,11 +33,8 @@ export default function AdminReviewsPage() {
   async function handleApprove(id: string) {
     setActionLoading(id + "_approve");
     try {
-      console.log("[AdminReviewsPage] Approve called for id:", id);
       const res = await fetch(`/api/reviews/approve?id=${id}`, { method: "POST", cache: 'no-store' });
-      console.log("[AdminReviewsPage] Approve response status:", res.status);
       const body = await res.json().catch(() => null);
-      console.log("[AdminReviewsPage] Approve response body:", body);
       if (res.ok) {
         // Mark as approved locally so buttons disappear immediately
         setPending((prev) => prev.map((r) => (r.id === id ? ({ ...r, approved: true } as any) : r)));
@@ -62,11 +54,8 @@ export default function AdminReviewsPage() {
   async function handleReject(id: string) {
     setActionLoading(id + "_reject");
     try {
-      console.log("[AdminReviewsPage] Reject called for id:", id);
       const res = await fetch(`/api/reviews/reject?id=${id}`, { method: "POST", cache: 'no-store' });
-      console.log("[AdminReviewsPage] Reject response status:", res.status);
       const body = await res.json().catch(() => null);
-      console.log("[AdminReviewsPage] Reject response body:", body);
       if (res.ok) {
         // Optimistically remove rejected review from list
         setPending((prev) => prev.filter((r) => r.id !== id));

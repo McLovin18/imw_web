@@ -142,7 +142,6 @@ export default function LandingEditor() {
         const placeId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_PLACE_ID || "";
         const res = await fetch(`/api/google-scrape-reviews?place_id=${placeId}`);
         const data = await res.json();
-        console.log("[Admin] fetchGoogleComments data:", data);
         setGoogleComments(data.reviews || []);
         if (data.error) {
           setGoogleCommentsError(data.error);
@@ -162,7 +161,6 @@ export default function LandingEditor() {
   const saveSelectedGoogleComments = async () => {
     setSaving(true);
     // Log selecci+�n antes de guardar
-    console.log("[Admin] selectedGoogleComments:", selectedGoogleComments);
     // Mapear los comentarios al formato esperado por GoogleCommentsSection
     const mappedComments = selectedGoogleComments.map((c: any) => ({
       author_name: c.author || c.author_name || "",
@@ -194,12 +192,10 @@ export default function LandingEditor() {
       } catch {
         setSelectedGoogleComments([]);
       }
-      console.log("[Admin] updatedSections googleComments:", updatedSections.find(s => s.type === "googleComments"));
     }
     setSaving(false);
     setShowGoogleCommentsModal(false);
     alert("Comentarios de Google guardados");
-    console.log("[Admin] mappedComments:", mappedComments);
     // ...existing code...
     setSaving(false);
     setShowGoogleCommentsModal(false);
@@ -213,21 +209,17 @@ export default function LandingEditor() {
   // Seleccionar/deseleccionar comentarios
   const toggleGoogleComment = (comment: any) => {
     // Log antes y despu+�s de seleccionar/deseleccionar
-    console.log("[Admin] toggleGoogleComment BEFORE:", selectedGoogleComments);
     // Usar el texto como clave +�nica
     if (selectedGoogleComments.some((c) => c.text === comment.text)) {
       setSelectedGoogleComments(selectedGoogleComments.filter((c) => c.text !== comment.text));
-      console.log("[Admin] toggleGoogleComment REMOVED:", comment);
     } else {
       if (selectedGoogleComments.length < 8) {
         setSelectedGoogleComments([...selectedGoogleComments, comment]);
-        console.log("[Admin] toggleGoogleComment ADDED:", comment);
       } else {
         alert("Solo puedes seleccionar hasta 8 comentarios.");
       }
     }
     setTimeout(() => {
-      console.log("[Admin] toggleGoogleComment AFTER:", selectedGoogleComments);
     }, 100);
   };
   // Abrir modal y cargar comentarios
@@ -249,7 +241,6 @@ export default function LandingEditor() {
         }
       }
       // Log los comentarios cargados para seleccionar
-      console.log("[Admin] googleComments for modal:", googleComments);
     }
   }, [showGoogleCommentsModal, sections]);
 

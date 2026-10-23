@@ -39,8 +39,6 @@ export default function GoogleCommentsSection({
   styles,
   fieldStyles,
 }: GoogleCommentsSectionProps) {
-  // Log para depuración
-  console.log("[GoogleCommentsSection] comments prop:", comments);
   const bg = styles?.backgroundColor;
   const color = styles?.textColor;
   const paddingTop = styles?.paddingTop || (typeof window !== "undefined" && window.innerWidth < 768 ? "1rem" : "2rem");

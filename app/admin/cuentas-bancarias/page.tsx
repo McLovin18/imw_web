@@ -17,15 +17,11 @@ export default function CuentasBancariasAdminPage() {
   });
 
   const loadCuentas = async () => {
-    console.log("[loadCuentas] Iniciando carga de cuentas...");
     setLoading(true);
     try {
       const res = await fetch("/api/cuentas-bancarias");
-      console.log("[loadCuentas] Response status:", res.status);
       if (res.ok) {
         const data = await res.json();
-        console.log("[loadCuentas] Cuentas recibidas:", data.length);
-        console.log("[loadCuentas] IDs:", data.map((c: any) => c.id));
         setCuentas(data);
       } else {
         console.error("Error fetching cuentas:", res.status);
@@ -107,16 +103,13 @@ export default function CuentasBancariasAdminPage() {
   };
 
   const handleEliminar = async (id: string) => {
-    console.log("[handleEliminar] Iniciando eliminación de cuenta:", id);
     if (!confirm("¿Estás seguro de eliminar esta cuenta bancaria?")) return;
     try {
       const res = await fetch(`/api/admin/cuentas-bancarias?id=${id}`, {
         method: "DELETE",
       });
-      console.log("[handleEliminar] Response status:", res.status);
       if (!res.ok) throw new Error("Error al eliminar cuenta");
       alert("Cuenta eliminada exitosamente");
-      console.log("[handleEliminar] Llamando a loadCuentas...");
       loadCuentas();
     } catch (error) {
       console.error("Error eliminando cuenta:", error);

@@ -46,10 +46,41 @@ export function getCatalogPricing(product: any): CatalogPricing {
 }
 
 export function getSnapshotPricing(item: any): SnapshotPricing {
-  const discount = Number(item?.descuento || 0);
-  const hasDiscount = !isNaN(discount) && discount > 0 && discount < 100;
+  // Si hay variaciones seleccionadas, usar precioPromocional de la variación si está disponible
+  const hasVariations = item?.selectedVariations && item?.variationAttributeIds && Array.isArray(item.variationAttributeIds) && item.variationAttributeIds.length > 0;
+  const allVariationsSelected = hasVariations && item.variationAttributeIds.every((attrId: string) => item.selectedVariations[attrId]);
+  
   const basePrice = Number(item?.precioBase ?? item?.precio ?? 0);
-  const finalPrice = Number(item?.precioUnitario ?? item?.precioFinal ?? (hasDiscount ? basePrice * (1 - discount / 100) : basePrice));
+  const promoPrice = Number(item?.precioPromocional ?? 0);
+  const unitPrice = Number(item?.precioUnitario ?? item?.precioFinal ?? basePrice);
+  
+  let discount = 0;
+  let finalPrice = basePrice;
+  
+  if (hasVariations && allVariationsSelected) {
+    // Para variaciones, usar precioPromocional si es válido
+    const hasValidPromoPrice = promoPrice > 0 && promoPrice < basePrice;
+    if (hasValidPromoPrice) {
+      finalPrice = promoPrice;
+      discount = Math.round(((basePrice - promoPrice) / basePrice) * 100);
+    } else {
+      // Si no hay precio promocional, calcular descuento basado en la diferencia entre precioBase y precioUnitario
+      // Esto maneja items existentes en el carrito que no tienen precioPromocional guardado
+      if (unitPrice > 0 && unitPrice < basePrice) {
+        finalPrice = unitPrice;
+        discount = Math.round(((basePrice - unitPrice) / basePrice) * 100);
+      } else {
+        finalPrice = unitPrice;
+        discount = 0;
+      }
+    }
+  } else {
+    // Para productos sin variaciones, usar el campo descuento
+    discount = Number(item?.descuento || 0);
+    finalPrice = Number(item?.precioUnitario ?? item?.precioFinal ?? (discount > 0 && discount < 100 ? basePrice * (1 - discount / 100) : basePrice));
+  }
+  
+  const hasDiscount = !isNaN(discount) && discount > 0 && discount < 100;
   const fakeOldPrice = hasDiscount ? basePrice : null;
 
   return { basePrice, discount, hasDiscount, fakeOldPrice, finalPrice };

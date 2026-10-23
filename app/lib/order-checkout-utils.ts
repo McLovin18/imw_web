@@ -172,10 +172,10 @@ export function buildOrderProductLine(item: CheckoutRequestItem, productData: an
     : Number(productData?.precioPromocional ?? 0);
 
   const { basePrice, discount, hasDiscount, finalPrice } = getCatalogPricing({
-    ...productData,
     precio: variantBasePrice,
     precioBase: variantBasePrice,
     precioPromocional: variantPromoPrice > 0 && variantPromoPrice < variantBasePrice ? variantPromoPrice : undefined,
+    descuento: variantMatch ? undefined : productData.descuento,
   });
 
   const subtotal = Math.round(finalPrice * cantidad * 100) / 100;

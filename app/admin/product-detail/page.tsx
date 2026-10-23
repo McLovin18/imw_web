@@ -49,18 +49,14 @@ export default function ProductDetailPage({ params }) {
       fetchReviews(id);
       if (prod) {
         let rel = [];
-        console.log("[RELACIONADOS] subsubcategoria:", prod.subsubcategoria, "subcategoria:", prod.subcategoria, "categoria:", prod.categoria);
         if (prod.subsubcategoria) {
           rel = await obtenerProductosPorSubsubcategoria(prod.subsubcategoria, prod.id, 5);
-          console.log("[RELACIONADOS] encontrados por subsubcategoria:", rel);
         }
         if ((!rel || rel.length === 0) && prod.subcategoria) {
           rel = await obtenerProductosPorSubcategoria(prod.subcategoria, prod.id, 5);
-          console.log("[RELACIONADOS] encontrados por subcategoria:", rel);
         }
         if ((!rel || rel.length === 0) && prod.categoria) {
           rel = await obtenerProductosPorCategoria(prod.categoria, prod.id, 5);
-          console.log("[RELACIONADOS] encontrados por categoria:", rel);
         }
         setRelacionados(rel);
       } else {

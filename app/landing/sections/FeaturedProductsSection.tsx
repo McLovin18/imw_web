@@ -18,7 +18,7 @@ export type FeaturedProductsSectionProps = {
   loading?: boolean;
 };
 
-const MAX_PRODUCTS = 40;
+const MAX_PRODUCTS = 10;
 
 // Extrae la fecha de creación de un producto en milisegundos,
 // soportando Firestore Timestamp, Date, string ISO o number.
@@ -47,6 +47,9 @@ export default function FeaturedProductsSection({
   loading = false,
 }: FeaturedProductsSectionProps) {
   const [theme, setTheme] = React.useState("dark");
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [visibleCount, setVisibleCount] = React.useState(4);
+  const [isTransitioning, setIsTransitioning] = React.useState(true);
   const titleRef = React.useRef<HTMLHeadingElement>(null);
 
   React.useEffect(() => {
@@ -58,6 +61,25 @@ export default function FeaturedProductsSection({
     const handler = () => checkTheme();
     window.addEventListener('theme-changed', handler);
     return () => window.removeEventListener('theme-changed', handler);
+  }, []);
+
+  // Detectar tamaño de pantalla para ajustar visibleCount
+  React.useEffect(() => {
+    const updateVisibleCount = () => {
+      if (typeof window === 'undefined') return;
+      const width = window.innerWidth;
+      if (width < 768) {
+        setVisibleCount(1); // Móvil
+      } else if (width < 1024) {
+        setVisibleCount(2); // Tablet
+      } else {
+        setVisibleCount(4); // Laptop/Desktop
+      }
+    };
+
+    updateVisibleCount();
+    window.addEventListener('resize', updateVisibleCount);
+    return () => window.removeEventListener('resize', updateVisibleCount);
   }, []);
 
   React.useEffect(() => {
@@ -77,6 +99,72 @@ export default function FeaturedProductsSection({
       .sort((a: any, b: any) => getCreatedAtMillis(b) - getCreatedAtMillis(a))
       .slice(0, MAX_PRODUCTS);
   }, [products]);
+
+  // Crear array extendido para carousel infinito (copia al principio y al final)
+  const extendedProducts = React.useMemo(() => {
+    if (recentProducts.length === 0) return [];
+    return [
+      ...recentProducts.slice(-visibleCount),
+      ...recentProducts,
+      ...recentProducts.slice(0, visibleCount)
+    ];
+  }, [recentProducts, visibleCount]);
+
+  const maxIndex = extendedProducts.length - visibleCount;
+
+  const handlePrev = () => {
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => {
+      const newIndex = prev - 1;
+      if (newIndex < visibleCount) {
+        // Llegó al inicio, saltar al final
+        setTimeout(() => {
+          setIsTransitioning(false);
+          setCurrentIndex(maxIndex - visibleCount);
+          setTimeout(() => setIsTransitioning(true), 50);
+        }, 500);
+      }
+      return newIndex;
+    });
+  };
+
+  const handleNext = () => {
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => {
+      const newIndex = prev + 1;
+      if (newIndex > maxIndex - visibleCount) {
+        // Llegó al final, saltar al inicio
+        setTimeout(() => {
+          setIsTransitioning(false);
+          setCurrentIndex(visibleCount);
+          setTimeout(() => setIsTransitioning(true), 50);
+        }, 500);
+      }
+      return newIndex;
+    });
+  };
+
+  // Auto-play cada 5 segundos
+  React.useEffect(() => {
+    if (recentProducts.length <= visibleCount) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => {
+        if (prev >= maxIndex - visibleCount) {
+          return visibleCount;
+        }
+        return prev + 1;
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [recentProducts.length, maxIndex, visibleCount]);
+
+  // Resetear currentIndex cuando cambia visibleCount
+  React.useEffect(() => {
+    setCurrentIndex(visibleCount);
+    setIsTransitioning(true);
+  }, [visibleCount]);
 
   // ── Return condicional DESPUÉS de todos los hooks ──
   if (loading) {
@@ -183,16 +271,78 @@ export default function FeaturedProductsSection({
       )}
 
       <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 md:px-12">
-        {/* ── Grid: 2 columnas en móvil, 3 desde sm ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-5 md:gap-6">
-          {recentProducts.map((prod: any, idx: number) => (
+        {/* ── Carousel con 2 productos visibles ── */}
+        <div className="relative">
+          {/* Contenedor del carousel */}
+          <div className="overflow-hidden">
             <div
-              key={prod.id}
-              className="transition-all duration-300 flex flex-col items-stretch justify-stretch h-full"
+              className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
+              style={{
+                transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
+              }}
             >
-              <ProductoCard producto={prod} index={idx} />
+              {extendedProducts.map((prod: any, idx: number) => (
+                <div
+                  key={`${prod.id}-${idx}`}
+                  className="flex-shrink-0 px-1"
+                  style={{ width: `${100 / visibleCount}%` }}
+                >
+                  <div className="transition-all duration-300 flex flex-col items-stretch justify-stretch h-full scale-90 origin-top">
+                    <ProductoCard producto={prod} index={idx % recentProducts.length} />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* Controles de navegación */}
+          {recentProducts.length > visibleCount && (
+            <>
+              <button
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+                style={{
+                  background: "var(--card)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text)",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+                }}
+              >
+                <span className="material-icons-round text-xl">chevron_left</span>
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={currentIndex >= maxIndex}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+                style={{
+                  background: "var(--card)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text)",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+                }}
+              >
+                <span className="material-icons-round text-xl">chevron_right</span>
+              </button>
+            </>
+          )}
+
+          {/* Indicadores */}
+          {recentProducts.length > visibleCount && (
+            <div className="flex justify-center gap-2 mt-4">
+              {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  className="w-2 h-2 rounded-full transition-all"
+                  style={{
+                    background: currentIndex === idx ? "var(--primary)" : "var(--border)",
+                    width: currentIndex === idx ? "24px" : "8px"
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

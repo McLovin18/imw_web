@@ -521,7 +521,7 @@ export default function HeroSection({
 
         {/* Contenido textual por defecto (sin posicionamiento personalizado) */}
         {!fieldPositions?.badge && !fieldPositions?.title && !fieldPositions?.subtitle && (
-          <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center sm:items-center lg:items-start px-2 sm:px-8 pb-5 sm:pb-8 gap-1.5 sm:gap-3 w-full">
+          <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-start sm:items-center lg:items-start px-2 sm:px-8 pb-5 sm:pb-8 gap-1.5 sm:gap-3 w-full">
             {current.badge && (
               <span
                 style={{
@@ -543,7 +543,7 @@ export default function HeroSection({
                   ...titleStyle,
                   transform: 'none'
                 }}
-                className="text-xl sm:text-5xl lg:text-5xl font-extrabold leading-none max-w-full drop-shadow-lg whitespace-nowrap text-center sm:text-center lg:text-left"
+                className="text-xl sm:text-5xl lg:text-5xl font-extrabold leading-none max-w-full drop-shadow-lg whitespace-nowrap text-left sm:text-center lg:text-left"
               >
                 {current.title}
               </h2>

@@ -556,7 +556,7 @@ a.ftContactItem:hover .ftContactIcon { background: var(--ft-surface-hover); }
 }
 
 @media (max-width: 767px) {
-  .ftContainer { padding: 40px 20px 24px; }
+  .ftContainer { padding: 40px 20px 100px; }
 
   .ftTrust {
     grid-template-columns: 1fr;

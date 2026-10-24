@@ -70,11 +70,13 @@ export default function ProductosPage() {
   const subcategoriaFromUrl = (searchParams?.get("subcat") || searchParams?.get("subcategory") || searchParams?.get("sub") || "").trim();
   const subsubcategoriaFromUrl = (searchParams?.get("subsubcat") || searchParams?.get("subsubcategory") || searchParams?.get("subsub") || "").trim();
   const generoFromUrl = (searchParams?.get("genero") || "").trim() as "hombre" | "mujer" | "unisex" | "";
+  const bodegaFromUrl = (searchParams?.get("bodega") || "").trim();
 
   // Estado local: responde al click al instante (router.push a veces no actualiza searchParams en la misma ruta)
   const [filterCat, setFilterCat] = useState(categoriaFromUrl);
   const [filterSub, setFilterSub] = useState(subcategoriaFromUrl);
   const [filterSubsub, setFilterSubsub] = useState(subsubcategoriaFromUrl);
+  const [filterBodega, setFilterBodega] = useState(bodegaFromUrl);
 
   useEffect(() => {
     setFilterCat(categoriaFromUrl);
@@ -85,6 +87,10 @@ export default function ProductosPage() {
   useEffect(() => {
     setFilterGenero(generoFromUrl);
   }, [generoFromUrl]);
+
+  useEffect(() => {
+    setFilterBodega(bodegaFromUrl);
+  }, [bodegaFromUrl]);
 
   const categoriaId = filterCat;
   const subcategoriaId = filterSub;
@@ -267,8 +273,9 @@ export default function ProductosPage() {
         const matchMax = maxNum === null || basePrice <= maxNum;
         
         const matchGenero = !filterGenero || p.genero === filterGenero;
+        const matchBodega = !filterBodega || p.bodegaId === filterBodega;
 
-        return matchTexto && matchMin && matchMax && matchGenero;
+        return matchTexto && matchMin && matchMax && matchGenero && matchBodega;
       })
       .sort((a: any, b: any) => {
         const basePrice = (p: any) => Number(p.precio || 0);
@@ -277,7 +284,7 @@ export default function ProductosPage() {
         return (new Date(b.createdAt).getTime() || 0) - (new Date(a.createdAt).getTime() || 0);
       });
     return filtered;
-  }, [productos, categoriaId, subcategoriaId, subsubcategoriaId, categorias, search, precioMin, precioMax, orden, urlMinPrice, urlMaxPrice, filterGenero]);
+  }, [productos, categoriaId, subcategoriaId, subsubcategoriaId, categorias, search, precioMin, precioMax, orden, urlMinPrice, urlMaxPrice, filterGenero, filterBodega]);
 
   const hasFilters = !!(search || precioMin || precioMax || orden !== "newest");
 

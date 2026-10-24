@@ -484,8 +484,11 @@ export default function HeroSection({
             href={current.buttonLink || "/products-by-category"}
             style={{
               position: "absolute",
-              background: "var(--cardBg)",
-              color: "var(--text)",
+              background: (styles as any)?.buttonBackgroundColor || "var(--cardBg)",
+              color: (styles as any)?.buttonTextColor || "var(--text)",
+              borderColor: (styles as any)?.buttonBorderColor,
+              borderWidth: (styles as any)?.buttonBorderWidth,
+              borderRadius: (styles as any)?.buttonBorderRadius,
               ...buttonTextStyle,
             }}
             className="absolute inline-flex items-center gap-1 sm:gap-2 hover:bg-[var(--bgSecondary)] font-bold text-[9px] sm:text-2xl px- py-1.5 sm:px-1 sm:py-4 rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95"
@@ -564,8 +567,11 @@ export default function HeroSection({
               <a
                 href={current.buttonLink || "/products-by-category"}
                 style={{
-                  background: "var(--cardBg)",
-                  color: "var(--text)",
+                  background: (styles as any)?.buttonBackgroundColor || "var(--cardBg)",
+                  color: (styles as any)?.buttonTextColor || "var(--text)",
+                  borderColor: (styles as any)?.buttonBorderColor,
+                  borderWidth: (styles as any)?.buttonBorderWidth,
+                  borderRadius: (styles as any)?.buttonBorderRadius,
                   ...defaultButtonInlineStyle,
                   ...buttonTextStyle
                 }}

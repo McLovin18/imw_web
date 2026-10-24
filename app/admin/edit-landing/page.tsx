@@ -102,7 +102,7 @@ export default function LandingEditor() {
   // Para drag & drop de items dentro de secciones
   const [draggedItemState, setDraggedItemState] = useState<{
     sectionId: string;
-    itemType: "gallery" | "featured-category" | "hero" | "vip";
+    itemType: "gallery" | "featured-category" | "featured-collection" | "hero" | "vip";
     fromIndex: number;
   } | null>(null);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">(
@@ -339,160 +339,172 @@ export default function LandingEditor() {
      HERO
   ============================ */
 
-  const handleHeroChange = (
+  const handleHeroChange = useCallback((
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     if (!hero) return;
     setHero({ ...hero, [e.target.name]: e.target.value });
-  };
+  }, [hero]);
 
-  const handleHeroImage = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleHeroImage = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const url = await uploadLandingImage(file, "hero");
     setHero({ ...hero, image: url });
-  };
+  }, [hero]);
 
-  const saveHero = async () => {
+  const saveHero = useCallback(async () => {
     if (!hero) return;
     setSaving(true);
     await updateHero(hero);
     setSaving(false);
     alert("Hero actualizado");
-  };
+  }, [hero]);
 
 
 
 
-  const handleSectionPropChange = async (
+  const handleSectionPropChange = useCallback(async (
     idx: number,
     field: string,
     value: any
   ) => {
-    const updated = [...sections];
-    const current = updated[idx];
-    const baseProps = {
-      ...(current.props || {}),
-      [field]: value,
-    };
-    // If this is a hero section with items, update the active hero item instead
-    if (current.type === "hero" && Array.isArray(current.props?.items)) {
-      const items = ((current.props?.items as any[]) || []) as any[];
-      const sectionId = current.id;
-      const activeIdx = (activeHeroIndex[sectionId] ?? 0) as number;
-      const newItems = [...items];
-      const target = { ...(newItems[activeIdx] || {}) };
-      target[field] = value;
-      newItems[activeIdx] = target;
-      baseProps.items = newItems;
-    }
-
-    updated[idx] = {
-      ...current,
-      props: baseProps,
-    };
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
-
-  const toggleSectionHidden = async (id: string) => {
-    const updated = sections.map((s) =>
-      s.id === id ? { ...s, hidden: !s.hidden } : s
-    );
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
-
-  const duplicateSection = async (idx: number) => {
-    const original = sections[idx];
-    if (!original) return;
-    const clone: Section = {
-      ...original,
-      id: `section-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    };
-    const updated = [...sections];
-    updated.splice(idx + 1, 0, clone);
-    updated.forEach((s, i) => (s.order = i + 1));
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
-
-  const handleSectionStyleChange = async (
-    idx: number,
-    field: string,
-    value: any
-  ) => {
-    const updated = [...sections];
-    const current = updated[idx];
-    updated[idx] = {
-      ...current,
-      styles: {
-        ...(current.styles || {}),
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[idx];
+      const baseProps = {
+        ...(current.props || {}),
         [field]: value,
-      },
-    };
-    setSections(updated);
+      };
+      // If this is a hero section with items, update the active hero item instead
+      if (current.type === "hero" && Array.isArray(current.props?.items)) {
+        const items = ((current.props?.items as any[]) || []) as any[];
+        const sectionId = current.id;
+        const activeIdx = (activeHeroIndex[sectionId] ?? 0) as number;
+        const newItems = [...items];
+        const target = { ...(newItems[activeIdx] || {}) };
+        target[field] = value;
+        newItems[activeIdx] = target;
+        baseProps.items = newItems;
+      }
+
+      updated[idx] = {
+        ...current,
+        props: baseProps,
+      };
+      return updated;
+    });
     setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
-  const handleFieldStyleChange = async (
+    await new Promise(resolve => setTimeout(resolve, 0));
+    setSections(asyncSections => {
+      saveLandingSections(asyncSections);
+      setSaving(false);
+      return asyncSections;
+    });
+  }, [activeHeroIndex]);
+
+  const toggleSectionHidden = useCallback(async (id: string) => {
+    setSections(prevSections => {
+      const updated = prevSections.map((s) =>
+        s.id === id ? { ...s, hidden: !s.hidden } : s
+      );
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const duplicateSection = useCallback(async (idx: number) => {
+    setSections(prevSections => {
+      const original = prevSections[idx];
+      if (!original) return prevSections;
+      const clone: Section = {
+        ...original,
+        id: `section-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      };
+      const updated = [...prevSections];
+      updated.splice(idx + 1, 0, clone);
+      updated.forEach((s, i) => (s.order = i + 1));
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleSectionStyleChange = useCallback(async (
+    idx: number,
+    field: string,
+    value: any
+  ) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[idx];
+      updated[idx] = {
+        ...current,
+        styles: {
+          ...(current.styles || {}),
+          [field]: value,
+        },
+      };
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+  const handleFieldStyleChange = useCallback(async (
     idx: number,
     fieldName: string,
     styleKey: keyof import("../../lib/landing-types").LandingFieldStyle,
     value: any
   ) => {
-    // If this section is a hero with items and there's an active item,
-    // delegate to the hero-item specific handler so styles are saved per-variant.
-    const sec = sections[idx];
-    const items = (sec?.props?.items as any[]) || [];
-    const activeIdx = sec ? (activeHeroIndex[sec.id] as number | undefined) : undefined;
-    if (sec && sec.type === "hero" && items.length > 0 && typeof activeIdx === "number") {
-      await handleHeroItemFieldStyleChange(idx, activeIdx, fieldName, styleKey, value as any);
-      return;
-    }
+    setSections(prevSections => {
+      const sec = prevSections[idx];
+      const items = (sec?.props?.items as any[]) || [];
+      const activeIdx = sec ? (activeHeroIndex[sec.id] as number | undefined) : undefined;
+      if (sec && sec.type === "hero" && items.length > 0 && typeof activeIdx === "number") {
+        handleHeroItemFieldStyleChange(idx, activeIdx, fieldName, styleKey, value as any);
+        return prevSections;
+      }
 
-    const updated = [...sections];
-    const current = updated[idx];
-    const currentFieldStyles = current.fieldStyles || {};
-    let currentStyle = currentFieldStyles[fieldName] || {};
+      const updated = [...prevSections];
+      const current = updated[idx];
+      const currentFieldStyles = current.fieldStyles || {};
+      let currentStyle = currentFieldStyles[fieldName] || {};
 
-    // Normalize legacy shape -> { desktop: legacy }
-    if (currentStyle && ((currentStyle as any).desktop === undefined && (currentStyle as any).mobile === undefined)) {
-      currentStyle = { desktop: { ...(currentStyle as any) } } as any;
-    }
+      // Normalize legacy shape -> { desktop: legacy }
+      if (currentStyle && ((currentStyle as any).desktop === undefined && (currentStyle as any).mobile === undefined)) {
+        currentStyle = { desktop: { ...(currentStyle as any) } } as any;
+      }
 
-    const deviceKey = previewDevice || "desktop";
+      const deviceKey = previewDevice || "desktop";
 
-    const newFieldStyleForDevice = {
-      ...((currentStyle as any)?.[deviceKey] || {}),
-      [styleKey]: value,
-    };
+      const newFieldStyleForDevice = {
+        ...((currentStyle as any)?.[deviceKey] || {}),
+        [styleKey]: value,
+      };
 
-    updated[idx] = {
-      ...current,
-      fieldStyles: {
-        ...currentFieldStyles,
-        [fieldName]: {
-          ...((currentStyle as any) || {}),
-          [deviceKey]: newFieldStyleForDevice,
+      updated[idx] = {
+        ...current,
+        fieldStyles: {
+          ...currentFieldStyles,
+          [fieldName]: {
+            ...((currentStyle as any) || {}),
+            [deviceKey]: newFieldStyleForDevice,
+          },
         },
-      },
-    };
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
+      };
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, [activeHeroIndex, previewDevice]);
 
-  const updateHeroItems = async (
+  const updateHeroItems = useCallback(async (
     sectionIndex: number,
     updater: (
       items: {
@@ -524,93 +536,99 @@ export default function LandingEditor() {
       >;
     }[]
   ) => {
-    const updated = [...sections];
-    const current = updated[sectionIndex];
-    if (!current) return;
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      if (!current) return prevSections;
 
-    const currentItems = ((current.props?.items as any[]) || []) as {
-      title?: string;
-      subtitle?: string;
-      badge?: string;
-      buttonText?: string;
-      buttonLink?: string;
-      image?: string | null;
-      images?: string[];
-      videoUrl?: string | null;
-      fieldStyles?: Record<
-        string,
-        import("../../lib/landing-types").LandingFieldStyle
-      >;
-    }[];
+      const currentItems = ((current.props?.items as any[]) || []) as {
+        title?: string;
+        subtitle?: string;
+        badge?: string;
+        buttonText?: string;
+        buttonLink?: string;
+        image?: string | null;
+        images?: string[];
+        videoUrl?: string | null;
+        fieldStyles?: Record<
+          string,
+          import("../../lib/landing-types").LandingFieldStyle
+        >;
+      }[];
 
-    const newItems = updater(currentItems);
+      const newItems = updater(currentItems);
 
-    updated[sectionIndex] = {
-      ...current,
-      props: {
-        ...(current.props || {}),
-        items: newItems,
-      },
-    };
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
 
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-    return newItems;
-  };
-
-  const handleAddHeroItem = async (sectionIndex: number) => {
-    const sec = sections[sectionIndex];
-    const baseProps = sec?.props || {};
-    const newItemTemplate = {
-      title: baseProps.title || "",
-      subtitle: baseProps.subtitle || "",
-      badge: baseProps.badge || "",
-      buttonText: baseProps.buttonText || "",
-      buttonLink: baseProps.buttonLink || "",
-      image: baseProps.image || null,
-      fieldStyles: {},
-      fieldPositions: {},
-    };
-
-    const newItems = await updateHeroItems(sectionIndex, (items) => [
-      ...items,
-      newItemTemplate,
-    ]);
-    // Select the newly created hero as active (last index)
-    if (sec) {
-      const id = sec.id;
-      const newLen = (newItems || []).length || 0;
-      setActiveHeroIndex((prev) => ({ ...prev, [id]: Math.max(0, newLen - 1) }));
-    }
-  };
-
-  const handleHeroItemFieldChange = async (
-    sectionIndex: number,
-    itemIndex: number,
-    field: "title" | "subtitle" | "badge" | "buttonText" | "buttonLink",
-    value: string
-  ) => {
-    await updateHeroItems(sectionIndex, (items) => {
-      const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = { ...current, [field]: value };
-      return copy;
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
     });
-  };
+  }, []);
 
-  const handleHeroItemFieldStyleChange = async (
+  const handleAddHeroItem = useCallback(async (sectionIndex: number) => {
+    setSections(prevSections => {
+      const sec = prevSections[sectionIndex];
+      const baseProps = sec?.props || {};
+      const newItemTemplate = {
+        title: baseProps.title || "",
+        subtitle: baseProps.subtitle || "",
+        badge: baseProps.badge || "",
+        buttonText: baseProps.buttonText || "",
+        buttonLink: baseProps.buttonLink || "",
+        image: baseProps.image || null,
+        fieldStyles: {},
+        fieldPositions: {},
+      };
+
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const currentItems = ((current.props?.items as any[]) || []) as any[];
+      const newItems = [...currentItems, newItemTemplate];
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      // Select the newly created hero as active (last index)
+      if (sec) {
+        const id = sec.id;
+        const newLen = newItems.length || 0;
+        setActiveHeroIndex((prev) => ({ ...prev, [id]: Math.max(0, newLen - 1) }));
+      }
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleHeroItemFieldStyleChange = useCallback(async (
     sectionIndex: number,
     itemIndex: number,
     fieldName: string,
     styleKey: keyof import("../../lib/landing-types").LandingFieldStyle,
     value: any
   ) => {
-    await updateHeroItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      const currentFieldStyles = (current as any).fieldStyles || {};
+      const item = copy[itemIndex] || {};
+      const currentFieldStyles = (item as any).fieldStyles || {};
       let currentStyle = currentFieldStyles[fieldName] || {};
       if (currentStyle && (((currentStyle as any).desktop === undefined) && ((currentStyle as any).mobile === undefined))) {
         currentStyle = { desktop: { ...(currentStyle as any) } } as any;
@@ -622,7 +640,7 @@ export default function LandingEditor() {
       };
 
       copy[itemIndex] = {
-        ...current,
+        ...item,
         fieldStyles: {
           ...currentFieldStyles,
           [fieldName]: {
@@ -632,11 +650,22 @@ export default function LandingEditor() {
         },
       } as any;
 
-      return copy;
-    });
-  };
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
 
-  const handleHeroItemImage = async (
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, [previewDevice]);
+
+  const handleHeroItemImage = useCallback(async (
     e: ChangeEvent<HTMLInputElement>,
     sectionIndex: number,
     itemIndex: number
@@ -649,173 +678,238 @@ export default function LandingEditor() {
       ? await uploadLandingVideo(file, `hero-${sectionIndex}-${itemIndex}`)
       : await uploadLandingImage(file, `hero-${sectionIndex}-${itemIndex}`);
 
-    await updateHeroItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      const currentImages = Array.isArray((current as any).images)
-        ? (current as any).images.filter(Boolean)
-        : current.image
-          ? [current.image]
+      const item = copy[itemIndex] || {};
+      const currentImages = Array.isArray((item as any).images)
+        ? (item as any).images.filter(Boolean)
+        : item.image
+          ? [item.image]
           : [];
 
       if (isVideo) {
         if (currentImages.length > 0) {
           alert("Si hay más de un recurso, solo se admiten imágenes.");
-          return items;
+          return prevSections;
         }
 
         copy[itemIndex] = {
-          ...current,
+          ...item,
           image: null,
           images: [],
           videoUrl: url,
         };
-        return copy;
+      } else {
+        const nextImages = Array.from(new Set([...currentImages, url].filter(Boolean)));
+        copy[itemIndex] = {
+          ...item,
+          image: nextImages[0] || null,
+          images: nextImages,
+          videoUrl: null,
+        };
       }
 
-      const nextImages = Array.from(new Set([...currentImages, url].filter(Boolean)));
-      copy[itemIndex] = {
+      updated[sectionIndex] = {
         ...current,
-        image: nextImages[0] || null,
-        images: nextImages,
-        videoUrl: null,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
       };
-      return copy;
-    });
-  };
 
-  const handleHeroItemRemoveImage = async (
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleHeroItemRemoveImage = useCallback(async (
     sectionIndex: number,
     itemIndex: number,
     imageUrl: string
   ) => {
-    await updateHeroItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      const currentImages = Array.isArray((current as any).images)
-        ? (current as any).images.filter(Boolean)
-        : current.image
-          ? [current.image]
+      const item = copy[itemIndex] || {};
+      const currentImages = Array.isArray((item as any).images)
+        ? (item as any).images.filter(Boolean)
+        : item.image
+          ? [item.image]
           : [];
       const nextImages = currentImages.filter((existingUrl: string) => existingUrl !== imageUrl);
       copy[itemIndex] = {
-        ...current,
+        ...item,
         image: nextImages[0] || null,
         images: nextImages,
       };
-      return copy;
-    });
-  };
 
-  const handleHeroItemClearMedia = async (sectionIndex: number, itemIndex: number) => {
-    await updateHeroItems(sectionIndex, (items) => {
-      const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = {
+      updated[sectionIndex] = {
         ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleHeroItemClearMedia = useCallback(async (sectionIndex: number, itemIndex: number) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const copy = [...items];
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = {
+        ...item,
         image: null,
         images: [],
         videoUrl: null,
       };
-      return copy;
-    });
-  };
 
-  const handleRemoveHeroItem = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleRemoveHeroItem = useCallback(async (
     sectionIndex: number,
     itemIndex: number
   ) => {
-    const oldLen = ((sections[sectionIndex]?.props?.items as any[]) || []).length || 0;
-    await updateHeroItems(sectionIndex, (items) =>
-      items.filter((_, idx) => idx !== itemIndex)
-    );
-    // Adjust active selection for this section
-    const sec = sections[sectionIndex];
-    if (sec) {
-      const id = sec.id;
-      const prevIdx = activeHeroIndex[id] ?? 0;
-      const newLen = Math.max(0, oldLen - 1);
-      const newIdx = Math.max(0, Math.min(prevIdx, newLen - 1 >= 0 ? newLen - 1 : 0));
-      setActiveHeroIndex((p) => ({ ...p, [id]: newIdx }));
-    }
-  };
+    setSections(prevSections => {
+      const current = prevSections[sectionIndex];
+      const oldLen = ((current?.props?.items as any[]) || []).length || 0;
+      const updated = [...prevSections];
+      const sec = updated[sectionIndex];
+      const items = ((sec?.props?.items as any[]) || []) as any[];
+      const newItems = items.filter((_, idx) => idx !== itemIndex);
+
+      updated[sectionIndex] = {
+        ...sec,
+        props: {
+          ...(sec?.props || {}),
+          items: newItems,
+        },
+      };
+
+      // Adjust active selection for this section
+      if (sec) {
+        const id = sec.id;
+        const prevIdx = activeHeroIndex[id] ?? 0;
+        const newLen = Math.max(0, oldLen - 1);
+        const newIdx = Math.max(0, Math.min(prevIdx, newLen - 1 >= 0 ? newLen - 1 : 0));
+        setActiveHeroIndex((p) => ({ ...p, [id]: newIdx }));
+      }
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, [activeHeroIndex]);
 
   // ������������������������ Manejador para actualizar fieldPositions ������������������������������������������������������������������������������
-  const handleFieldPositionChange = async (
+  const handleFieldPositionChange = useCallback(async (
     sectionIndex: number,
     fieldPositions: Record<string, { desktop?: any; mobile?: any }>
   ) => {
-    const updated = [...sections];
-    const current = updated[sectionIndex];
-    if (!current) return;
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      if (!current) return prevSections;
 
-    updated[sectionIndex] = {
-      ...current,
-      fieldPositions,
-    };
+      updated[sectionIndex] = {
+        ...current,
+        fieldPositions,
+      };
 
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
 
   // ������������������������ Crear callback memoizado para onPositionChange del editor ���������������������������
   const [autosaveTimer, setAutosaveTimer] = useState<NodeJS.Timeout | null>(null);
 
   const createPositionChangeHandler = useCallback(
     (sectionIndex: number, itemIndex?: number) => (field: string, position: any) => {
-      const updated = [...sections];
-      const current = updated[sectionIndex];
-      if (!current) return;
+      setSections(prevSections => {
+        const updated = [...prevSections];
+        const current = updated[sectionIndex];
+        if (!current) return prevSections;
 
-      // If this is a hero item position (itemIndex provided), store under props.items[itemIndex].fieldPositions
-      if (current.type === "hero" && typeof itemIndex === "number") {
-        const items = ((current.props?.items as any[]) || []) as any[];
-        const newItems = [...items];
-        const targetItem = { ...(newItems[itemIndex] || {}) };
-        const currentFieldPositions = (targetItem.fieldPositions || {}) as Record<string, any>;
-        const newFieldPositionsForItem = {
-          ...currentFieldPositions,
-          [field]: {
-            ...((currentFieldPositions[field] as any) || {}),
+        // If this is a hero item position (itemIndex provided), store under props.items[itemIndex].fieldPositions
+        if (current.type === "hero" && typeof itemIndex === "number") {
+          const items = ((current.props?.items as any[]) || []) as any[];
+          const newItems = [...items];
+          const targetItem = { ...(newItems[itemIndex] || {}) };
+          const currentFieldPositions = (targetItem.fieldPositions || {}) as Record<string, any>;
+          const newFieldPositionsForItem = {
+            ...currentFieldPositions,
+            [field]: {
+              ...((currentFieldPositions[field] as any) || {}),
+              [previewDevice]: position,
+            },
+          };
+          targetItem.fieldPositions = newFieldPositionsForItem;
+          newItems[itemIndex] = targetItem;
+
+          updated[sectionIndex] = {
+            ...current,
+            props: {
+              ...(current.props || {}),
+              items: newItems,
+            },
+          };
+        } else {
+          const newFieldPositions = { ...(current.fieldPositions || {}) };
+          newFieldPositions[field] = {
+            ...newFieldPositions[field],
             [previewDevice]: position,
-          },
-        };
-        targetItem.fieldPositions = newFieldPositionsForItem;
-        newItems[itemIndex] = targetItem;
+          };
+          updated[sectionIndex] = {
+            ...current,
+            fieldPositions: newFieldPositions,
+          };
+        }
 
-        updated[sectionIndex] = {
-          ...current,
-          props: {
-            ...(current.props || {}),
-            items: newItems,
-          },
-        };
-      } else {
-        const newFieldPositions = { ...(current.fieldPositions || {}) };
-        newFieldPositions[field] = {
-          ...newFieldPositions[field],
-          [previewDevice]: position,
-        };
-        updated[sectionIndex] = {
-          ...current,
-          fieldPositions: newFieldPositions,
-        };
-      }
+        // Autosave con debounce de 1s
+        if (autosaveTimer) clearTimeout(autosaveTimer);
+        const newTimer = setTimeout(async () => {
+          setSaving(true);
+          await saveLandingSections(updated);
+          setSaving(false);
+        }, 1000);
+        setAutosaveTimer(newTimer);
 
-      setSections(updated);
-
-      // Autosave con debounce de 1s
-      if (autosaveTimer) clearTimeout(autosaveTimer);
-      const newTimer = setTimeout(async () => {
-        setSaving(true);
-        await saveLandingSections(updated);
-        setSaving(false);
-      }, 1000);
-      setAutosaveTimer(newTimer);
+        return updated;
+      });
     },
-    [sections, previewDevice, autosaveTimer]
+    [previewDevice, autosaveTimer]
   );
 
   // Cleanup del timer al desmontar
@@ -825,105 +919,181 @@ export default function LandingEditor() {
     };
   }, [autosaveTimer]);
 
-  const updateGalleryItems = async (
+  const updateGalleryItems = useCallback(async (
     sectionIndex: number,
     updater: (items: { title?: string; image?: string }[]) => {
       title?: string;
       image?: string;
     }[]
   ) => {
-    const updated = [...sections];
-    const current = updated[sectionIndex];
-    if (!current) return;
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      if (!current) return prevSections;
 
-    const currentItems = ((current.props?.items as any[]) || []) as {
-      title?: string;
-      image?: string;
-    }[];
+      const currentItems = ((current.props?.items as any[]) || []) as {
+        title?: string;
+        image?: string;
+      }[];
 
-    const newItems = updater(currentItems);
+      const newItems = updater(currentItems);
 
-    updated[sectionIndex] = {
-      ...current,
-      props: {
-        ...(current.props || {}),
-        items: newItems,
-      },
-    };
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
 
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
 
-  const handleAddGalleryItem = async (sectionIndex: number) => {
-    await updateGalleryItems(sectionIndex, (items) => [
-      ...items,
-      { title: "", image: "" },
-    ]);
-  };
+  const handleAddGalleryItem = useCallback(async (sectionIndex: number) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = [...items, { title: "", image: "" }];
 
-  const handleGalleryItemTitleChange = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleGalleryItemTitleChange = useCallback(async (
     sectionIndex: number,
     itemIndex: number,
     title: string
   ) => {
-    await updateGalleryItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = { ...current, title };
-      return copy;
-    });
-  };
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, title };
 
-  const handleGalleryItemImage = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleGalleryItemImage = useCallback(async (
     e: ChangeEvent<HTMLInputElement>,
     sectionIndex: number,
     itemIndex: number
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const url = await uploadLandingImage(file, `gallery-${sectionIndex}-${itemIndex}`);
-
-    await updateGalleryItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = { ...current, image: url };
-      return copy;
-    });
-  };
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, image: url };
 
-  const handleRemoveGalleryItem = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleRemoveGalleryItem = useCallback(async (
     sectionIndex: number,
     itemIndex: number
   ) => {
-    await updateGalleryItems(sectionIndex, (items) =>
-      items.filter((_, idx) => idx !== itemIndex)
-    );
-  };
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = items.filter((_, idx) => idx !== itemIndex);
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
 
   // ������������������������ Reordenar items dentro de galer+�a ������������������������������������������������������������������������������������������������
-  const reorderGalleryItems = async (
+  const reorderGalleryItems = useCallback(async (
     sectionIndex: number,
     fromIndex: number,
     toIndex: number
   ) => {
     if (fromIndex === toIndex) return;
 
-    await updateGalleryItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
       const [item] = copy.splice(fromIndex, 1);
       copy.splice(toIndex, 0, item);
-      return copy;
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
     });
-  };
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // VIP Products Items
   // ─────────────────────────────────────────────────────────────────────────────
-  const updateVIPItems = async (
+  const updateVIPItems = useCallback(async (
     sectionIndex: number,
     updater: (items: {
       badge?: string;
@@ -941,57 +1111,89 @@ export default function LandingEditor() {
       image?: string;
     }[]
   ) => {
-    const updated = [...sections];
-    const current = updated[sectionIndex];
-    if (!current) return;
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      if (!current) return prevSections;
 
-    const currentItems = ((current.props?.items as any[]) || []) as {
-      badge?: string;
-      title?: string;
-      subtitle?: string;
-      buttonText?: string;
-      buttonLink?: string;
-      image?: string;
-    }[];
+      const currentItems = ((current.props?.items as any[]) || []) as {
+        badge?: string;
+        title?: string;
+        subtitle?: string;
+        buttonText?: string;
+        buttonLink?: string;
+        image?: string;
+      }[];
 
-    const newItems = updater(currentItems);
+      const newItems = updater(currentItems);
 
-    updated[sectionIndex] = {
-      ...current,
-      props: {
-        ...(current.props || {}),
-        items: newItems,
-      },
-    };
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
 
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
 
-  const handleAddVIPItem = async (sectionIndex: number) => {
-    await updateVIPItems(sectionIndex, (items) => [
-      ...items,
-      { badge: "", title: "", subtitle: "", buttonText: "VER MÁS 👀", buttonLink: "", image: "" },
-    ]);
-  };
+  const handleAddVIPItem = useCallback(async (sectionIndex: number) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = [...items, { badge: "", title: "", subtitle: "", buttonText: "VER MÁS 👀", buttonLink: "", image: "" }];
 
-  const handleVIPItemFieldChange = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleVIPItemFieldChange = useCallback(async (
     sectionIndex: number,
     itemIndex: number,
     field: string,
     value: string
   ) => {
-    await updateVIPItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = { ...current, [field]: value };
-      return copy;
-    });
-  };
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, [field]: value };
 
-  const handleVIPItemImage = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleVIPItemImage = useCallback(async (
     e: ChangeEvent<HTMLInputElement>,
     sectionIndex: number,
     itemIndex: number
@@ -1001,51 +1203,97 @@ export default function LandingEditor() {
 
     const url = await uploadLandingImage(file, `vip-${sectionIndex}-${itemIndex}`);
 
-    await updateVIPItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = { ...current, image: url };
-      return copy;
-    });
-  };
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, image: url };
 
-  const handleRemoveVIPItem = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleRemoveVIPItem = useCallback(async (
     sectionIndex: number,
     itemIndex: number
   ) => {
-    await updateVIPItems(sectionIndex, (items) =>
-      items.filter((_, idx) => idx !== itemIndex)
-    );
-  };
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = items.filter((_, idx) => idx !== itemIndex);
 
-  const reorderVIPItems = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const reorderVIPItems = useCallback(async (
     sectionIndex: number,
     fromIndex: number,
     toIndex: number
   ) => {
     if (fromIndex === toIndex) return;
 
-    await updateVIPItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
       const [item] = copy.splice(fromIndex, 1);
       copy.splice(toIndex, 0, item);
-      return copy;
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
     });
-  };
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────────────
 
 
-  const getResolvedHeroIndex = (sectionId: string, itemCount: number) => {
+  const getResolvedHeroIndex = useCallback((sectionId: string, itemCount: number) => {
     if (!itemCount) return undefined;
     const storedIndex = activeHeroIndex[sectionId];
     if (typeof storedIndex !== "number" || Number.isNaN(storedIndex)) {
       return 0;
     }
     return Math.max(0, Math.min(storedIndex, itemCount - 1));
-  };
+  }, [activeHeroIndex]);
 
-  const buildHeroPreviewProps = (section: any, previewDeviceValue: "desktop" | "mobile") => {
+  const buildHeroPreviewProps = useCallback((section: any, previewDeviceValue: "desktop" | "mobile") => {
     const sectionProps = section.props || {};
     const { items: _ignoredItems, ...baseProps } = sectionProps;
     const heroItems = Array.isArray(sectionProps.items) ? sectionProps.items : [];
@@ -1074,9 +1322,9 @@ export default function LandingEditor() {
       fieldPositions: section.fieldPositions || {},
       fieldStyles: section.fieldStyles || {},
     };
-  };
+  }, [getResolvedHeroIndex]);
 
-  const buildHeroPositioningValues = (section: any, activeIdx?: number) => {
+  const buildHeroPositioningValues = useCallback((section: any, activeIdx?: number) => {
     const sectionProps = section.props || {};
     const heroItems = Array.isArray(sectionProps.items) ? sectionProps.items : [];
     const activeItem = typeof activeIdx === "number" ? heroItems[activeIdx] || {} : {};
@@ -1085,11 +1333,11 @@ export default function LandingEditor() {
       title: activeItem.title ?? sectionProps.title ?? "",
       buttonText: activeItem.buttonText ?? sectionProps.buttonText ?? "",
     };
-  };
+  }, []);
 
 
 
-  const handleSectionImage = async (
+  const handleSectionImage = useCallback(async (
     e: ChangeEvent<HTMLInputElement>,
     idx: number,
     fieldName: string
@@ -1099,23 +1347,25 @@ export default function LandingEditor() {
 
     const url = await uploadLandingImage(file, `section-${idx}`);
 
-    const updated = [...sections];
-    const current = updated[idx];
-    updated[idx] = {
-      ...current,
-      props: {
-        ...(current.props || {}),
-        [fieldName]: url,
-      },
-    };
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[idx];
+      updated[idx] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          [fieldName]: url,
+        },
+      };
 
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
 
-  const updateFeaturedCategoryItems = async (
+  const updateFeaturedCategoryItems = useCallback(async (
     sectionIndex: number,
     updater: (
       items: {
@@ -1129,58 +1379,86 @@ export default function LandingEditor() {
       link?: string;
     }[]
   ) => {
-    const updated = [...sections];
-    const current = updated[sectionIndex];
-    if (!current) return;
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      if (!current) return prevSections;
 
-    const currentItems = ((current.props?.items as any[]) || []) as {
-      title?: string;
-      image?: string | null;
-      link?: string;
-    }[];
+      const currentItems = ((current.props?.items as any[]) || []) as {
+        title?: string;
+        image?: string | null;
+        link?: string;
+      }[];
 
-    const newItems = updater(currentItems);
+      const newItems = updater(currentItems);
 
-    updated[sectionIndex] = {
-      ...current,
-      props: {
-        ...(current.props || {}),
-        items: newItems,
-      },
-    };
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
 
-    setSections(updated);
-    setSaving(true);
-    await saveLandingSections(updated);
-    setSaving(false);
-  };
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
 
-  const handleAddFeaturedCategoryItem = async (sectionIndex: number) => {
-    await updateFeaturedCategoryItems(sectionIndex, (items) => [
-      ...items,
-      {
-        title: "",
-        image: null,
-        link: "",
-      },
-    ]);
-  };
+  const handleAddFeaturedCategoryItem = useCallback(async (sectionIndex: number) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = [...items, { title: "", image: null, link: "" }];
 
-  const handleFeaturedCategoryFieldChange = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleFeaturedCategoryFieldChange = useCallback(async (
     sectionIndex: number,
     itemIndex: number,
     field: "title" | "link",
     value: string
   ) => {
-    await updateFeaturedCategoryItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = { ...current, [field]: value };
-      return copy;
-    });
-  };
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, [field]: value };
 
-  const handleFeaturedCategoryImage = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleFeaturedCategoryImage = useCallback(async (
     e: ChangeEvent<HTMLInputElement>,
     sectionIndex: number,
     itemIndex: number
@@ -1190,37 +1468,268 @@ export default function LandingEditor() {
 
     const url = await uploadLandingImage(file, `featured-category-${sectionIndex}-${itemIndex}`);
 
-    await updateFeaturedCategoryItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
-      const current = copy[itemIndex] || {};
-      copy[itemIndex] = { ...current, image: url };
-      return copy;
-    });
-  };
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, image: url };
 
-  const handleRemoveFeaturedCategoryItem = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleRemoveFeaturedCategoryItem = useCallback(async (
     sectionIndex: number,
     itemIndex: number
   ) => {
-    await updateFeaturedCategoryItems(sectionIndex, (items) =>
-      items.filter((_, idx) => idx !== itemIndex)
-    );
-  };
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = items.filter((_, idx) => idx !== itemIndex);
 
-  const reorderFeaturedCategoryItems = async (
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const reorderFeaturedCategoryItems = useCallback(async (
     sectionIndex: number,
     fromIndex: number,
     toIndex: number
   ) => {
     if (fromIndex === toIndex) return;
 
-    await updateFeaturedCategoryItems(sectionIndex, (items) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
       const copy = [...items];
       const [item] = copy.splice(fromIndex, 1);
       copy.splice(toIndex, 0, item);
-      return copy;
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
     });
-  };
+  }, []);
+
+  // Handlers para Featured Collections (Bodegas)
+  const updateFeaturedCollectionItems = useCallback(async (
+    sectionIndex: number,
+    updater: (
+      items: {
+        bodegaId?: string;
+        title?: string;
+        image?: string | null;
+        link?: string;
+      }[]
+    ) => {
+      bodegaId?: string;
+      title?: string;
+      image?: string | null;
+      link?: string;
+    }[]
+  ) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      if (!current) return prevSections;
+
+      const currentItems = ((current.props?.items as any[]) || []) as {
+        bodegaId?: string;
+        title?: string;
+        image?: string | null;
+        link?: string;
+      }[];
+
+      const newItems = updater(currentItems);
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleAddFeaturedCollectionItem = useCallback(async (sectionIndex: number) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = [...items, { bodegaId: "", title: "", image: null, link: "" }];
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleFeaturedCollectionFieldChange = useCallback(async (
+    sectionIndex: number,
+    itemIndex: number,
+    field: "bodegaId" | "title" | "link",
+    value: string
+  ) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const copy = [...items];
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, [field]: value };
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleFeaturedCollectionImage = useCallback(async (
+    e: ChangeEvent<HTMLInputElement>,
+    sectionIndex: number,
+    itemIndex: number
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const url = await uploadLandingImage(file, `featured-collection-${sectionIndex}-${itemIndex}`);
+
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const copy = [...items];
+      const item = copy[itemIndex] || {};
+      copy[itemIndex] = { ...item, image: url };
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const handleRemoveFeaturedCollectionItem = useCallback(async (
+    sectionIndex: number,
+    itemIndex: number
+  ) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const newItems = items.filter((_, idx) => idx !== itemIndex);
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: newItems,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
+  const reorderFeaturedCollectionItems = useCallback(async (
+    sectionIndex: number,
+    fromIndex: number,
+    toIndex: number
+  ) => {
+    if (fromIndex === toIndex) return;
+
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const copy = [...items];
+      const [item] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, item);
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
 
   const removeSection = async (id: string) => {
     setSaving(true);
@@ -2560,6 +3069,171 @@ export default function LandingEditor() {
                                     </div>
                                   )}
 
+                                {/* Editor de colecciones (Bodegas) */}
+                                {section.type === "featuredCollections" &&
+                                  currentTab === "content" && (
+                                    <div className="mt-3 border border-dashed border-slate-200 rounded-md p-3 bg-slate-50 dark:bg-slate-900">
+                                      <h4 className="text-xs font-semibold uppercase text-slate-500 mb-2 flex items-center gap-1">
+                                        <span className="material-icons-round text-[14px] text-purple-500">
+                                          inventory_2
+                                        </span>
+                                        Colecciones (Bodegas)
+                                      </h4>
+                                      {(() => {
+                                        const items = ((section.props?.items as any[]) || []) as {
+                                          bodegaId?: string;
+                                          title?: string;
+                                          image?: string | null;
+                                          link?: string;
+                                        }[];
+
+                                        if (!items.length) {
+                                          return (
+                                            <div className="space-y-2">
+                                              <p className="text-[11px] text-slate-500">
+                                                No hay colecciones aún. Crea la primera colección con ID de bodega, título, imagen y enlace.
+                                              </p>
+                                              <button
+                                                type="button"
+                                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-purple-600 text-white text-xs hover:bg-purple-700"
+                                                onClick={() => handleAddFeaturedCollectionItem(idx)}
+                                              >
+                                                <span className="material-icons-round text-[14px]">
+                                                  add
+                                                </span>
+                                                Agregar colección
+                                              </button>
+                                            </div>
+                                          );
+                                        }
+
+                                        return (
+                                          <>
+                                            <div className="flex items-stretch gap-3 overflow-x-auto pb-2">
+                                              {items.map((item, itemIndex) => {
+                                                const isDragging = draggedItemState?.sectionId === section.id && draggedItemState?.itemType === "featured-collection" && draggedItemState?.fromIndex === itemIndex;
+                                                return (
+                                                  <div
+                                                    key={itemIndex}
+                                                    draggable
+                                                    onDragStart={() => setDraggedItemState({ sectionId: section.id, itemType: "featured-collection", fromIndex: itemIndex })}
+                                                    onDragEnd={() => setDraggedItemState(null)}
+                                                    onDragOver={(e) => e.preventDefault()}
+                                                    onDrop={async (e) => {
+                                                      e.preventDefault();
+                                                      if (draggedItemState?.sectionId === section.id && draggedItemState?.itemType === "featured-collection") {
+                                                        await reorderFeaturedCollectionItems(idx, draggedItemState.fromIndex, itemIndex);
+                                                        setDraggedItemState(null);
+                                                      }
+                                                    }}
+                                                    className={`shrink-0 w-64 rounded-lg border p-3 flex flex-col gap-2 transition-all cursor-grab active:cursor-grabbing ${
+                                                      isDragging
+                                                        ? "opacity-50 scale-95 border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:shadow-md"
+                                                    }`}
+                                                  >
+                                                    <div className="flex items-center justify-between gap-2 mb-1">
+                                                      <span className="text-[11px] font-semibold text-slate-500">
+                                                        Colección {itemIndex + 1}
+                                                      </span>
+                                                      <button
+                                                        type="button"
+                                                        className="text-[10px] px-2 py-0.5 rounded bg-red-600 text-white hover:bg-red-700"
+                                                        onClick={() =>
+                                                          handleRemoveFeaturedCollectionItem(
+                                                            idx,
+                                                            itemIndex
+                                                          )
+                                                        }
+                                                      >
+                                                        Quitar
+                                                      </button>
+                                                    </div>
+                                                    <input
+                                                      type="text"
+                                                      className="border rounded px-2 py-1 text-xs"
+                                                      placeholder="ID de bodega"
+                                                      value={item.bodegaId || ""}
+                                                      onChange={(e) =>
+                                                        handleFeaturedCollectionFieldChange(
+                                                          idx,
+                                                          itemIndex,
+                                                          "bodegaId",
+                                                          e.target.value
+                                                        )
+                                                      }
+                                                    />
+                                                    <input
+                                                      type="text"
+                                                      className="border rounded px-2 py-1 text-xs"
+                                                      placeholder="Título de la colección"
+                                                      value={item.title || ""}
+                                                      onChange={(e) =>
+                                                        handleFeaturedCollectionFieldChange(
+                                                          idx,
+                                                          itemIndex,
+                                                          "title",
+                                                          e.target.value
+                                                        )
+                                                      }
+                                                    />
+                                                    <input
+                                                      type="text"
+                                                      className="border rounded px-2 py-1 text-xs"
+                                                      placeholder="Enlace (ruta interna, ej: /productos?bodega=...)"
+                                                      value={item.link || ""}
+                                                      onChange={(e) =>
+                                                        handleFeaturedCollectionFieldChange(
+                                                          idx,
+                                                          itemIndex,
+                                                          "link",
+                                                          e.target.value
+                                                        )
+                                                      }
+                                                    />
+                                                    <div className="space-y-1 mt-1">
+                                                      {item.image && (
+                                                        <div className="aspect-square rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                                          <img
+                                                            src={item.image}
+                                                            alt={item.title || "Colección"}
+                                                            className="w-full h-full object-cover"
+                                                          />
+                                                        </div>
+                                                      )}
+                                                      <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="text-[11px]"
+                                                        onChange={(e) =>
+                                                          handleFeaturedCollectionImage(
+                                                            e,
+                                                            idx,
+                                                            itemIndex
+                                                          )
+                                                        }
+                                                      />
+                                                    </div>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                            <button
+                                              type="button"
+                                              className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 rounded bg-purple-600 text-white text-xs hover:bg-purple-700"
+                                              onClick={() => handleAddFeaturedCollectionItem(idx)}
+                                            >
+                                              <span className="material-icons-round text-[14px]">
+                                                add
+                                              </span>
+                                              Agregar otra colección
+                                            </button>
+                                          </>
+                                        );
+                                      })()}
+                                    </div>
+                                  )}
+
                                 {/* Editor de productos VIP */}
                                 {section.type === "vipProducts" &&
                                   currentTab === "content" && (
@@ -3666,6 +4340,15 @@ export default function LandingEditor() {
                           items: currentItems.length > 0 ? currentItems : featuredCategoryItemsFromProducts,
                           device: previewDevice,
                         };
+                      } else if (section.type === "featuredCollections") {
+                        const currentItems = Array.isArray((section.props as any)?.items)
+                          ? (section.props as any).items
+                          : [];
+                        previewSection.props = {
+                          ...(section.props || {}),
+                          items: currentItems,
+                          device: previewDevice,
+                        };
                       } else if (section.type === "hero") {
                         const normalized = buildHeroPreviewProps(section, previewDevice);
                         previewSection.props = normalized.props;
@@ -3782,6 +4465,8 @@ export default function LandingEditor() {
                         if (section.type === "featuredProducts") {
                           previewSection.props = { ...(section.props || {}), products: featuredProducts, device: previewDevice };
                         } else if (section.type === "featuredCategories") {
+                          previewSection.props = { ...(section.props || {}), device: previewDevice };
+                        } else if (section.type === "featuredCollections") {
                           previewSection.props = { ...(section.props || {}), device: previewDevice };
                         } else if (section.type === "hero") {
                             const normalized = buildHeroPreviewProps(section, previewDevice);

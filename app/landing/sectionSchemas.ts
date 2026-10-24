@@ -125,6 +125,15 @@ export const sectionSchemas: { [key: string]: { type: string; label: string; ico
       // Las categorías individuales se gestionan desde el editor específico de la sección
     ],
   },
+  featuredCollections: {
+    type: "featuredCollections",
+    label: "Colecciones (Bodegas)",
+    icon: "inventory_2",
+    fields: [
+      { name: "title", type: "text", label: "Título", group: "content", stylable: true },
+      // Las colecciones individuales se gestionan desde el editor específico de la sección
+    ],
+  },
   titleSubtitle: {
     type: "titleSubtitle",
     label: "Título y subtítulo",

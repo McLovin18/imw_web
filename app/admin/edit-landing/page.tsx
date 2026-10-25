@@ -665,6 +665,39 @@ export default function LandingEditor() {
     });
   }, [previewDevice]);
 
+  const handleHeroItemFieldChange = useCallback(async (
+    sectionIndex: number,
+    itemIndex: number,
+    fieldName: string,
+    value: string
+  ) => {
+    setSections(prevSections => {
+      const updated = [...prevSections];
+      const current = updated[sectionIndex];
+      const items = ((current.props?.items as any[]) || []) as any[];
+      const copy = [...items];
+      const item = copy[itemIndex] || {};
+
+      copy[itemIndex] = {
+        ...item,
+        [fieldName]: value,
+      };
+
+      updated[sectionIndex] = {
+        ...current,
+        props: {
+          ...(current.props || {}),
+          items: copy,
+        },
+      };
+
+      saveLandingSections(updated);
+      setSaving(true);
+      setTimeout(() => setSaving(false), 500);
+      return updated;
+    });
+  }, []);
+
   const handleHeroItemImage = useCallback(async (
     e: ChangeEvent<HTMLInputElement>,
     sectionIndex: number,

@@ -275,7 +275,7 @@ export const Navbar = () => {
 
   // Logo paths - AGREGA TUS LOGOS AQUÍ
   const logoDark = "/imw-dark.png"; // Logo para modo oscuro
-  const logoLight = "/imw-light.png"; // Logo para modo claro
+  const logoLight = "/imw_light.png"; // Logo para modo claro
   const logoSrc = theme === "light" ? logoLight : logoDark;
 
   const handleSearch = () => {
@@ -291,7 +291,7 @@ export const Navbar = () => {
     <>
       {/* ══════════════════ NAVBAR ══════════════════ */}
       <nav
-        className="sticky top-0 z-40 border-b py-4 shadow-sm backdrop-blur-md"
+        className="sticky top-0 z-40 border-b py-6 shadow-sm backdrop-blur-md"
         style={{
           background: theme === "light" ? "rgba(255, 255, 255, 0.8)" : "#111827",
           borderColor: theme === "light" ? "#e2e8f0" : "rgba(255,255,255,0.08)"
@@ -299,7 +299,7 @@ export const Navbar = () => {
       >
         {/* ── Header principal ── */}
         <div
-          className="relative flex items-center justify-between gap-4 px-4 py-2 lg:px-6 lg:py-2"
+          className="relative flex items-center justify-between gap-4 px-4 py-3 lg:px-6 lg:py-4"
           style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
         >
           <div className="flex items-center gap-3 shrink-0">
@@ -323,7 +323,7 @@ export const Navbar = () => {
                   >
                     <button
                       onClick={() => setCatalogDropdown(!catalogDropdown)}
-                      className="px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-white/10 whitespace-nowrap text-body flex items-center gap-1"
+                      className="px-3 py-2 rounded-xl text-base font-medium transition-colors hover:bg-white/10 whitespace-nowrap text-body flex items-center gap-1"
                       style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
                     >
                       {link.label}
@@ -438,7 +438,7 @@ export const Navbar = () => {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-white/10 whitespace-nowrap text-body"
+                    className="px-3 py-2 rounded-xl text-base font-medium transition-colors hover:bg-white/10 whitespace-nowrap text-body"
                     style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
                   >
                     {link.label}
@@ -459,7 +459,7 @@ export const Navbar = () => {
                 alt="IMW"
                 width={180}
                 height={48}
-                className="h-12 w-auto"
+                className="h-16 w-auto"
                 priority
               />
             </a>

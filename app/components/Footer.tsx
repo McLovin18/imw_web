@@ -241,7 +241,7 @@ const Footer: React.FC = () => {
                     <span className={styles.ftContactIcon}>
                       <IconStore />
                     </span>
-                    <span>Tienda 100% online, sin local físico</span>
+                    <span>Tienda 100% online.</span>
                   </span>
                 </li>
               </ul>

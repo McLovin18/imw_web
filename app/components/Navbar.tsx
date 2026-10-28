@@ -381,7 +381,7 @@ export const Navbar = () => {
                                 href="/productos?cat=1792053354691"
                                 className="block px-4 py-3 text-sm text-slate-900 hover:bg-slate-50 rounded-md transition-colors"
                               >
-                                Árabes
+                                Perfumes Árabes
                               </a>
                             </div>
                           )}
@@ -956,7 +956,7 @@ export const Navbar = () => {
                                 style={{ color: theme === "light" ? "#0f172a" : "#ffffff" }}
                                 onClick={() => setMobileOpen(false)}
                               >
-                                Árabes
+                                Perfumes Árabes
                               </a>
                             </div>
                           )}

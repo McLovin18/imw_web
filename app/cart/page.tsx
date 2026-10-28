@@ -381,9 +381,6 @@ export default function CartPage() {
                               +
                             </button>
                           </div>
-                          <span className="text-xs text-[var(--textSecondary)]">
-                            {availableStock} en stock
-                          </span>
                         </div>
                       </div>
 

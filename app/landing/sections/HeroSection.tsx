@@ -539,8 +539,9 @@ export default function HeroSection({
                   color: "var(--text)",
                   ...defaultTitleInlineStyle,
                   ...titleStyle,
+                  textAlign: 'center',
                 }}
-                className="text-xl sm:text-5xl lg:text-5xl font-extrabold leading-none max-w-full drop-shadow-lg whitespace-nowrap text-center"
+                className="text-xl sm:text-5xl lg:text-5xl font-extrabold leading-none max-w-[90vw] sm:max-w-full drop-shadow-lg sm:whitespace-nowrap whitespace-normal text-center"
               >
                 {current.title}
               </h2>

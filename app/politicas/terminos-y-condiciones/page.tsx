@@ -9,7 +9,7 @@ const sections = [
   {
     number: "01",
     title: "Datos de la Empresa",
-    body: "Razón social: IMW - In My Wardrobe. Tienda online de perfumes. Domicilio: Ecuador. Correo: imw_ec@gmail.com — WhatsApp: 0968514889. Horario de atención: Lunes a Viernes de 9:00 a 18:00.",
+    body: "Razón social: IMW - In My Wardrobe. Tienda online de perfumes. Domicilio: Ecuador. WhatsApp: 0968514889. Horario de atención: Lunes a Viernes de 9:00 a 18:00.",
   },
   {
     number: "02",
@@ -49,7 +49,7 @@ const sections = [
   {
     number: "09",
     title: "Responsabilidad",
-    body: "iMW no se hace responsable por el mal uso que el cliente dé a los productos. No garantizamos que el sitio esté libre de errores; si encuentras uno, repórtalo a imw_ec@gmail.com. No nos responsabilizamos por links a sitios de terceros.",
+    body: "iMW no se hace responsable por el mal uso que el cliente dé a los productos. No garantizamos que el sitio esté libre de errores; si encuentras uno, repórtalo por WhatsApp. No nos responsabilizamos por links a sitios de terceros.",
   },
   {
     number: "10",
@@ -462,8 +462,8 @@ const TerminosCondiciones: React.FC = () => {
                     <p className="tc-contact-desc">
                       Dudas sobre estos términos o para iniciar un cambio / garantía.
                     </p>
-                    <a href="mailto:imw_ec@gmail.com" className="tc-btn">
-                      imw_ec@gmail.com
+                    <a href="https://wa.me/593968514889" target="_blank" rel="noreferrer" className="tc-btn">
+                      0968514889
                     </a>
                   </div>
                   <div style={{ fontSize: "12px", color: "#3a3750", textAlign: "right", lineHeight: 1.8 }}>

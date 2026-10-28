@@ -145,17 +145,17 @@ export default function CartPage() {
         const cantidad = p.cantidad || 1;
         const variationText = getVariationText(p);
         const personalizacionText = getPersonalizacionText(p);
-        return `• ${cantidad}x ${p.nombre}${variationText}${personalizacionText} (Entrega Aproximada en: ${tiempoEntrega}h)`;
+        return `• ${cantidad}x ${p.nombre}${variationText}${personalizacionText} (${tiempoEntrega}h)`;
       })
       .join("\n");
 
-    const headerMsg = "Hola, Me gustaría realizar una compra:";
-    const footerMsg = "Quiero confirmar disponibilidad y conocer más detalles. Gracias!";
+    const headerMsg = "Hola, quiero comprar:";
+    const footerMsg = "Quiero confirmar disponibilidad.";
 
     // Para WhatsApp, solo incluir subtotal + envío
     const totalWhatsApp = subtotal;
 
-    const message = `${headerMsg}\n\n${productosText}\n\n--------------------\nTOTAL: $${totalWhatsApp.toFixed(2)}\n--------------------\n\n${footerMsg}`;
+    const message = `${headerMsg}\n\n${productosText}\n\nTotal: $${totalWhatsApp.toFixed(2)}\n\n${footerMsg}`;
     return encodeURIComponent(message);
   };
 
@@ -177,7 +177,17 @@ export default function CartPage() {
 
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "0968517232";
     const message = await generateWhatsAppMessage();
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+
+    // Detectar si es móvil para usar el protocolo nativo
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // Usar protocolo nativo para móviles (más compatible con iOS)
+      window.location.href = `whatsapp://send?phone=${whatsappNumber}&text=${message}`;
+    } else {
+      // Usar wa.me para desktop
+      window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+    }
   };
 
   const handleTransferenciaClick = () => {

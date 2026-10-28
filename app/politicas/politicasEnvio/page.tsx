@@ -526,8 +526,8 @@ const PoliticasEnvio: React.FC = () => {
                     <p className="env-contact-desc">
                       Consultas sobre tu envío — escríbenos con tu número de pedido.
                     </p>
-                    <a href="mailto:imw_ec@gmail.com" className="env-btn">
-                      imw_ec@gmail.com
+                    <a href="https://wa.me/593968514889" target="_blank" rel="noreferrer" className="env-btn">
+                      0968514889
                     </a>
                   </div>
                   <div style={{ fontSize: "12px", color: isLight ? "#64748b" : "#3a3750", textAlign: "right", lineHeight: 1.8 }}>

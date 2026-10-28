@@ -295,12 +295,7 @@ export default function HeroSection({
   const currentFieldPositions = current.fieldPositions || fieldPositions || {};
 
   const innerStyle: React.CSSProperties = {
-    aspectRatio:
-      screenType === "mobile"
-        ? "6 / 4"
-        : screenType === "tablet"
-        ? "14 / 9"
-        : "2400 / 1000",
+    aspectRatio: "2400 / 1000",
     overflow: "hidden",
   };
 
@@ -524,7 +519,7 @@ export default function HeroSection({
 
         {/* Contenido textual por defecto (sin posicionamiento personalizado) */}
         {!fieldPositions?.badge && !fieldPositions?.title && !fieldPositions?.subtitle && (
-          <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-start sm:items-center lg:items-start px-2 sm:px-8 pb-5 sm:pb-8 gap-1.5 sm:gap-3 w-full">
+          <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-2 sm:px-8 pb-5 sm:pb-8 gap-1.5 sm:gap-3 w-full">
             {current.badge && (
               <span
                 style={{
@@ -546,7 +541,7 @@ export default function HeroSection({
                   ...titleStyle,
                   transform: 'none'
                 }}
-                className="text-xl sm:text-5xl lg:text-5xl font-extrabold leading-none max-w-full drop-shadow-lg whitespace-nowrap text-left sm:text-center lg:text-left"
+                className="text-xl sm:text-5xl lg:text-5xl font-extrabold leading-none max-w-full drop-shadow-lg whitespace-nowrap text-center"
               >
                 {current.title}
               </h2>
@@ -558,7 +553,7 @@ export default function HeroSection({
                   ...defaultSubtitleInlineStyle,
                   ...subtitleStyle
                 }}
-                className="w-full text-[9px] sm:text-sm drop-shadow text-left"
+                className="w-full text-[9px] sm:text-sm drop-shadow text-center"
               >
                 {current.subtitle}
               </p>

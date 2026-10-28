@@ -8,7 +8,7 @@ const sections = [
   {
     number: "01",
     title: "Responsable del Tratamiento de Datos",
-    body: "iMW. Tienda online de perfumes. Domiciliada en Ecuador. Correo para temas de privacidad: imw_ec@gmail.com — WhatsApp: 0968514889.",
+    body: "iMW. Tienda online de perfumes. Domiciliada en Ecuador. WhatsApp: 0968514889.",
   },
   {
     number: "02",
@@ -33,7 +33,7 @@ const sections = [
   {
     number: "06",
     title: "Tus Derechos ARCO",
-    body: "Tienes derecho a: Acceso (saber qué datos tenemos tuyos), Rectificación (corregir datos incorrectos), Cancelación (eliminar tu cuenta y datos) y Oposición (que no usemos tus datos para marketing). Escríbenos a imw_ec@gmail.com con tu cédula y solicitud. Responderemos dentro de los plazos establecidos por la normativa ecuatoriana.",
+    body: "Tienes derecho a: Acceso (saber qué datos tenemos tuyos), Rectificación (corregir datos incorrectos), Cancelación (eliminar tu cuenta y datos) y Oposición (que no usemos tus datos para marketing). Escríbenos por WhatsApp al 0968514889 con tu cédula y solicitud. Responderemos dentro de los plazos establecidos por la normativa ecuatoriana.",
   },
   {
     number: "07",
@@ -460,8 +460,8 @@ const PoliticaPrivacidad: React.FC = () => {
                     <p className="pp-contact-desc">
                       Escríbenos para cualquier consulta sobre privacidad o ejercer tus derechos ARCO.
                     </p>
-                    <a href="mailto:imw_ec@gmail.com" className="pp-btn">
-                      imw_ec@gmail.com
+                    <a href="https://wa.me/593968514889" target="_blank" rel="noreferrer" className="pp-btn">
+                      0968514889
                     </a>
                   </div>
                   <div style={{ fontSize: "12px", color: "#3a3750", textAlign: "right", lineHeight: 1.8 }}>

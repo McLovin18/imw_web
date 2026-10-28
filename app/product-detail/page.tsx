@@ -567,7 +567,7 @@ export default function ProductDetailPage({ params }) {
                 {hasVariations && variationAttributeIds.length > 0 && !variationAttributeIds.every(attrId => selectedVariations[attrId])
                   ? "Selecciona opciones para ver stock"
                   : maxCantidad > 0
-                  ? `${maxCantidad} en stock`
+                  ? "Disponible"
                   : "Sin stock"}
               </span>
             </div>

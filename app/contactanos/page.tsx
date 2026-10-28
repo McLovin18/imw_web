@@ -33,11 +33,7 @@ const Contacto: React.FC = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText("imw_ec@gmail.com");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+
 
   const isLight = theme === "light";
 
@@ -587,38 +583,6 @@ const Contacto: React.FC = () => {
             </p>
           </div>
 
-          {/* CORREO */}
-          <div className="ct-card" style={{ animationDelay: "0.19s" }}>
-            <div className="ct-icon-wrap">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-              </svg>
-            </div>
-            <div className="ct-card-label">Correo electrónico</div>
-            <div className="ct-card-value" style={{ fontSize: "16px", wordBreak: "break-all" }}>
-              imw_ec@gmail.com
-            </div>
-            <p className="ct-card-sub">Para consultas formales, cambios y garantías.</p>
-            <button className="ct-copy-btn" onClick={copyEmail}>
-              {copied ? (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  ¡Copiado!
-                </>
-              ) : (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                  </svg>
-                  Copiar correo
-                </>
-              )}
-            </button>
-          </div>
-
           {/* REDES SOCIALES */}
           <div className="ct-card" style={{ animationDelay: "0.26s" }}>
             <div className="ct-icon-wrap">
@@ -651,7 +615,7 @@ const Contacto: React.FC = () => {
                 <span className="ct-social-arrow">→</span>
               </a>
               <a
-                href="https://www.facebook.com/imwec/"
+                href="https://www.tiktok.com/@imw2026"
                 target="_blank"
                 rel="noreferrer"
                 className="ct-social-link"

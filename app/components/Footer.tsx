@@ -76,7 +76,6 @@ const IconTruck = () => (
 
 const WHATSAPP_NUMBER = "593968514889"; // solo números, con código de país, sin '+' ni espacios
 const WHATSAPP_DISPLAY = "0968514889"; // como se muestra al usuario
-const EMAIL = "imw_ec@gmail.com";
 const INSTAGRAM_URL = "https://www.instagram.com/imw_ec/";
 const FACEBOOK_URL = "https://www.facebook.com/imwec/";
 const TIKTOK_URL = "https://www.tiktok.com/@imw2026";
@@ -235,14 +234,6 @@ const Footer: React.FC = () => {
                       <IconWhatsApp size={16} />
                     </span>
                     <span>{WHATSAPP_DISPLAY}</span>
-                  </a>
-                </li>
-                <li>
-                  <a href={`mailto:${EMAIL}`} className={styles.ftContactItem} onClick={track}>
-                    <span className={styles.ftContactIcon}>
-                      <IconMail />
-                    </span>
-                    <span>{EMAIL}</span>
                   </a>
                 </li>
                 <li>

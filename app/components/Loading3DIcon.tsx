@@ -5,7 +5,7 @@ import Image from "next/image";
 import { themeManager } from "./themeManager";
 
 /* Logo según el tema (ajusta los nombres si tus archivos se llaman distinto) */
-const LOGO_LIGHT = "/imw-light.png"; // se muestra con el tema claro
+const LOGO_LIGHT = "/imw_light.png"; // se muestra con el tema claro
 const LOGO_DARK = "/imw-dark.png"; // se muestra con el tema oscuro
 
 /**

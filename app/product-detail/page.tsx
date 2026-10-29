@@ -837,6 +837,11 @@ export default function ProductDetailPage({ params }) {
             </div>
           )}
         </div>
+
+        {/* ── PRODUCTOS RELACIONADOS ─────────────────────────────────────────── */}
+        <div className="w-full py-2 sm:py-1">
+          <RelatedProductsCarousel productos={relacionados} />
+        </div>
     </div>
   );
 }

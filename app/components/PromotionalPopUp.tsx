@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import type { Producto } from "../lib/productos-db";
+import { getCatalogPricing } from "../lib/pricing";
 
 type PromocionalPopupProps = {
   productos: Producto[];
@@ -42,13 +43,14 @@ export default function PromocionalPopup({ productos, onClose }: PromocionalPopu
   const currentProduct = promos[safeIndex];
   const imagen = currentProduct.imagenes?.[0] || currentProduct.imagen || "/no-image.png";
 
-  // Precio con descuento (base + promocional)
-  const precioBase = Number(currentProduct.precio || 0);
-  const descuentoBase = Number(currentProduct.descuento || 0);
-  const descuentoPromocional = Number(currentProduct.promocionarDescuento || 0);
-  const descuentoTotal = Math.min(descuentoBase + descuentoPromocional, 100);
-  const precioFinal = descuentoTotal > 0 ? precioBase * (1 - descuentoTotal / 100) : precioBase;
-  const ahorro = precioBase - precioFinal;
+  // Usar la misma lógica de precios que en el resto de la aplicación
+  const { basePrice, discount, hasDiscount, fakeOldPrice, finalPrice } = getCatalogPricing({
+    precio: currentProduct.precio,
+    precioPromocional: currentProduct.precioPromocional,
+    descuento: currentProduct.descuento,
+  });
+
+  const ahorro = hasDiscount ? basePrice - finalPrice : 0;
 
   const tituloPromocional = currentProduct.promocionarTitulo || "¡OFERTA ESPECIAL!";
   const descripcionPromocional =
@@ -106,9 +108,9 @@ export default function PromocionalPopup({ productos, onClose }: PromocionalPopu
             />
 
             {/* Badge de descuento */}
-            {descuentoTotal > 0 && (
+            {hasDiscount && (
               <div className="absolute left-3 top-3 z-10 rounded-full bg-[var(--primary)] px-3 py-1 text-sm font-bold tracking-wide text-[var(--primaryForeground)] shadow-lg">
-                -{Math.round(descuentoTotal)}%
+                -{discount}%
               </div>
             )}
 
@@ -196,10 +198,10 @@ export default function PromocionalPopup({ productos, onClose }: PromocionalPopu
 
             {/* Precios */}
             <div className="mb-5 border-y border-[var(--border)] py-4">
-              {descuentoTotal > 0 && (
+              {hasDiscount && (
                 <div className="mb-1 flex items-center gap-2">
                   <span className="text-lg text-[var(--textSecondary)] line-through">
-                    ${precioBase.toFixed(2)}
+                    ${fakeOldPrice?.toFixed(2)}
                   </span>
                   <span className="rounded-full bg-[var(--primary)]/15 px-2 py-0.5 text-xs font-bold text-[var(--accent)]">
                     Ahorras ${ahorro.toFixed(2)}
@@ -207,7 +209,7 @@ export default function PromocionalPopup({ productos, onClose }: PromocionalPopu
                 </div>
               )}
               <div className="text-4xl font-bold text-[var(--text)] md:text-5xl">
-                ${precioFinal.toFixed(2)}
+                ${finalPrice.toFixed(2)}
               </div>
             </div>
 

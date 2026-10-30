@@ -661,26 +661,37 @@ export default function ProductDetailPage({ params }) {
             )}
 
             {/* Cantidad */}
-            {maxCantidad > 0 && (
-              <div className="flex items-center gap-3">
-                <span style={{ color: "var(--textSecondary)" }} className="text-xs font-medium">Cantidad:</span>
-                <div style={{ background: "var(--bgSecondary)" }} className="flex items-center rounded-xl p-1 gap-1">
-                  <button
-                    onClick={() => setCantidad((v) => Math.max(1, v - 1))}
-                    style={{ color: "var(--text)" }}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 font-bold text-lg transition-colors"
-                  >−</button>
-                  <span style={{ color: "var(--text)" }} className="w-9 text-center text-sm font-semibold">
-                    {cantidad}
-                  </span>
-                  <button
-                    onClick={() => setCantidad((v) => Math.min(maxCantidad, v + 1))}
-                    style={{ color: "var(--text)" }}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 font-bold text-lg transition-colors"
-                  >+</button>
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              {maxCantidad > 0 && (
+                <div className="flex items-center gap-3">
+                  <span style={{ color: "var(--textSecondary)" }} className="text-xs font-medium">Cantidad:</span>
+                  <div style={{ background: "var(--bgSecondary)" }} className="flex items-center rounded-xl p-1 gap-1">
+                    <button
+                      onClick={() => setCantidad((v) => Math.max(1, v - 1))}
+                      style={{ color: "var(--text)" }}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 font-bold text-lg transition-colors"
+                    >−</button>
+                    <span style={{ color: "var(--text)" }} className="w-9 text-center text-sm font-semibold">
+                      {cantidad}
+                    </span>
+                    <button
+                      onClick={() => setCantidad((v) => Math.min(maxCantidad, v + 1))}
+                      style={{ color: "var(--text)" }}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 font-bold text-lg transition-colors"
+                    >+</button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+              <a
+                href="/blogs/HE8QmPFi5fhFi44krmu9"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs font-medium text-[var(--textSecondary)] hover:text-[var(--primary)] transition-colors"
+              >
+                <span className="material-icons-round text-base">info</span>
+                Información de Decants
+              </a>
+            </div>
 
             {/* Acciones */}
             <div className="flex gap-2">

@@ -7,7 +7,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getTodayAnalytics } from "../lib/analytics-db";
+import { getTodayAnalytics, getWeeklyAnalytics } from "../lib/analytics-db";
 
 interface Analytics {
   uniqueVisitors: number;
@@ -20,10 +20,16 @@ interface Analytics {
     blogClick: number;
     [key: string]: number;
   };
+  purchases?: {
+    whatsapp: number;
+    transferencia: number;
+    total: number;
+  };
 }
 
 export default function AnalyticsWidget() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [weeklyAnalytics, setWeeklyAnalytics] = useState<Analytics[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,8 +37,27 @@ export default function AnalyticsWidget() {
     const loadAnalytics = async () => {
       try {
         setLoading(true);
-        const data = await getTodayAnalytics();
-        setAnalytics(data || { uniqueVisitors: 0, totalClicks: 0, clicksByType: {} });
+        const [todayData, weeklyData] = await Promise.all([
+          getTodayAnalytics(),
+          getWeeklyAnalytics(),
+        ]);
+        setAnalytics(todayData || {
+          uniqueVisitors: 0,
+          totalClicks: 0,
+          clicksByType: {
+            productClick: 0,
+            categoryClick: 0,
+            buttonClick: 0,
+            linkClick: 0,
+            blogClick: 0,
+          },
+          purchases: {
+            whatsapp: 0,
+            transferencia: 0,
+            total: 0,
+          },
+        });
+        setWeeklyAnalytics(weeklyData);
         setError(null);
       } catch (err) {
         setError("Error cargando analytics");
@@ -79,12 +104,23 @@ export default function AnalyticsWidget() {
     blogClick: 0,
   };
 
+  const purchases = analytics?.purchases || {
+    whatsapp: 0,
+    transferencia: 0,
+    total: 0,
+  };
+
   const engagementScore = Math.min(
     100,
     Math.round(
       (analytics?.totalClicks || 0) / Math.max(1, analytics?.uniqueVisitors || 1) * 100
     )
   );
+
+  // Calculate weekly totals
+  const weeklyTotal = weeklyAnalytics.reduce((sum, day) => sum + (day.purchases?.total || 0), 0);
+  const weeklyWhatsApp = weeklyAnalytics.reduce((sum, day) => sum + (day.purchases?.whatsapp || 0), 0);
+  const weeklyTransferencia = weeklyAnalytics.reduce((sum, day) => sum + (day.purchases?.transferencia || 0), 0);
 
   return (
     <div className="space-y-6 mb-8">
@@ -117,7 +153,7 @@ export default function AnalyticsWidget() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <p className="text-sm font-medium text-blue-600 dark:text-blue-300 mb-1">
-                Visitantes \u00danicos
+                Visitantes
               </p>
               <p className="text-4xl font-bold text-blue-900 dark:text-blue-100">
                 {analytics?.uniqueVisitors || 0}
@@ -130,7 +166,7 @@ export default function AnalyticsWidget() {
             </div>
           </div>
           <p className="text-xs text-blue-600 dark:text-blue-400">
-            Personas \u00fanicas que entraron por device-id
+            Personas que entraron
           </p>
         </div>
 
@@ -187,6 +223,98 @@ export default function AnalyticsWidget() {
                 ? "Buen engagement - ¡Los usuarios están interactuando!"
                 : "Excelente engagement - ¡Los usuarios aman tu sitio!"}
         </p>
+      </div>
+
+      {/* Purchase Analytics - Daily */}
+      <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-md">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+          <span className="material-icons-round text-green-600 dark:text-green-400">
+            shopping_cart
+          </span>
+          Compras del Día
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-700/50 text-center">
+            <div className="flex justify-center mb-2 text-green-600 dark:text-green-300">
+              <span className="material-icons-round text-2xl">chat</span>
+            </div>
+            <p className="text-2xl font-bold text-green-900 dark:text-green-100 mb-1">
+              {purchases.whatsapp}
+            </p>
+            <p className="text-xs text-green-600 dark:text-green-400">
+              WhatsApp
+            </p>
+          </div>
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700/50 text-center">
+            <div className="flex justify-center mb-2 text-purple-600 dark:text-purple-300">
+              <span className="material-icons-round text-2xl">account_balance</span>
+            </div>
+            <p className="text-2xl font-bold text-purple-900 dark:text-purple-100 mb-1">
+              {purchases.transferencia}
+            </p>
+            <p className="text-xs text-purple-600 dark:text-purple-400">
+              Transferencia
+            </p>
+          </div>
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700/50 text-center">
+            <div className="flex justify-center mb-2 text-blue-600 dark:text-blue-300">
+              <span className="material-icons-round text-2xl">attach_money</span>
+            </div>
+            <p className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-1">
+              {purchases.total}
+            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-400">
+              Total
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Purchase Analytics - Weekly */}
+      <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-md">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+          <span className="material-icons-round text-blue-600 dark:text-blue-400">
+            date_range
+          </span>
+          Compras Semanales (últimos 7 días)
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-700/50 text-center">
+            <div className="flex justify-center mb-2 text-green-600 dark:text-green-300">
+              <span className="material-icons-round text-2xl">chat</span>
+            </div>
+            <p className="text-2xl font-bold text-green-900 dark:text-green-100 mb-1">
+              {weeklyWhatsApp}
+            </p>
+            <p className="text-xs text-green-600 dark:text-green-400">
+              WhatsApp
+            </p>
+          </div>
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700/50 text-center">
+            <div className="flex justify-center mb-2 text-purple-600 dark:text-purple-300">
+              <span className="material-icons-round text-2xl">account_balance</span>
+            </div>
+            <p className="text-2xl font-bold text-purple-900 dark:text-purple-100 mb-1">
+              {weeklyTransferencia}
+            </p>
+            <p className="text-xs text-purple-600 dark:text-purple-400">
+              Transferencia
+            </p>
+          </div>
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700/50 text-center">
+            <div className="flex justify-center mb-2 text-blue-600 dark:text-blue-300">
+              <span className="material-icons-round text-2xl">attach_money</span>
+            </div>
+            <p className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-1">
+              {weeklyTotal}
+            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-400">
+              Total
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Click Breakdown */}

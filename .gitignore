@@ -64,3 +64,6 @@ next-env.d.ts
 # credenciales privadas para crear admin
 firebase-adminsdk.json
 setAdminRole.js
+
+# Archivo problemático en Windows
+nul

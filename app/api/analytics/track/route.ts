@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log("[Analytics API] 2. Body received:", body);
     
-    const { eventType, deviceId, clickType: bodyClickType } = body;
-    console.log("[Analytics API] 3. Extracted values:", { eventType, deviceId, bodyClickType });
+    const { eventType, deviceId, clickType: bodyClickType, purchaseType } = body;
+    console.log("[Analytics API] 3. Extracted values:", { eventType, deviceId, bodyClickType, purchaseType });
 
     if (!eventType || !deviceId) {
       console.error("[Analytics API] ❌ Missing required fields:", { eventType, deviceId });
@@ -81,6 +81,11 @@ export async function POST(req: NextRequest) {
             linkClick: 0,
             blogClick: 0,
           },
+          purchases: {
+            whatsapp: 0,
+            transferencia: 0,
+            total: 0,
+          },
           lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
         });
         console.log(`[Analytics API] ✅ Created new analytics doc for today`);
@@ -122,9 +127,57 @@ export async function POST(req: NextRequest) {
           visitorIds: [],
           totalClicks: 1,
           clicksByType: newClicksByType,
+          purchases: {
+            whatsapp: 0,
+            transferencia: 0,
+            total: 0,
+          },
           lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
         });
         console.log(`[Analytics API] ✅ Created new doc for click (no visitors yet)`);
+      }
+    } else if (eventType === "purchase") {
+      console.log("[Analytics API] 8a. Branch: purchase");
+      // Track purchase
+      const type = purchaseType || "whatsapp";
+      console.log(`[Analytics API] 8b. Purchase type: ${type}`);
+
+      const docSnap = await docRef.get();
+      console.log("[Analytics API] 8c. Document exists:", docSnap.exists);
+
+      if (docSnap.exists) {
+        console.log("[Analytics API] 8d. Updating existing doc with purchase...");
+        const updateData: any = {
+          "purchases.total": admin.firestore.FieldValue.increment(1),
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        };
+        updateData[`purchases.${type}`] = admin.firestore.FieldValue.increment(1);
+        console.log("[Analytics API] 8e. Update data:", updateData);
+
+        await docRef.update(updateData);
+        console.log(`[Analytics API] ✅ Updated existing doc with purchase`);
+      } else {
+        console.log("[Analytics API] 8d. Creating new doc for purchase...");
+        await docRef.set({
+          date: today,
+          uniqueVisitors: 0,
+          visitorIds: [],
+          totalClicks: 0,
+          clicksByType: {
+            productClick: 0,
+            categoryClick: 0,
+            buttonClick: 0,
+            linkClick: 0,
+            blogClick: 0,
+          },
+          purchases: {
+            whatsapp: type === "whatsapp" ? 1 : 0,
+            transferencia: type === "transferencia" ? 1 : 0,
+            total: 1,
+          },
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        console.log(`[Analytics API] ✅ Created new doc for purchase`);
       }
     } else {
       console.warn(`[Analytics API] Unknown eventType: ${eventType}`);

@@ -27,6 +27,11 @@ interface DailyAnalytics {
     blogClick: number;
     [key: string]: number;
   };
+  purchases: {
+    whatsapp: number;
+    transferencia: number;
+    total: number;
+  };
   lastUpdated: any;
 }
 
@@ -44,10 +49,6 @@ function getTodayDate(): string {
  */
 export async function trackPageView(): Promise<void> {
   try {
-    // Temporarily disabled due to Firebase configuration issues
-    console.log("[Analytics] Tracking temporarily disabled");
-    return;
-
     const deviceId = getOrCreateDeviceId();
     console.log("[Analytics] Tracking page view for device:", deviceId);
 
@@ -82,10 +83,6 @@ export async function trackClick(
   type: "productClick" | "categoryClick" | "buttonClick" | "linkClick" | "blogClick" = "buttonClick"
 ): Promise<void> {
   try {
-    // Temporarily disabled due to Firebase configuration issues
-    console.log("[Analytics] Click tracking temporarily disabled");
-    return;
-
     const deviceId = getOrCreateDeviceId();
     console.log("[Analytics] Tracking click:", { type, deviceId });
 
@@ -123,7 +120,16 @@ export async function getTodayAnalytics(): Promise<DailyAnalytics | null> {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      return docSnap.data() as DailyAnalytics;
+      const data = docSnap.data() as DailyAnalytics;
+      // Ensure purchases field exists with defaults
+      if (!data.purchases) {
+        data.purchases = {
+          whatsapp: 0,
+          transferencia: 0,
+          total: 0,
+        };
+      }
+      return data;
     }
     return null;
   } catch (error) {
@@ -149,11 +155,101 @@ export async function getAnalyticsByDate(date: string): Promise<DailyAnalytics |
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      return docSnap.data() as DailyAnalytics;
+      const data = docSnap.data() as DailyAnalytics;
+      // Ensure purchases field exists with defaults
+      if (!data.purchases) {
+        data.purchases = {
+          whatsapp: 0,
+          transferencia: 0,
+          total: 0,
+        };
+      }
+      return data;
     }
     return null;
   } catch (error) {
     console.error("[Analytics] Error getting analytics for date:", date, error);
     return null;
+  }
+}
+
+/**
+ * Track a purchase event (client-side)
+ * Uses API endpoint for safety and permissions
+ */
+export async function trackPurchase(
+  metodoPago: "whatsapp" | "transferencia"
+): Promise<void> {
+  try {
+    const deviceId = getOrCreateDeviceId();
+    console.log("[Analytics] Tracking purchase:", { metodoPago, deviceId });
+
+    const response = await fetch(API_TRACK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventType: "purchase",
+        purchaseType: metodoPago,
+        deviceId,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[Analytics] Purchase API returned non-ok status:", response.status);
+      console.error("[Analytics] Purchase API response:", errorText);
+    } else {
+      console.log("[Analytics] Purchase tracked successfully");
+    }
+  } catch (error) {
+    console.error("[Analytics] Error tracking purchase:", error);
+  }
+}
+
+/**
+ * Get weekly analytics (last 7 days)
+ */
+export async function getWeeklyAnalytics(): Promise<DailyAnalytics[]> {
+  try {
+    const analytics: DailyAnalytics[] = [];
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split("T")[0];
+      const data = await getAnalyticsByDate(dateStr);
+      if (data) {
+        analytics.push(data);
+      } else {
+        // Add empty analytics for missing days
+        analytics.push({
+          date: dateStr,
+          uniqueVisitors: 0,
+          visitorIds: [],
+          totalClicks: 0,
+          clicksByType: {
+            productClick: 0,
+            categoryClick: 0,
+            buttonClick: 0,
+            linkClick: 0,
+            blogClick: 0,
+          },
+          purchases: {
+            whatsapp: 0,
+            transferencia: 0,
+            total: 0,
+          },
+          lastUpdated: null,
+        });
+      }
+    }
+
+    return analytics;
+  } catch (error) {
+    console.error("[Analytics] Error getting weekly analytics:", error);
+    return [];
   }
 }

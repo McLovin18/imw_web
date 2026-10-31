@@ -7,6 +7,7 @@ import { useUser } from "../context/UserContext";
 import BottomBarPublic from "../components/BottomBarPublic";
 import { obtenerAtributos } from "../lib/atributos-db";
 import TransferenciaModal from "../components/TransferenciaModal";
+import { trackPurchase } from "../lib/analytics-db";
 
 function resolveCartItemKey(item: any) {
   if (!item) return "";
@@ -173,6 +174,14 @@ export default function CartPage() {
         setError(`Solo hay ${availableStock} unidades disponibles de "${p.nombre}".`);
         return;
       }
+    }
+
+    // Track purchase analytics for WhatsApp
+    try {
+      await trackPurchase("whatsapp");
+    } catch (analyticsError) {
+      console.error("[Cart] Error tracking WhatsApp purchase analytics:", analyticsError);
+      // No fallar el proceso si falla el tracking
     }
 
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "0968517232";

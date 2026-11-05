@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import admin from './app/lib/firebase-admin';
 
 // Rutas consideradas "públicas" (landing, blog, carrito, etc.)
 const PUBLIC_EXACT: string[] = ["/", "/login"];
@@ -20,7 +21,7 @@ function isPublicPath(pathname: string): boolean {
   );
 }
 
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const session = req.cookies.get("session");
   const roleCookie = req.cookies.get("role")?.value;
@@ -30,8 +31,43 @@ export function proxy(req: NextRequest) {
 
   const redirectTo = (path: string) => NextResponse.redirect(new URL(path, req.url));
 
-  // Debug logging
-  console.log(`[proxy] pathname: ${pathname}, session: ${!!session}, role: ${roleCookie}`);
+  // Redirecciones SEO para productos antiguos
+  if (pathname.startsWith('/product-detail')) {
+    const id = req.nextUrl.searchParams.get('id');
+    if (id) {
+      try {
+        const adminDb = admin.firestore();
+        const doc = await adminDb.collection('productos').doc(id).get();
+        if (doc.exists) {
+          const product = doc.data();
+          if (product.slug) {
+            return NextResponse.redirect(new URL(`/${product.slug}`, req.url), 301);
+          }
+        }
+      } catch (error) {
+        console.error('Error redirecting product:', error);
+      }
+    }
+  }
+
+  // Redirecciones SEO para blogs antiguos
+  if (pathname.startsWith('/blogs/')) {
+    const id = pathname.split('/')[2];
+    if (id) {
+      try {
+        const adminDb = admin.firestore();
+        const doc = await adminDb.collection('blogs').doc(id).get();
+        if (doc.exists) {
+          const blog = doc.data();
+          if (blog.slug) {
+            return NextResponse.redirect(new URL(`/${blog.slug}`, req.url), 301);
+          }
+        }
+      } catch (error) {
+        console.error('Error redirecting blog:', error);
+      }
+    }
+  }
 
   // Sin sesión: se bloquea zona protegida (/admin) y se redirige al landing
   if (!session) {

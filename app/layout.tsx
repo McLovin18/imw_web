@@ -17,7 +17,7 @@ export const revalidate = 1800;
 // Cambiar cuando tengas el dominio
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://imw_ec.com";
+  "https://imwec.com";
 
 const SITE_NAME = "IMW - In My Wardrobe";
 
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    "Tienda online de perfumes originales importados desde USA. Productos 100% originales con envíos a todo Ecuador por Servientrega.",
+    "Comprar perfumes originales importados desde USA al mejor precio. Marcas como Guess, Rasasi, Paris Corner, Ariana Grande y más. Envíos a todo Ecuador por Servientrega. Productos 100% originales garantizados. Decants de perfumes premium a precios accesibles.",
 
   keywords: [
     "Perfumes originales",
@@ -61,6 +61,17 @@ export const metadata: Metadata = {
     "Tienda de perfumes online",
     "Perfumes Ecuador",
     "Envíos a todo Ecuador",
+    "Decants de perfume",
+    "Perfumes Guess",
+    "Perfumes Rasasi",
+    "Perfumes Paris Corner",
+    "Perfumes Ariana Grande",
+    "Perfumes originales baratos",
+    "Comprar perfumes online",
+    "Perfumes de marca",
+    "Perfumes premium",
+    "Perfumes importados a Ecuador",
+    "Servientrega perfumes",
   ],
 
   creator: SITE_NAME,
@@ -86,14 +97,14 @@ export const metadata: Metadata = {
     title: "IMW - In My Wardrobe | Perfumes originales importados desde USA",
 
     description:
-      "Tienda online de perfumes originales importados desde USA. Productos 100% originales con envíos a todo Ecuador por Servientrega.",
+      "Comprar perfumes originales importados desde USA al mejor precio. Marcas como Guess, Rasasi, Paris Corner, Ariana Grande y más. Envíos a todo Ecuador por Servientrega. Productos 100% originales garantizados.",
 
     images: [
       {
         url: `${SITE_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: "IMW - In My Wardrobe",
+        alt: "IMW - In My Wardrobe - Perfumes originales importados",
       },
     ],
   },
@@ -104,7 +115,7 @@ export const metadata: Metadata = {
     title: "IMW - In My Wardrobe | Perfumes originales importados desde USA",
 
     description:
-      "Tienda online de perfumes originales importados desde USA. Productos 100% originales con envíos a todo Ecuador por Servientrega.",
+      "Comprar perfumes originales importados desde USA al mejor precio. Marcas como Guess, Rasasi, Paris Corner, Ariana Grande y más. Envíos a todo Ecuador por Servientrega.",
 
     images: [`${SITE_URL}/twitter-image.jpg`],
   },

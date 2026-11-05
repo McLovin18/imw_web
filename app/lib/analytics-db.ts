@@ -253,3 +253,51 @@ export async function getWeeklyAnalytics(): Promise<DailyAnalytics[]> {
     return [];
   }
 }
+
+/**
+ * Get analytics for a date range
+ */
+export async function getAnalyticsByRange(startDate: string, endDate: string): Promise<DailyAnalytics[]> {
+  try {
+    const analytics: DailyAnalytics[] = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Generate all dates in range
+    const currentDate = new Date(start);
+    while (currentDate <= end) {
+      const dateStr = currentDate.toISOString().split("T")[0];
+      const data = await getAnalyticsByDate(dateStr);
+      if (data) {
+        analytics.push(data);
+      } else {
+        // Add empty analytics for missing days
+        analytics.push({
+          date: dateStr,
+          uniqueVisitors: 0,
+          visitorIds: [],
+          totalClicks: 0,
+          clicksByType: {
+            productClick: 0,
+            categoryClick: 0,
+            buttonClick: 0,
+            linkClick: 0,
+            blogClick: 0,
+          },
+          purchases: {
+            whatsapp: 0,
+            transferencia: 0,
+            total: 0,
+          },
+          lastUpdated: null,
+        });
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return analytics;
+  } catch (error) {
+    console.error("[Analytics] Error getting analytics by range:", error);
+    return [];
+  }
+}

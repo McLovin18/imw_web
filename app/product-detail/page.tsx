@@ -1,24 +1,40 @@
 "use client";
 
-import { obtenerProductoPorId, obtenerProductosPorCategoria, obtenerProductosPorSubcategoria, obtenerProductosPorSubsubcategoria } from "../lib/productos-db";
-import { obtenerAtributos } from "../lib/atributos-db";
+import { useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { obtenerProductoPorId } from "../lib/productos-db";
 import { Loading3DIcon } from "../components/Loading3DIcon";
-import ProductoCard from "../components/ProductoCard";
-import RelatedProductsCarousel from "../components/RelatedProductsCarousel";
-import VariationsManager from "../components/VariationsManager";
-import React, { useState, useEffect } from "react";
-import { ProductReview } from "../lib/reviews-types";
-import { useUser } from "../context/UserContext";
-import { useToast } from "../context/ToastContext";
-import { useSearchParams } from "next/navigation";
-import BottomBarPublic from "../components/BottomBarPublic";
-import dynamic from "next/dynamic";
-import { getCartItemKey } from "../context/userLocalStorage";
-import { getCatalogPricing } from "../lib/pricing";
-
-const Markdown = dynamic(() => import("../components/Markdown"), { ssr: false });
 
 export default function ProductDetailPage({ params }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = params?.id || searchParams.get("id");
+
+  useEffect(() => {
+    async function redirect() {
+      if (!id) return;
+
+      try {
+        const producto = await obtenerProductoPorId(id);
+        if (producto?.slug) {
+          // Redirección 301 (permanente) a la nueva URL con slug
+          router.replace(`/${producto.slug}`);
+        }
+      } catch (error) {
+        console.error("Error redirecting product:", error);
+      }
+    }
+
+    redirect();
+  }, [id, router]);
+
+  return (
+    <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center mt-2">
+      <Loading3DIcon />
+      <span className="mt-4 text-white/40 text-sm">Redirigiendo...</span>
+    </div>
+  );
+}
   const [relacionados, setRelacionados] = useState([]);
   const [producto, setProducto] = useState(null);
   const [imgIdx, setImgIdx] = useState(0);

@@ -1,41 +1,7 @@
-# Robots.txt para Marca Estilo
-# Optimizado para Google, Bing y otros crawlers
-
+# Bloquear URLs antiguas para evitar contenido duplicado
 User-agent: *
-Allow: /
-Allow: /productos
-Allow: /blogs
-Allow: /products-by-category
-Allow: /home/product-detail
-Allow: /home/cart
-Allow: /account/*
+Disallow: /product-detail
+Disallow: /blogs/
 
-# Evitar que crawleen admin
-Disallow: /admin/
-Disallow: /api/
-Disallow: /login/
-Disallow: /auth/
-
-# Firebase y archivos internos
-Disallow: /__firebase
-Disallow: /.well-known/
-
-# Rate limiting para bots agresivos
-User-agent: MJ12bot
-Crawl-delay: 10
-
-User-agent: AhrefsBot
-Crawl-delay: 10
-
-# Sitemap
-Sitemap: https://marcaestilo.com/sitemap.xml
-Sitemap: https://marcaestilo.com/sitemap/productos
-Sitemap: https://marcaestilo.com/sitemap/blogs
-
-# Permitir Googlebot acceso prioritario
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
-
-# Sitio web en Google Search Console
-# Verifica tu sitio en Google Search Console para mejor indexación
+# Permitir sitemap
+Sitemap: https://imwec.com/sitemap.xml

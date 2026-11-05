@@ -10,7 +10,7 @@ try {
   console.log('Firebase Admin init (sitemap):', error);
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://marcaestilo.com';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://imwec.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [
@@ -42,27 +42,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // Agregar URLs dinámicas de productos
+    // Agregar URLs dinámicas de productos (solo con slugs)
     const productosSnapshot = await db.collection('productos').get();
     const productosUrls = productosSnapshot.docs
       .map((doc: any) => {
         const data = doc.data();
         const slug = data.slug;
-        // Fallback to old URL structure if slug doesn't exist yet
-        const url = slug
-          ? `${BASE_URL}/${slug}`
-          : `${BASE_URL}/home/product-detail?id=${doc.id}`;
+        // Solo incluir si tiene slug
+        if (!slug) return null;
         return {
-          url,
+          url: `${BASE_URL}/${slug}`,
           lastModified: data.updatedAt || new Date(),
           changeFrequency: 'weekly' as const,
           priority: 0.8,
         };
       })
-      .filter((entry) => entry.url); // Filter out any null entries
+      .filter((entry) => entry); // Filter out null entries
     routes.push(...productosUrls);
 
-    // Agregar URLs dinámicas de blogs publicados
+    // Agregar URLs dinámicas de blogs publicados (solo con slugs)
     const blogsSnapshot = await db
       .collection('blogs')
       .where('status', '==', 'published')
@@ -71,18 +69,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .map((doc: any) => {
         const data = doc.data();
         const slug = data.slug;
-        // Fallback to old URL structure if slug doesn't exist yet
-        const url = slug
-          ? `${BASE_URL}/${slug}`
-          : `${BASE_URL}/blogs/${doc.id}`;
+        // Solo incluir si tiene slug
+        if (!slug) return null;
         return {
-          url,
+          url: `${BASE_URL}/${slug}`,
           lastModified: data.updatedAt || new Date(),
           changeFrequency: 'weekly' as const,
           priority: 0.7,
         };
       })
-      .filter((entry) => entry.url); // Filter out any null entries
+      .filter((entry) => entry); // Filter out null entries
     routes.push(...blogsUrls);
 
     // Agregar URLs dinámicas de categorías

@@ -149,7 +149,7 @@ export default function SlugPage() {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center mt-2">
         <Loading3DIcon />
-        <span className="mt-4 text-white/40 text-sm">Cargando...</span>
+        <span className="mt-4 text-sm" style={{ color: "var(--textSecondary)" }}>Cargando...</span>
       </div>
     );
   }
@@ -157,8 +157,8 @@ export default function SlugPage() {
   if (notFound) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center mt-2 gap-3">
-        <span className="material-icons-round text-5xl text-white/15">error_outline</span>
-        <p className="text-white/40 font-medium">Página no encontrada</p>
+        <span className="material-icons-round text-5xl" style={{ color: "var(--textSecondary)", opacity: 0.3 }}>error_outline</span>
+        <p className="font-medium" style={{ color: "var(--textSecondary)" }}>Página no encontrada</p>
       </div>
     );
   }
@@ -348,7 +348,7 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
   const rawDescripcion = (producto as any).descripcion || "";
 
   const inputCls =
-    "w-full px-3 py-2.5 rounded-xl border text-sm placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors";
+    "w-full px-3 py-2.5 rounded-xl border text-sm placeholder:text-[var(--textSecondary)] focus:outline-none focus:border-[var(--textSecondary)] transition-colors";
   const inputStyle = {
     borderColor: "var(--border)",
     background: "var(--bgSecondary)",
@@ -425,7 +425,7 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                   onClick={() => setImgIdx(imgIdx - 1)}
                   className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[var(--card)] border border-[var(--border)] shadow flex items-center justify-center hover:scale-105 transition-transform"
                 >
-                  <span className="material-icons-round text-white/70 text-lg">chevron_left</span>
+                  <span className="material-icons-round text-lg" style={{ color: "var(--textSecondary)" }}>chevron_left</span>
                 </button>
               )}
               {producto.imagenes && producto.imagenes.length > 1 && imgIdx < producto.imagenes.length - 1 && (
@@ -433,7 +433,7 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                   onClick={() => setImgIdx(imgIdx + 1)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[var(--card)] border border-[var(--border)] shadow flex items-center justify-center hover:scale-105 transition-transform"
                 >
-                  <span className="material-icons-round text-white/70 text-lg">chevron_right</span>
+                  <span className="material-icons-round text-lg" style={{ color: "var(--textSecondary)" }}>chevron_right</span>
                 </button>
               )}
             </div>
@@ -474,7 +474,7 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
             {reviews.length > 0 && (
               <div className="flex items-center gap-1.5">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className={`text-base ${i < Math.round(avgRating) ? "text-yellow-400" : "text-white/15"}`}>★</span>
+                  <span key={i} className={`text-base ${i < Math.round(avgRating) ? "text-yellow-400" : ""}`} style={{ color: i < Math.round(avgRating) ? undefined : "var(--textSecondary)", opacity: i < Math.round(avgRating) ? 1 : 0.3 }}>★</span>
                 ))}
                 <span style={{ color: "var(--textSecondary)" }} className="text-xs ml-1">
                   {avgRating.toFixed(1)} ({reviews.length})
@@ -542,15 +542,15 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
 
             {descItems.length > 0 && (
               <div>
-                <h3 className="font-semibold mb-2">Descripción</h3>
-                <ul className="space-y-2 text-sm text-white/80">
+                <h3 className="font-semibold mb-2" style={{ color: "var(--text)" }}>Descripción</h3>
+                <ul className="space-y-2 text-sm" style={{ color: "var(--textSecondary)" }}>
                   {descItems.map((item, idx) => (
                     <li key={idx}>
-                      <span className="font-medium">{item.text}</span>
+                      <span className="font-medium" style={{ color: "var(--text)" }}>{item.text}</span>
                       {item.sub.length > 0 && (
                         <ul className="ml-4 mt-1 space-y-1">
                           {item.sub.map((sub, subIdx) => (
-                            <li key={subIdx} className="text-white/60">• {sub}</li>
+                            <li key={subIdx} style={{ opacity: 0.7 }}>• {sub}</li>
                           ))}
                         </ul>
                       )}
@@ -562,7 +562,7 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
 
             {/* TABS: Características / Reseñas */}
             <div className="flex flex-col gap-0">
-              <div className="flex rounded-xl overflow-hidden border border-white/[0.08]">
+              <div className="flex rounded-xl overflow-hidden border border-[var(--border)]">
                 {producto.caracteristicas && producto.caracteristicas.length > 0 && (
                   <button
                     onClick={() => handleTabToggle("caracteristicas")}
@@ -579,7 +579,7 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                 <button
                   onClick={() => handleTabToggle("resenas")}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition-all ${
-                    producto.caracteristicas && producto.caracteristicas.length > 0 ? "border-l border-white/[0.08]" : ""
+                    producto.caracteristicas && producto.caracteristicas.length > 0 ? "border-l border-[var(--border)]" : ""
                   } ${
                     activeTab === "resenas"
                             ? "bg-[var(--primary)] text-[var(--primaryForeground)]"
@@ -591,8 +591,8 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                   {reviews.length > 0 && (
                     <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
                       activeTab === "resenas"
-                        ? "bg-white/20 text-white"
-                        : "bg-slate-100 text-slate-600"
+                        ? "bg-[var(--primary)]/20 text-[var(--primaryForeground)]"
+                        : "bg-[var(--card)] text-[var(--textSecondary)]"
                     }`}>
                       {reviews.length}
                     </span>
@@ -605,8 +605,8 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                   {activeTab === "caracteristicas" && producto.caracteristicas && producto.caracteristicas.length > 0 && (
                     <ul className="space-y-2">
                       {producto.caracteristicas.map((c, idx) => (
-                        <li key={idx} className="flex items-start gap-2.5 text-sm text-white/80">
-                          <span className="w-1 h-1 rounded-full bg-white/20 mt-2 flex-shrink-0" />
+                        <li key={idx} className="flex items-start gap-2.5 text-sm" style={{ color: "var(--textSecondary)" }}>
+                          <span className="w-1 h-1 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: "var(--textSecondary)" }} />
                           <Markdown>{c}</Markdown>
                         </li>
                       ))}
@@ -617,14 +617,15 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                     <div className="space-y-4">
                       <form onSubmit={handleSubmitReview} className="space-y-3">
                         <div>
-                          <label className="block text-sm font-medium mb-1">Calificación</label>
+                          <label className="block text-sm font-medium mb-1" style={{ color: "var(--text)" }}>Calificación</label>
                           <div className="flex gap-1">
                             {[1, 2, 3, 4, 5].map((star) => (
                               <button
                                 key={star}
                                 type="button"
                                 onClick={() => setReviewRating(star)}
-                                className={`text-2xl ${star <= reviewRating ? "text-yellow-400" : "text-white/20"}`}
+                                className="text-2xl"
+                                style={{ color: star <= reviewRating ? "#facc15" : "var(--textSecondary)", opacity: star <= reviewRating ? 1 : 0.3 }}
                               >
                                 ★
                               </button>
@@ -669,7 +670,7 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                           </>
                         )}
                         {reviewError && (
-                          <p className="text-red-400 text-sm">{reviewError}</p>
+                          <p className="text-sm" style={{ color: "#ef4444" }}>{reviewError}</p>
                         )}
                         <button
                           type="submit"
@@ -685,14 +686,14 @@ function ProductDetailContent({ producto, relacionados, reviews, atributos }: { 
                           {reviews.map((review) => (
                             <div key={review.id} className="p-3 bg-[var(--card)] rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
-                                <span className="font-medium">{review.userName}</span>
+                                <span className="font-medium" style={{ color: "var(--text)" }}>{review.userName}</span>
                                 <div className="flex">
                                   {Array.from({ length: 5 }).map((_, i) => (
-                                    <span key={i} className={`text-sm ${i < review.rating ? "text-yellow-400" : "text-white/20"}`}>★</span>
+                                    <span key={i} className="text-sm" style={{ color: i < review.rating ? "#facc15" : "var(--textSecondary)", opacity: i < review.rating ? 1 : 0.3 }}>★</span>
                                   ))}
                                 </div>
                               </div>
-                              <p className="text-sm text-white/80">{review.comment}</p>
+                              <p className="text-sm" style={{ color: "var(--textSecondary)" }}>{review.comment}</p>
                             </div>
                           ))}
                         </div>

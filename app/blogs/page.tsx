@@ -66,7 +66,7 @@ export default function BlogsPage() {
                   type="button"
                   onClick={() => {
                     trackBlogClick().catch(console.error);
-                    router.push(`/blogs/${featured.id}`);
+                    router.push(featured.slug ? `/${featured.slug}` : `/blogs/${featured.id}`);
                   }}
                   style={{
                     borderColor: "var(--border)",
@@ -122,7 +122,7 @@ export default function BlogsPage() {
                         key={b.id}
                         onClick={() => {
                           trackBlogClick().catch(console.error);
-                          router.push(`/blogs/${b.id}`);
+                          router.push(b.slug ? `/${b.slug}` : `/blogs/${b.id}`);
                         }}
                         style={{
                           borderColor: "var(--border)",

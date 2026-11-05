@@ -15,6 +15,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import type { Blog } from "./blog-types";
+import { generateSlug } from "./slug-utils";
 
 const COLLECTION = "blogs";
 
@@ -41,6 +42,45 @@ export async function getBlogById(id: string): Promise<Blog | null> {
   return { id: snap.id, ...(snap.data() as any) } as Blog;
 }
 
+export async function getBlogBySlug(slug: string): Promise<Blog | null> {
+  try {
+    // Check localStorage cache first
+    if (typeof window !== 'undefined') {
+      const cacheKey = `blog:${slug}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        // Cache por 5 minutos
+        if (Date.now() - timestamp < 5 * 60 * 1000) {
+          return data as Blog;
+        }
+      }
+    }
+
+    const res = await fetch(`/api/blog?slug=${slug}`, {
+      cache: 'force-cache',
+    });
+    if (!res.ok) {
+      return null;
+    }
+    const blog = await res.json();
+
+    // Cache en localStorage
+    if (typeof window !== 'undefined' && blog) {
+      const cacheKey = `blog:${slug}`;
+      localStorage.setItem(cacheKey, JSON.stringify({
+        data: blog,
+        timestamp: Date.now(),
+      }));
+    }
+
+    return blog as Blog;
+  } catch (error) {
+    console.error("Error fetching blog by slug:", error);
+    return null;
+  }
+}
+
 export async function saveBlog(data: Partial<Blog> & { id?: string }): Promise<Blog> {
   const now = Timestamp.now();
   if (data.id) {
@@ -54,12 +94,16 @@ export async function saveBlog(data: Partial<Blog> & { id?: string }): Promise<B
     return { id, ...(updated.data() as any) } as Blog;
   }
 
+  // Auto-generate slug for new blogs
+  const slug = data.slug || generateSlug(data.title || "");
+
   const ref = await addDoc(collection(db, COLLECTION), {
     title: data.title || "",
     description: data.description || "",
     blocks: data.blocks || [],
     featured: data.featured || false,
     status: data.status || "draft",
+    slug,
     createdAt: now,
     updatedAt: now,
   } as any);

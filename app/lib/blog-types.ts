@@ -37,4 +37,5 @@ export interface Blog {
   position?: number;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
+  slug?: string;
 }

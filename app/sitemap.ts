@@ -44,12 +44,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     // Agregar URLs dinámicas de productos
     const productosSnapshot = await db.collection('productos').get();
-    const productosUrls = productosSnapshot.docs.map((doc: any) => ({
-      url: `${BASE_URL}/home/product-detail?id=${doc.id}`,
-      lastModified: doc.data().updatedAt || new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }));
+    const productosUrls = productosSnapshot.docs
+      .map((doc: any) => {
+        const data = doc.data();
+        const slug = data.slug;
+        // Fallback to old URL structure if slug doesn't exist yet
+        const url = slug
+          ? `${BASE_URL}/${slug}`
+          : `${BASE_URL}/home/product-detail?id=${doc.id}`;
+        return {
+          url,
+          lastModified: data.updatedAt || new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.8,
+        };
+      })
+      .filter((entry) => entry.url); // Filter out any null entries
     routes.push(...productosUrls);
 
     // Agregar URLs dinámicas de blogs publicados
@@ -57,12 +67,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .collection('blogs')
       .where('status', '==', 'published')
       .get();
-    const blogsUrls = blogsSnapshot.docs.map((doc: any) => ({
-      url: `${BASE_URL}/blogs/${doc.id}`,
-      lastModified: doc.data().updatedAt || new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    }));
+    const blogsUrls = blogsSnapshot.docs
+      .map((doc: any) => {
+        const data = doc.data();
+        const slug = data.slug;
+        // Fallback to old URL structure if slug doesn't exist yet
+        const url = slug
+          ? `${BASE_URL}/${slug}`
+          : `${BASE_URL}/blogs/${doc.id}`;
+        return {
+          url,
+          lastModified: data.updatedAt || new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.7,
+        };
+      })
+      .filter((entry) => entry.url); // Filter out any null entries
     routes.push(...blogsUrls);
 
     // Agregar URLs dinámicas de categorías

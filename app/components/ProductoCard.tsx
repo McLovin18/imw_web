@@ -383,7 +383,11 @@ function ProductoCard({
     getCatalogPricing(producto);
 
   const getDetailUrl = () => {
-    let detailUrl = `/product-detail?id=${producto.id}`;
+    // Use slug if available, otherwise fallback to ID
+    const slug = producto.slug;
+    const productIdentifier = slug || producto.id;
+
+    let detailUrl = slug ? `/${slug}` : `/product-detail?id=${producto.id}`;
     try {
       if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) {
         detailUrl = `/admin/product-detail?id=${producto.id}`;

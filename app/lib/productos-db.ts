@@ -14,6 +14,7 @@ import {
   orderBy,
   limit
 } from "firebase/firestore";
+import { generateSlug } from "./slug-utils";
 
 // Tipos
 export interface StockVariant {
@@ -56,6 +57,7 @@ export interface Producto {
   imagenes?: string[];
   createdAt?: number | Date;
   fechaCreacion?: any;
+  slug?: string;
   [key: string]: any;
 }
 
@@ -205,9 +207,12 @@ import { serverTimestamp } from "firebase/firestore";
 
 export async function crearProducto(producto: Producto): Promise<Producto> {
   const cleanProducto = cleanUndefinedDeep(producto);
+  // Auto-generate slug if not provided
+  const slug = cleanProducto.slug || generateSlug(cleanProducto.nombre || "");
   // Agregar campo de fecha de creación (timestamp en ms para ordenamiento)
   const productoConFecha = {
     ...cleanProducto,
+    slug,
     createdAt: Date.now(),
     fechaCreacion: serverTimestamp(),
   };
@@ -274,6 +279,46 @@ export async function obtenerProductoPorId(id: string): Promise<Producto | null>
   const docSnap = await getDoc(doc(db, COLLECTION, id));
   if (!docSnap.exists()) return null;
   return { id: docSnap.id, ...docSnap.data() };
+}
+
+// Obtener producto por slug
+export async function obtenerProductoPorSlug(slug: string): Promise<Producto | null> {
+  try {
+    // Check localStorage cache first
+    if (typeof window !== 'undefined') {
+      const cacheKey = `product:${slug}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        // Cache por 5 minutos
+        if (Date.now() - timestamp < 5 * 60 * 1000) {
+          return data as Producto;
+        }
+      }
+    }
+
+    const res = await fetch(`/api/product?slug=${slug}`, {
+      cache: 'force-cache',
+    });
+    if (!res.ok) {
+      return null;
+    }
+    const product = await res.json();
+
+    // Cache en localStorage
+    if (typeof window !== 'undefined' && product) {
+      const cacheKey = `product:${slug}`;
+      localStorage.setItem(cacheKey, JSON.stringify({
+        data: product,
+        timestamp: Date.now(),
+      }));
+    }
+
+    return product as Producto;
+  } catch (error) {
+    console.error("Error fetching product by slug:", error);
+    return null;
+  }
 }
 
 // Actualizar producto

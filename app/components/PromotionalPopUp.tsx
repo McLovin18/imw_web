@@ -229,7 +229,7 @@ export default function PromocionalPopup({ productos, onClose }: PromocionalPopu
             {/* Acciones */}
             <div className="flex flex-col gap-2">
               <a
-                href={`/product-detail?id=${currentProduct.id}`}
+                href={currentProduct.slug ? `/${currentProduct.slug}` : `/product-detail?id=${currentProduct.id}`}
                 onClick={onClose}
                 className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-6 py-3.5 text-base font-bold uppercase tracking-wide text-[var(--primaryForeground)] shadow-lg transition hover:-translate-y-0.5 hover:bg-[var(--primaryHover)] hover:shadow-xl"
               >

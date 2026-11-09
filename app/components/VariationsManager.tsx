@@ -67,7 +67,16 @@ export default function VariationsManager({
         }
       });
 
-      formatted[targetAttrId] = Array.from(values).sort();
+      formatted[targetAttrId] = Array.from(values).sort((a, b) => {
+        // Extraer números de los strings para ordenar numéricamente de mayor a menor
+        const extractNumber = (str: string) => {
+          const match = str.match(/\d+/);
+          return match ? parseInt(match[0], 10) : 0;
+        };
+        const numA = extractNumber(a);
+        const numB = extractNumber(b);
+        return numB - numA; // Orden descendente (mayor a menor)
+      });
     });
 
     return formatted;
